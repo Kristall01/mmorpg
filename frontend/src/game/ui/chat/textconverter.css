@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+.chat {
+	font-family: 'Roboto', sans-serif;
+}
+
+.chat.bold {
+	font-weight: bold;
+}
+
+.chat.crossed.chat.underline {
+	text-decoration: line-through underline;
+}
+
+.chat.crossed {
+	text-decoration: line-through;
+}
+
+.chat.underline {
+	text-decoration: underline;
+}
+
+.chat.italic {
+	font-style: italic;
+}
+
+.chat.black {
+	color: #1d1c21;
+}
+
+.chat.darkblue {
+	color: #0000AA;
+}
+
+.chat.darkgreen {
+	color: #00AA00;
+}
+
+.chat.darkcyan {
+	color: #00AAAA;
+}
+
+.chat.darkred {
+	color: #AA0000;
+}
+
+.chat.purple {
+	color: #AA00AA;
+}
+
+.chat.orange {
+	color: #FFAA00;
+}
+
+.chat.gray {
+	color: #AAAAAA;
+}
+
+.chat.darkgray {
+	color: #555555;
+}
+
+.chat.blue {
+	color: #5555FF;
+}
+
+.chat.green {
+	color: #55FF55;
+}
+
+.chat.cyan {
+	color: #55FFFF;
+}
+
+.chat.red {
+	color: #FF5555;
+}
+
+.chat.magenta {
+	color: #FF55FF;
+}
+
+.chat.yellow {
+	color: #FFFF55;
+}
+
+.chat.white {
+	color: #FFFFFF;
+}

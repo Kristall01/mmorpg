@@ -1,0 +1,6 @@
+chat
+	String message
+
+move
+	double x
+	double y

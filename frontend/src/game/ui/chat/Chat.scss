@@ -1,0 +1,66 @@
+.chatwindow {
+	position: absolute;
+	bottom: 50px;
+	left: 50px;
+	height: 300px;
+	width: 500px;
+	display: flex;
+	flex-direction: column;
+	color: white;
+	font-size: 20px;
+	outline: none;
+	pointer-events: none;
+
+	::-webkit-scrollbar {
+		width: 7px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+		background: rgba(0,0,0,0.5);
+		border-radius: 100px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: #000;
+	}
+	  
+
+	&.open {
+		pointer-events: initial;
+		background-color: rgba(0,0,0,0.3);
+
+		.log {
+			overflow: auto;
+			user-select: initial;
+		}
+
+	}
+
+	.log {
+		padding: 10px;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		overflow: hidden;
+		user-select: none;
+	}
+
+	.input-placeholder {
+		height: 30px;
+
+		input {
+			height: 100%;
+			width: 100%;
+			&[hidden] {
+				display: none;
+			}
+		}
+
+	}
+
+}

@@ -1,0 +1,30 @@
+chat
+	string message
+
+spawnentity
+	int id
+	string type
+	double x
+	double y
+	dobule speed
+
+entitypath
+	int id
+	Position[] points
+	long startNanos
+
+teleport
+	int id
+	double x
+	double y
+
+entityspeed
+	int id
+	double speed
+
+renameentity
+	int id
+	string newname
+
+removeentityname
+	int id

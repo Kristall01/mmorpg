@@ -1,0 +1,11 @@
+{
+	"water": {
+		"path": "water_output.png",
+		"type": "animated_global_column",
+		"sliceTime": 125
+	},
+	"grass": {
+		"path":"grass.png",
+		"type": "static_global"
+	}
+}
