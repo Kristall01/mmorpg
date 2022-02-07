@@ -4,18 +4,8 @@ Bővebb leírás hamarosan...
 
 ## projekt fordítása
 
-A projekt fordításához lépj be a projekt fő könyvtárába
-és futtasd le a megfelelő scriptet. A kész artifact az "artifacts" könyvtárába fog kerülni.
+A projekt fordításához lépj be a projekt fő könyvtárába és futtasd le a **build.sh** scriptet. A kész artifact a projekt **artifacts** könyvtárába fog kerülni. A projekt lefordítható dockerrel is (pl. ci-cd rendszerekben) a **--docker** flag használatával
 
-fordításhoz szükséges előre telepített programok:
+A nem-dockerrel történő frodításhoz szükség van néhány előre telepített programra:
  - backend: jdk 11+
  - frontend: nodejs
-
-## projekt fordítása dockerrel
-A projekt dockerrel történő fordításához lépj be a projekt fő könyvtárába és futtasd le az alábbi parancsok közül a megfelelőt. A kész artifact az "artifacts" könyvtárába fog kerülni.
-
-frontend fordítása:
- - docker container run --rm -it -w /repo -v $(pwd):/repo node:16 /bin/sh ./build_frontend.sh
-
-backend fordítása:
- - docker container run --rm -it -w /repo -v $(pwd):/repo openjdk:11 /bin/sh ./build_backend.sh
