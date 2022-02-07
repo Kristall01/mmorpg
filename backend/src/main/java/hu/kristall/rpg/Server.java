@@ -47,7 +47,14 @@ public class Server extends SynchronizedObject<Server> {
 		catch (Throwable t) {
 			System.out.println("failed to bootstrap server");
 			t.printStackTrace();
+			this.shutdown();
 		}
+	}
+	
+	@Override
+	protected void shutdown() {
+		System.out.println("shutting down server");
+		super.shutdown();
 	}
 	
 	public static Synchronizer<Server> createServer() {

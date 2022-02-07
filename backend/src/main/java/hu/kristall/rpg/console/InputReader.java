@@ -14,6 +14,7 @@ public class InputReader {
 		this.supplier = supp;
 		
 		t = new Thread(this::run);
+		t.setDaemon(true);
 		t.start();
 	}
 	
