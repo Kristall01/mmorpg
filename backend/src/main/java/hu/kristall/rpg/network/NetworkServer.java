@@ -3,7 +3,6 @@ package hu.kristall.rpg.network;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.Synchronizer;
 import io.javalin.Javalin;
-import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.*;
 
 import java.util.Map;
@@ -22,7 +21,7 @@ public class NetworkServer {
 		
 		Javalin httpServer = Javalin.create(c -> {
 			c.showJavalinBanner = false;
-			c.addStaticFiles("/hdd/teams_records/szakdolgozat/game/build", Location.EXTERNAL);
+			//c.addStaticFiles("/hdd/teams_records/szakdolgozat/game/build", Location.EXTERNAL);
 		});
 		httpServer.ws("/ws", ws -> {
 			ws.onConnect(this::handleConnect);
