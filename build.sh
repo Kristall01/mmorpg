@@ -54,18 +54,16 @@ if [ $docker = true ]
 then
 	if [ $target = "all" ] || [ $target = "frontend" ]
 	then
-		printf "\033[32mbuilding frontend...\n"
 		docker container run --rm -it -w /repo -v $(pwd):/repo node:16 /bin/sh ./build.sh frontend
 	fi
 	if [ $target = "all" ] || [ $target = "backend" ]
 	then
-		printf "\033[32mbuilding backend...\n"
 		docker container run --rm -it -w /repo -v $(pwd):/repo openjdk:11 /bin/sh ./build.sh backend
 	fi
 else
 	if [ $target = "all" ] || [ $target = "frontend" ]
 	then
-		printf "\033[32mbuilding frontend...\n"
+		printf "\033[32mbuilding frontend...\n\033[0m"
 		cd frontend
 		npm install
 		npm run build
@@ -76,7 +74,7 @@ else
 	fi
 	if [ $target = "all" ] || [ $target = "backend" ]
 	then
-		printf "\033[32mbuilding backend...\n"
+		printf "\033[32mbuilding backend...\n\033[0m"
 		cd backend
 		/bin/sh ./gradlew build
 		mkdir -p ../artifacts
