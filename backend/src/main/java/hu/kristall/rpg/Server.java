@@ -22,6 +22,7 @@ public class Server extends SynchronizedObject<Server> {
 	
 	private Server() {
 		try {
+			this.networkServer = new NetworkServer(this);
 			lang = new Lang();
 			lang.loadConfigFromJar("lang.cfg");
 			
@@ -40,8 +41,7 @@ public class Server extends SynchronizedObject<Server> {
 			
 			this.playerWorldManager = new PlayerWorldManager(this);
 			this.worldsManager = new WorldsManager(this);
-			this.networkServer = new NetworkServer(this);
-			
+			this.networkServer.starWsHandler();
 			this.worldsManager.createWorld("default", 3, 3);
 		}
 		catch (Throwable t) {

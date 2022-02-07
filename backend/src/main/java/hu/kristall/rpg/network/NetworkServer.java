@@ -12,6 +12,8 @@ public class NetworkServer {
 	
 	private final Map<WsContext, RawConnection> connections = new ConcurrentHashMap<>();
 	private final Synchronizer<Server> asyncServer;
+	private Javalin javalinServer;
+	private boolean wsAdded = false;
 	
 	public NetworkServer(Server server) {
 		//this.server = server;
@@ -23,12 +25,7 @@ public class NetworkServer {
 			c.showJavalinBanner = false;
 			//c.addStaticFiles("/hdd/teams_records/szakdolgozat/game/build", Location.EXTERNAL);
 		});
-		httpServer.ws("/ws", ws -> {
-			ws.onConnect(this::handleConnect);
-			ws.onMessage(this::handleConnectionMessage);
-			ws.onError(this::handleConnectionError);
-			ws.onClose(this::handleConnectionClose);
-		});
+		this.javalinServer = httpServer;
 		httpServer.start(8080);
 	}
 	
@@ -53,6 +50,19 @@ public class NetworkServer {
 	
 	private void handleConnectionError(WsErrorContext wsErrorContext) {
 		wsErrorContext.session.close();
+	}
+	
+	public void starWsHandler() {
+		if(wsAdded) {
+			throw new IllegalStateException("ws is already added");
+		}
+		this.wsAdded =  true;
+		javalinServer.ws("/ws", ws -> {
+			ws.onConnect(this::handleConnect);
+			ws.onMessage(this::handleConnectionMessage);
+			ws.onError(this::handleConnectionError);
+			ws.onClose(this::handleConnectionClose);
+		});
 	}
 	
 }
