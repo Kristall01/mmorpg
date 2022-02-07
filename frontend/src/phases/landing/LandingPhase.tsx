@@ -12,7 +12,7 @@ export const LandingPhase = () => {
 			<div className="center">
 				<button onClick={() => alert("Hamarosan...")}>dokumentáció</button>
 				<button onClick={() => setMenu(() => <LoadingScene />)}>játék</button>
-				<button onClick={() => alert("Hamarosan...")}>git repo</button>
+				<a href="https://github.com/Kristall01/mmorpg"><button >git repo</button></a>
 			</div>
 		</div>
 	)
