@@ -22,6 +22,10 @@ export default class GameView extends React.Component<props, {}> {
 	private logicModel: LogicModel
 	private visualModel: VisualModel
 	private mainRef = createRef<HTMLDivElement>();
+	private intervalTask: number | undefined = undefined
+
+	private mousePositionX: number = 0;
+	private mousePositionY: number = 0;
 
 	constructor(props: props) {
 		super(props);
@@ -32,6 +36,10 @@ export default class GameView extends React.Component<props, {}> {
 		this.visualModel.setUpdateCallback(() => this.handleModelUpdate());
 
 		this.worldView = new WorldView(this.visualModel);
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.intervalTask);
 	}
 
 	handleModelUpdate() {
@@ -59,15 +67,39 @@ export default class GameView extends React.Component<props, {}> {
 		if(e.target !== this.mainRef.current) {
 			return;
 		}
-		let {offsetX, offsetY} = e.nativeEvent;
-		let [logicX, logicY] = this.worldView.translateCanvasXY(offsetX, offsetY);
 
-		this.logicModel.moveMeTo(logicX, logicY);
+		const moveToOffset = (a: number, b: number) => {
+			let [logicX, logicY] = this.worldView.translateCanvasXY(a, b);
+			this.logicModel.moveMeTo(logicX, logicY);
+		}
+
+		moveToOffset(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+		let h: TimerHandler = () => moveToOffset(this.mousePositionX, this.mousePositionY);
+		this.intervalTask = setInterval(h, 250);
+	}
+
+	handleMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+		clearInterval(this.intervalTask);
+		this.intervalTask = undefined;
+	}
+
+	handleMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+		this.mousePositionX = e.nativeEvent.offsetX
+		this.mousePositionY = e.nativeEvent.offsetY;
 	}
 
 	render(): React.ReactNode {
 		return (
-			<div onWheel={e => this.handleWheel(e)} onMouseDown={e => this.handleMouseDown(e)} tabIndex={0} ref={this.mainRef} className="gameview" onKeyDown={e => this.handleKeydown(e)}>
+			<div
+				onWheel={e => this.handleWheel(e)}
+				onMouseDown={e => this.handleMouseDown(e)}
+				tabIndex={0}
+				ref={this.mainRef}
+				className="gameview"
+				onKeyDown={e => this.handleKeydown(e)}
+				onMouseUp={e => this.handleMouseUp(e)}
+				onMouseMove={e => this.handleMouseMove(e)}
+			>
 				<ModelContext.Provider value={[this.logicModel, this.visualModel]}>
 					<GraphicsComponent model={this.visualModel} view={this.worldView} />
 					<Chat />
