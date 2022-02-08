@@ -16,8 +16,6 @@ export type Models = [LogicModel, VisualModel];
 
 export const ModelContext = createContext<Models>(null!);
 
-const ignore = () => {};
-
 export default class GameView extends React.Component<props, {}> {
 
 	private worldView: WorldView
