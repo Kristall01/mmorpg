@@ -91,9 +91,7 @@ class NetworkModel extends LogicModel {
 	}
 
 	private convertServerNanos(nanos: number) {
-		let n = (nanos - this.pingDelay)/1000000;
-		console.log(n)
-		return n;
+		return (nanos - this.pingDelay)/1000000;
 	}
 
 	private handlePong(time: number, id: number) {
