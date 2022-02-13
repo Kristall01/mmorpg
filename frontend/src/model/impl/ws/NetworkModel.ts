@@ -39,6 +39,7 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("spawnentity", ({x, y, ID, speed}) => new SignalEntityspawn(ID, "player", [x,y], speed));
 		this.addPacketSignal("despawnentity", ({id}) => new SignalEntityDespawn(id));
 		this.addPacketSignal("followentity", ({id}) => new SignalFocus(id));
+		this.addPacketSignal("entityspeed", ({id, speed}) => new SignalEntityspeed(id, speed));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
