@@ -40,13 +40,7 @@ const Chat = (): JSX.Element | null => {
 		if(e.key === "Enter") {
 			let chattext = e.currentTarget.value;
 			if(chattext.trim().length !== 0) {
-				let msg = e.currentTarget.value;
-				if(msg === "/follow") {
-					visualModel.followEntity(0);
-				}
-				else {
-					logicModel.sendChatMessage(e.currentTarget.value);
-				}
+				logicModel.sendChatMessage(e.currentTarget.value);
 			}
 			setChatText("");
 			visualModel.setChatOpen(false);
