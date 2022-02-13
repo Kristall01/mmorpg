@@ -73,7 +73,7 @@ const Chat = (): JSX.Element | null => {
 	<div ref={dummyDiv}></div>
  */
 
-	return <div className={"chatwindow"+(visualModel.chatOpen ?" open":"")}>
+	return <div className={"nozoom chatwindow"+(visualModel.chatOpen ?" open":"")}>
 		<div className="log">
 			{visualModel.chatlog.map((e,v) => <div key={v} dangerouslySetInnerHTML={{__html: e}}></div>)}
 			<div ref={dummyDiv}></div>

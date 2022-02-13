@@ -60,6 +60,11 @@ export default class GameView extends React.Component<props, {}> {
 	}
 
 	handleWheel(e: React.WheelEvent) {
+		if(e.target instanceof Element) {
+			if(e.target.matches(".nozoom") || e.target.matches(".nozoom *")) {
+				return;
+			}
+		}
 		this.visualModel.multiplyZoom(1 - (e.deltaY / 1000));
 	}
 
