@@ -47,10 +47,10 @@ class WorldView extends StatelessRenderable {
 	}
 
 	calculateRenderConfig(rendertime: number, width: number, height: number) {
-		let camProps = this.model.camPosition(rendertime);
+		let camProps = this.model.world!.camPosition(rendertime);
 
-		let minHorizontalZoom = width / this.model.world.width;
-		let minVerticalZoom: number = height / this.model.world.height;
+		let minHorizontalZoom = width / this.model.world!.width;
+		let minVerticalZoom: number = height / this.model.world!.height;
 
 		let zoom = this.model.zoomAt(rendertime);
 
@@ -77,7 +77,7 @@ class WorldView extends StatelessRenderable {
 			camX = minCamX;
 		}
 		else {
-			let maxCamX = ((width * camFocusX)/zoom) + this.model.world.width - (width/zoom);
+			let maxCamX = ((width * camFocusX)/zoom) + this.model.world!.width - (width/zoom);
 			if(maxCamX < camX) {
 				camX = maxCamX;
 			}
@@ -88,7 +88,7 @@ class WorldView extends StatelessRenderable {
 			camY = minCamY;
 		}
 		else {
-			let maxCamY = ((height * camFocusY)/zoom) + this.model.world.height - (height/zoom);
+			let maxCamY = ((height * camFocusY)/zoom) + this.model.world!.height - (height/zoom);
 			if(maxCamY < camY) {
 				camY = maxCamY;
 			}
@@ -107,6 +107,13 @@ class WorldView extends StatelessRenderable {
 
 	render(renderTime: number, width: number, height: number): void {
 		this.ctx.imageSmoothingEnabled = false;
+
+		if(this.model.world === null) {
+			this.ctx.fillStyle = "#000";
+			this.ctx.fillRect(0, 0, width, height);
+			return;
+		}
+
 		this.calculateRenderConfig(renderTime, width, height);
 		
 		let {camX, camY, tileSize, camFocusX, camFocusY} = this.renderConfig;
@@ -139,7 +146,7 @@ class WorldView extends StatelessRenderable {
 
 		let halfBlockSize = blockSize/2;
 
-		for(let entity of this.model.entities.values()) {
+		for(let entity of this.model.world.entities) {
 			let [x,y] = entity.positionFn(renderTime);
 			let [cX, cY] = this.translateXY(x, y);
 			this.ctx.fillRect(cX-halfBlockSize, cY-halfBlockSize, blockSize, blockSize);

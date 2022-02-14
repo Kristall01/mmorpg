@@ -10,7 +10,7 @@ export default class SignalEntityDespawn implements SignalIn {
 	}
 
 	execute(model: VisualModel): void {
-		model.despawnEntiy(this.id);
+		model.world?.despawnEntiy(this.id);
 	}
 
 }

@@ -12,7 +12,11 @@ export default class SignalEntityspeed implements SignalIn {
 	}
 
 	execute(model: VisualModel): void {
-		let e = model.getEntity(this.entityID);
+		let world = model.world;
+		if(world === null) {
+			return;
+		}
+		let e = world.getEntity(this.entityID);
 		if(e === undefined) {
 			console.warn("network error: entity of ",this.entityID," does not exist clientside.");
 			return;

@@ -10,7 +10,7 @@ export default class SignalFocus implements SignalIn {
 	}
 
 	execute(model: VisualModel) {
-		model.followEntity(this.id);
+		model.world?.followEntity(this.id);
 	}
 
 }

@@ -16,7 +16,7 @@ export default class SignalEntityspawn implements SignalIn {
 	}
 
 	execute(model: VisualModel) {
-		model.spawnEntity(this.id, this.type, this.pos, this.speed);
+		model.world?.spawnEntity(this.id, this.type, this.pos, this.speed);
 	}
 
 }

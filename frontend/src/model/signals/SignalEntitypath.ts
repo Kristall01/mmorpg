@@ -14,7 +14,11 @@ export default class SignalEntitypath implements SignalIn {
 	}
 
 	execute(model: VisualModel) {
-		let e = model.getEntity(this.id);
+		let world = model.world;
+		if(world === null) {
+			return;
+		}
+		let e = world.getEntity(this.id);
 		if(e === undefined) {
 			console.warn("INVALID PACKET ERROR: Entity of "+this.id+" does not exist.");
 			return;

@@ -1,6 +1,8 @@
 import Texture from "game/graphics/texture/Texture";
 import TexturePack from "game/graphics/texture/TexturePack";
+import Entity from "./Entity";
 import VisualModel, { Position } from "./VisualModel";
+import { linearMove } from "utils";
 
 class World {
 
@@ -8,20 +10,52 @@ class World {
 	public height: number
 	private pack: TexturePack = null!
 	private textureMatrix: Array<Texture>
+	private _entities: Map<number, Entity> = new Map();
+	camPositionFn: (rendertime: number) => Position;
 
-	constructor(parent: VisualModel, width: number, height: number) {
+	constructor(parent: VisualModel, width: number, height: number, tileGrid: string[], camStart: Position) {
 		this.width = width;
 		this.height = height;
 		this.textureMatrix = new Array(width*height);
 		this.pack = TexturePack.getInstance();
+		this.camPositionFn = () => camStart;
 
-		for(let i = 0; i < this.textureMatrix.length; ++i) {
-			this.textureMatrix[i] = (this.pack.getTexture("water"));
+		for(let i = 0; i < tileGrid.length; ++i) {
+			this.textureMatrix[i] = this.pack.getTexture(tileGrid[i]);
 		}
-		for(let x = 5; x < 25; ++x) {
-			for(let y = 5; y < 25; ++y) {
-				this.textureMatrix[this.posToIndex([x,y])] = this.pack.getTexture("grass");
-			}
+ }
+
+	get entities(): IterableIterator<Entity> {
+		return this._entities.values();
+	}
+
+	camPosition(rendertime: number) {
+		return this.camPositionFn(rendertime);
+	}
+
+	moveCamTo(logicX: number, logicY: number) {
+		let now = performance.now();
+		let [camX, camY] = this.camPositionFn(now);
+		this.camPositionFn = linearMove(camX, camY, now, logicX, logicY, now+1000);
+	}
+
+	getEntity(id: number) {
+		return this._entities.get(id);
+	}
+
+	spawnEntity(id: number, type: string, pos: Position, speed: number) {
+		this._entities.set(id, new Entity(id, type, pos, speed));
+	}
+
+	despawnEntiy(id: number) {
+		this._entities.delete(id);
+	}
+
+	followEntity(id: number) {
+		let e = this.getEntity(id);
+		if(e) {
+			let a = e;
+			this.camPositionFn = (time) => a.getLocation(time);
 		}
 	}
 
