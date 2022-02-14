@@ -4,7 +4,10 @@ import SignalChat from "model/signals/SignalChat";
 import SignalEntityDespawn from "model/signals/SignalEntityDespawn";
 import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
+import SignalEntityspeed from "model/signals/SignalEntityspeed";
 import SignalFocus from "model/signals/SignalFocus";
+import SignalJoinworld from "model/signals/SignalJoinworld";
+import SignalLeaveworld from "model/signals/SignalLeaveworld";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 
@@ -43,6 +46,8 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("despawnentity", ({id}) => new SignalEntityDespawn(id));
 		this.addPacketSignal("followentity", ({id}) => new SignalFocus(id));
 		this.addPacketSignal("entityspeed", ({id, speed}) => new SignalEntityspeed(id, speed));
+		this.addPacketSignal("joinworld", ({tileGrid, width, height, spawnX, spawnY}) => new SignalJoinworld(spawnX, spawnY, width, height, tileGrid));
+		this.addPacketSignal("leaveworld", () => new SignalLeaveworld());
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
@@ -52,7 +57,7 @@ class NetworkModel extends LogicModel {
 		this.ws = new WebSocket(connectionURL);
 
 		this.ws.addEventListener("open", () => {
-			this.ws.send(name);
+			this.sendPacket("auth", {name: name});
 			this.connectionOpened = true;
 			this.broadcastEvent({type: ModelEventType.CONNECTED});
 			//this.recalcPingDelay();
