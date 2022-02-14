@@ -5,6 +5,7 @@ import SignalClarchat from "model/signals/SignalClearchat";
 import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalFocus from "model/signals/SignalFocus";
+import SignalJoinworld from "model/signals/SignalJoinworld";
 import { ConstPath, EntityConstPath, LinearPath, PathFn, zigzagPath } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
@@ -13,6 +14,11 @@ const entitySpeed = 5;
 
 const netLag = 100;
 const startPos: Position = [5,5];
+
+let tileGrid: string[] = [];
+for(let i = 0; i < 400; ++i) {
+	tileGrid.push("grass");
+}
 
 class DModel extends LogicModel {
 
@@ -25,13 +31,18 @@ class DModel extends LogicModel {
 		this.positionFn = ConstPath(startPos);
 
 		setTimeout(() => {
-			//this.broadcastEvent({type: ModelEventType.END, data: "lololo"});
- 			this.broadcastEvent({type: ModelEventType.PLAY});
-			this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
-			this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
-			this.broadcastSignal(new SignalEntityspawn(0, "test", startPos, entitySpeed));
-			this.broadcastSignal(new SignalFocus(0));
- 		}, 100);
+			this.broadcastEvent({type: ModelEventType.CONNECTED});
+			setTimeout(() => {
+				this.broadcastEvent({type: ModelEventType.PLAY});
+				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], 20, 20, tileGrid));
+				this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
+				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
+				this.broadcastSignal(new SignalEntityspawn(0, "test", startPos, entitySpeed));
+				this.broadcastSignal(new SignalFocus(0));
+			}, 500);
+	
+		}, 500);
+
 	}
 
 	/* sendSignal(signal: SignalOut) {
