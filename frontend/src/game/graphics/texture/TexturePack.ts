@@ -60,7 +60,7 @@ class TexturePack {
 	}
 
 	public getTexture(key: string): Texture {
-		return this.textureMap.get(key)!;
+		return this.textureMap.get(key) || this.defaultTexture;
 	}
 
 	private loadImage(path: string): Promise<HTMLImageElement> {
