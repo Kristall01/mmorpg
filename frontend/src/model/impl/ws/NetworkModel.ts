@@ -25,7 +25,10 @@ class NetworkModel extends LogicModel {
 
 		this.addPacketSignal("chat", ({message}) => new SignalChat(message));
 		this.addPacketSignal("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - this.pingDelay)/1000000, points));
-		this.addPacket("authenticated", () => {this.broadcastEvent({type: ModelEventType.PLAY});this.recalcPingDelay()});
+		this.addPacket("authenticated", () => {
+			this.broadcastEvent({type: ModelEventType.PLAY});
+			this.recalcPingDelay();
+		});
 
 		this.addPacket("pong", ({time, id}) => this.handlePong(time, id));
 		this.addPacket("disconnect", ({reason}) => this.endConnection("disconnected from server: "+reason));
