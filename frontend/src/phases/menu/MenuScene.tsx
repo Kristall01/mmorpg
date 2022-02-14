@@ -26,11 +26,7 @@ const MenuScene = () => {
 		if(name === null) {
 			return;
 		}
-		let serverAddress = prompt("Szerver címe:");
-		if(serverAddress === null) {
-			return;
-		}
-		setMenu(() => <GameScene modelGenerator={(a) => new NetworkModel(a, serverAddress!, name!)} />)
+		setMenu(() => <GameScene modelGenerator={(a) => new NetworkModel(a, "wss://rpg.ddominik.dev/ws", name!)} />)
 	}
 
 	return (
