@@ -1,5 +1,3 @@
-import { render } from "@testing-library/react";
-import { isConstructorDeclaration } from "typescript";
 import VisualModel from "visual_model/VisualModel";
 import { StatelessRenderable } from "../Renderable";
 import TexturePack from "../texture/TexturePack";
@@ -47,6 +45,81 @@ class WorldView extends StatelessRenderable {
 	}
 
 	calculateRenderConfig(rendertime: number, width: number, height: number) {
+		let world = this.model.world!;
+
+		let camProps = world.camPosition(rendertime);
+
+		const camFocusX = 0.5;
+		const camFocusY = 0.5;
+
+		let zoom = this.model.zoomAt(rendertime);
+
+		let camX = camProps[0];
+		let camY = camProps[1];
+
+		if(!this.model.allowCamLeak) {
+
+			let minHorizontalZoom = width / world.width;
+			let minVerticalZoom: number = height / world.height;
+
+			if(zoom < minVerticalZoom) {
+				zoom = minVerticalZoom;
+			}
+			if(zoom < minHorizontalZoom) {
+				zoom = minHorizontalZoom;
+			}
+		}
+
+		if(zoom < this.model.maxZoom) {
+			zoom = this.model.maxZoom;
+		}
+
+		if(height > world.height*zoom) {
+			camY = camFocusY * world.height;
+		}
+		else {
+			let minCamY = ((height * camFocusY)/zoom);
+			if(camY < minCamY) {
+				camY = minCamY;
+			}
+			else {
+				let maxCamY = ((height * camFocusY)/zoom) + this.model.world!.height - (height/zoom);
+				if(maxCamY < camY) {
+					camY = maxCamY;
+				}
+			}
+		}
+
+		if(width > world.width*zoom) {
+			camX = camFocusX * world.width;
+		}
+		else {
+			let minCamX = ((width * camFocusX)/zoom);
+			if(camX < minCamX) {
+				camX = minCamX;
+			}
+			else {
+				let maxCamX = ((width * camFocusX)/zoom) + this.model.world!.width - (width/zoom);
+				if(maxCamX < camX) {
+					camX = maxCamX;
+				}
+			}
+		}
+
+		this.renderConfig = {
+			camX: camX,
+			camY: camY,
+			tileSize: zoom,
+			width: width,
+			height: height,
+			camFocusX: camFocusX,
+			camFocusY: camFocusY,
+		};
+
+	}
+
+
+	/* calculateRenderConfig(rendertime: number, width: number, height: number) {
 		let camProps = this.model.world!.camPosition(rendertime);
 
 		let minHorizontalZoom = width / this.model.world!.width;
@@ -103,12 +176,12 @@ class WorldView extends StatelessRenderable {
 			camFocusX: camFocusX,
 			camFocusY: camFocusY,
 		};
-	}
+	} */
 
 	render(renderTime: number, width: number, height: number): void {
 		this.ctx.imageSmoothingEnabled = false;
 
-		if(this.model.world === null) {
+		if(this.model.world === null || this.model.world.width < 1 || this.model.world.height < 1) {
 			this.ctx.fillStyle = "#000";
 			this.ctx.fillRect(0, 0, width, height);
 			return;
