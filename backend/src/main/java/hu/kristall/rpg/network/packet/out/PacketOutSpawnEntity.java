@@ -6,18 +6,21 @@ import hu.kristall.rpg.world.entity.Entity;
 
 public class PacketOutSpawnEntity extends PacketOut {
 	
-	private double x, y, speed;
-	private int ID;
-	private String type;
+	double x, y, speed;
+	int ID;
+	String type;
+	
+	public PacketOutSpawnEntity(int entityID, double speed, String type, Position startPosition) {
+		super("spawnentity");
+		this.x = startPosition.getX();
+		this.y = startPosition.getY();
+		this.speed = speed;
+		this.type = type;
+		this.ID = entityID;
+	}
 	
 	public PacketOutSpawnEntity(Entity entity) {
-		super("spawnentity");
-		Position p = entity.getPosition();
-		this.x = p.getX();
-		this.y = p.getY();
-		this.speed = entity.getSpeed();
-		this.type = entity.type().name();
-		this.ID = entity.getID();
+		this(entity.getID(), entity.getSpeed(), entity.type().name(), entity.getPosition());
 	}
 	
 }

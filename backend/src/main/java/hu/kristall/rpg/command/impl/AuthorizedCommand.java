@@ -9,6 +9,7 @@ public abstract class AuthorizedCommand extends SimpleCommand {
 	
 	public AuthorizedCommand(String permission, CommandParent parent, String name, String args, String description) {
 		super(parent, name, args, description);
+		this.permission = permission;
 	}
 	
 	public String getPermission() {

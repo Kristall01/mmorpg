@@ -1,7 +1,9 @@
 package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.network.packet.out.PacketOutEntityspeed;
 import hu.kristall.rpg.world.World;
+import hu.kristall.rpg.world.path.Path;
 
 public abstract class Entity {
 	
@@ -9,6 +11,7 @@ public abstract class Entity {
 	private EntityType type;
 	private final World world;
 	private double speed;
+	private boolean removed = false;
 	
 	public Entity(World world, EntityType type, int entityID, double speed) {
 		this.type = type;
@@ -31,10 +34,27 @@ public abstract class Entity {
 		return world;
 	}
 	
+	public abstract Path getLastPath();
+	
 	public abstract void move(Position to);
 	
 	public double getSpeed() {
 		return this.speed;
+	}
+	
+	public void remove() {
+		this.removed = true;
+		world.cleanRemovedEntity(this);
+	}
+	
+	public boolean isRemoved() {
+		return removed;
+	}
+	
+	public void setSpeed(double newSpeed) {
+		this.speed = newSpeed;
+		this.world.broadcastPacket(new PacketOutEntityspeed(this));
+		this.move(getLastPath().getTarget());
 	}
 	
 }

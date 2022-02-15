@@ -72,7 +72,7 @@ public class CommandHandler implements ICommand, CommandParent {
 	@Override
 	public void execute(CommandSender sender, String label, String[] args) {
 		if(!executionAllowed(sender)) {
-			sender.sendRawMessage("cil.error.no-perm");
+			sender.sendRawMessage(getServer().getLang(), "cil.error.no-perm");
 			return;
 		}
 		if(args.length == 0) {
@@ -81,14 +81,14 @@ public class CommandHandler implements ICommand, CommandParent {
 		}
 		ICommand cmd = commandMap.get(args[0]);
 		if(cmd == null) {
-			sender.sendRawMessage("cil.error.unknown-command");
+			sender.sendRawMessage(getServer().getLang(), "cil.error.unknown-command");
 			return;
 		}
 		cmd.execute(sender, label, Arrays.copyOfRange(args, 1, args.length));
 	}
 	
 	public void showCommands(CommandSender sender, String label) {
-		sender.sendRawMessage("cil.handler.list", totalPath);
+		sender.sendRawMessage(getServer().getLang(), "cil.handler.list", totalPath);
 		for (ICommand e : commandMap.values()) {
 			sender.sendMessage(e.toHelpEntry());
 		}
@@ -106,6 +106,11 @@ public class CommandHandler implements ICommand, CommandParent {
 	@Override
 	public Collection<ICommand> getRegisteredCommands() {
 		return Collections.unmodifiableCollection(this.commandMap.values());
+	}
+	
+	@Override
+	public Collection<String> getRegisteredCommandNames() {
+		return Collections.unmodifiableCollection(commandMap.keySet());
 	}
 	
 	@Override

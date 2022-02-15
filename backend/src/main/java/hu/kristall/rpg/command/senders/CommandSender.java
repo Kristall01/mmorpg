@@ -1,15 +1,13 @@
 package hu.kristall.rpg.command.senders;
 
-import hu.kristall.rpg.Server;
+import hu.kristall.rpg.lang.Lang;
 
 public interface CommandSender {
 	
 	boolean hasPermission(String permission);
 	void sendMessage(String message);
-	
-	Server getServer();
-	default void sendRawMessage(String message, String... args) {
-		getServer().getLang().getMessage(message, args);
+	default void sendRawMessage(Lang lang, String message, String... args) {
+		sendMessage(lang.getMessage(message, args));
 	}
 	
 }

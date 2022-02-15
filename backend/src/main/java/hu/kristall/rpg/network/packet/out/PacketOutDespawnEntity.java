@@ -6,9 +6,13 @@ public class PacketOutDespawnEntity extends PacketOut {
 	
 	int id;
 	
-	public PacketOutDespawnEntity(Entity e) {
+	public PacketOutDespawnEntity(int entityID) {
 		super("despawnentity");
-		this.id = e.getID();
+		this.id = entityID;
+	}
+	
+	public PacketOutDespawnEntity(Entity entity) {
+		this(entity.getID());
 	}
 	
 }

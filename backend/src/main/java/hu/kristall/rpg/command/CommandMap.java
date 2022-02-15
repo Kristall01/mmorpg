@@ -4,15 +4,13 @@ import hu.kristall.rpg.Server;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.command.senders.ConsoleCommandSender;
-import hu.kristall.rpg.lang.Lang;
-import org.jline.reader.Candidate;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-public class CommandMap implements CommandParent, Completer {
+public class CommandMap implements CommandParent {
 
 	protected Map<String, ICommand> commandMap = new HashMap<>();
 	private final String[] emptyArgs = new String[0];
@@ -21,7 +19,7 @@ public class CommandMap implements CommandParent, Completer {
 	
 	public CommandMap(Server server) {
 		this.server = server;
-		consoleCommandSender = new ConsoleCommandSender(server);
+		consoleCommandSender = new ConsoleCommandSender(server.getSynchronizer());
 	}
 	
 	public Server getServer() {
@@ -50,18 +48,18 @@ public class CommandMap implements CommandParent, Completer {
 		}
 		else {
 			prefix = command.substring(0, firstSpace);
-			args = command.substring(firstSpace+1).split(" ");
+			args = Utils.fsplit(command.substring(firstSpace+1), ' ');
 		}
 		cmd = getCommand(prefix);
 		if(cmd == null) {
-			sender.sendRawMessage("cil.error.unknown-command");
+			sender.sendRawMessage(server.getLang(), "cil.error.unknown-command");
 			return;
 		}
 		try {
 			cmd.execute(sender, prefix, args);
 		}
 		catch (Throwable t) {
-			sender.sendRawMessage("cil.error.exception");
+			sender.sendRawMessage(server.getLang(), "cil.error.exception");
 		}
 	}
 	
@@ -85,17 +83,16 @@ public class CommandMap implements CommandParent, Completer {
 	}
 	
 	@Override
-	public void complete(LineReader reader, ParsedLine pline, List<Candidate> candidates) {
-		ArrayList<String> s = new ArrayList<>();
-		String line = pline.line();
+	public Collection<String> getRegisteredCommandNames() {
+		return Collections.unmodifiableCollection(this.commandMap.keySet());
+	}
+	
+	public Collection<String> complete(CommandSender sender, String line) {
 		if(line.length() == 0) {
-			tabComplete(new String[0], 0, s);
+			return tabComplete(sender, new String[0], 0);
 		}
 		else {
-			tabComplete(Utils.fsplit(line, ' '), 0, s);
-		}
-		for (String s1 : s) {
-			candidates.add(new Candidate(s1));
+			return tabComplete(sender, Utils.fsplit(line, ' '), 0);
 		}
 	}
 	

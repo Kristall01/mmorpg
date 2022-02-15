@@ -1,26 +1,24 @@
 package hu.kristall.rpg.network;
 
 import hu.kristall.rpg.Server;
-import hu.kristall.rpg.Synchronizer;
+import hu.kristall.rpg.sync.Synchronizer;
 import io.javalin.Javalin;
 import io.javalin.websocket.*;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NetworkServer {
 	
-	private final Map<WsContext, RawConnection> connections = new ConcurrentHashMap<>();
+	private final Map<WsContext, NetworkConnection> connections = new ConcurrentHashMap<>();
 	private final Synchronizer<Server> asyncServer;
 	private Javalin javalinServer;
 	private boolean wsAdded = false;
+	private AtomicBoolean stopping = new AtomicBoolean(false);
 	
 	public NetworkServer(Server server) {
-		//this.server = server;
 		this.asyncServer = server.getSynchronizer();
-		
-		//packetRegistry = PacketRegistry.baseRegistry();
-		
 		Javalin httpServer = Javalin.create(c -> {
 			c.showJavalinBanner = false;
 			//c.addStaticFiles("/hdd/teams_records/szakdolgozat/game/build", Location.EXTERNAL);
@@ -32,27 +30,34 @@ public class NetworkServer {
 	//------------- ASYNC METHODS //-------------
 	
 	private void handleConnectionMessage(WsMessageContext ctx) {
-		connections.get(ctx).phase.processMessage(ctx.message());
+		connections.get(ctx).handleNetworkMessage(ctx.message());
 	}
 	
 	private void handleConnectionClose(WsCloseContext ctx) {
-		connections.remove(ctx).phase.handleDisconnect();
-		//TODO remove connection from game logic
-		/*PlayerConnection conn = connections.remove(ctx);
-		asyncServer.sync((srv) -> {
-			srv.getPlayerManager().removePlayer(conn);
-		});*/
+		connections.remove(ctx).handleConnectionClose();
 	}
 	
 	private void handleConnect(WsConnectContext ctx) {
-		connections.put(ctx, new RawConnection(this.asyncServer, ctx));
+		if(stopping.get()) {
+			ctx.closeSession();
+			return;
+		}
+		connections.put(ctx, new WebsocketPlayerConnection(this.asyncServer, ctx));
 	}
 	
 	private void handleConnectionError(WsErrorContext wsErrorContext) {
 		wsErrorContext.session.close();
 	}
 	
-	public void starWsHandler() {
+	public void stop() {
+		stopping.set(true);
+		for (NetworkConnection value : connections.values()) {
+			value.close("server stopping");
+		}
+		javalinServer.stop();
+	}
+	
+	public void startAcceptingConnections() {
 		if(wsAdded) {
 			throw new IllegalStateException("ws is already added");
 		}

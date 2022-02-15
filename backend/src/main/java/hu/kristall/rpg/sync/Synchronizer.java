@@ -1,11 +1,12 @@
-package hu.kristall.rpg;
+package hu.kristall.rpg.sync;
 
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Synchronizer<T extends ISynchronized<T>> {
 
-	private final T taskRunner;
+	private final TaskRunner taskRunner;
 	private T returnedObject;
 	private final Object syncLock = new Object();
 	
@@ -14,10 +15,28 @@ public class Synchronizer<T extends ISynchronized<T>> {
 		this.returnedObject = t;
 	}
 	
+	public Synchronizer(T returnedObject, TaskRunner runner) {
+		this.taskRunner = runner;
+		this.returnedObject = returnedObject;
+	}
+	
 	public Future<?> sync(Consumer<T> task) {
 		return taskRunner.runTask(() -> {
+			try {
+				synchronized(syncLock) {
+					task.accept(returnedObject);
+				}
+			}
+			catch (Throwable t) {
+				t.printStackTrace();
+			}
+		});
+	}
+	
+	public <U> Future<U> syncCompute(Function<T, U> task) {
+		return taskRunner.computeTask(() -> {
 			synchronized(syncLock) {
-				task.accept(returnedObject);
+				return task.apply(returnedObject);
 			}
 		});
 	}

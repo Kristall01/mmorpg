@@ -54,4 +54,51 @@ public enum ChatColor {
 		return null;
 	}
 	
+	public static String stripColorCodes(String message) {
+		int index = message.indexOf('§');
+		if(index == -1) {
+			return message;
+		}
+		char[] chars = message.toCharArray();
+		StringBuilder output = new StringBuilder(message.length());
+		for(int i = 0; i < chars.length; ++i) {
+			if(chars[i] != '§') {
+				output.append(chars[i]);
+				continue;
+			}
+			++i;
+		}
+		return output.toString();
+	}
+	
+	public static String translateColorCodes(String message) {
+		int index = message.indexOf('§');
+		if(index == -1) {
+			return message;
+		}
+		
+		char[] chars = message.toCharArray();
+		boolean flag = false;
+		
+		StringBuilder output = new StringBuilder(message.length()*2);
+		
+		for(int i = 0; i < chars.length; ++i) {
+			if(chars[i] == '§') {
+				flag = !flag;
+				continue;
+			}
+			if(!flag) {
+				output.append(chars[i]);
+				continue;
+			}
+			flag = false;
+			ChatColor color = ChatColor.findByChar(chars[i]);
+			if(color != null) {
+				output.append(color.ansiCode);
+			}
+		}
+		output.append(ChatColor.RESET.ansiCode);
+		return output.toString();
+	}
+	
 }

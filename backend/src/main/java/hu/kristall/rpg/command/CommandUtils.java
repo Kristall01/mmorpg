@@ -1,7 +1,5 @@
 package hu.kristall.rpg.command;
 
-import hu.kristall.rpg.Server;
-
 public class CommandUtils {
 	
 	public static String buildSimpleHelpEntry(ICommand cmd) {

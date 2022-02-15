@@ -1,8 +1,7 @@
 package hu.kristall.rpg.network.packet.in.play;
 
 import hu.kristall.rpg.Position;
-import hu.kristall.rpg.Synchronizer;
-import hu.kristall.rpg.world.entity.EntityPlayer;
+import hu.kristall.rpg.world.entity.EntityHuman;
 
 public class PacketInPlayMove extends PacketInPlay {
 	
@@ -11,16 +10,17 @@ public class PacketInPlayMove extends PacketInPlay {
 	
 	@Override
 	public void execute() {
-		Synchronizer<EntityPlayer> p = sender.getAsyncEntity();
-		if(p == null) {
-			return;
-		}
-		p.sync(e -> {
+		getSender().getPlayer().getAsyncEntity().sync(e -> {
 			if(e == null) {
+				//player left world
 				return;
 			}
-			
-			e.move(new Position(x,y));
+			EntityHuman h = e.getEntity();
+			if(h == null) {
+				//player is dead, went shaco ult, or something
+				return;
+			}
+			h.move(new Position(x,y));
 		});
 	}
 	

@@ -1,8 +1,9 @@
 package hu.kristall.rpg.command;
 
+import hu.kristall.rpg.Server;
 import hu.kristall.rpg.command.senders.CommandSender;
 
-public interface ICommand extends Executeable {
+public interface ICommand extends Executable {
 	
 	String getName();
 	String getDescription();
@@ -10,5 +11,6 @@ public interface ICommand extends Executeable {
 	void execute(CommandSender sender, String label, String[] args);
 	String toHelpEntry();
 	CommandParent getParent();
+	Server getServer();
 	
 }

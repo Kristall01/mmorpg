@@ -1,8 +1,8 @@
 package hu.kristall.rpg.command.commands;
 
 import hu.kristall.rpg.command.CommandParent;
-import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.command.impl.SimpleCommand;
+import hu.kristall.rpg.command.senders.CommandSender;
 
 public class CommandHelp extends SimpleCommand {
 	

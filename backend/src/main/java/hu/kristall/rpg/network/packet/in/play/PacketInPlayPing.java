@@ -6,7 +6,7 @@ public class PacketInPlayPing extends PacketInPlay {
 	
 	@Override
 	public void execute() {
-		sender.getCreator().sendPacket(new PacketOutPong());
+		getSender().sendPacket(new PacketOutPong());
 	}
 	
 }

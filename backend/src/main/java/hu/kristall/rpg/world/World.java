@@ -2,11 +2,15 @@ package hu.kristall.rpg.world;
 
 import hu.kristall.rpg.*;
 import hu.kristall.rpg.network.packet.out.*;
-import hu.kristall.rpg.network.phase.PhasePlay;
+import hu.kristall.rpg.sync.SynchronizedObject;
+import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.Entity;
-import hu.kristall.rpg.world.entity.EntityPlayer;
+import hu.kristall.rpg.world.entity.EntityHuman;
+import hu.kristall.rpg.world.entity.EntityType;
 import hu.kristall.rpg.world.path.LinearPosition;
 import hu.kristall.rpg.world.path.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,14 +21,18 @@ public class World extends SynchronizedObject<World> {
 	private final Tile[] tileMap;
 	private Tile defaultTile;
 	private final int width, height;
-	private HashMap<Player, EntityPlayer> playerEntities = new HashMap<>();
+	private HashMap<Player, WorldPlayer> worldPlayers = new HashMap<>();
 	private HashMap<Integer, Entity> worldEntities = new HashMap<Integer, Entity>();
 	private String name;
 	private Synchronizer<Server> asyncServer;
 	private int nextEntityID = 0;
-	private String bakedMapSerialize;
+	private List<String> bakedMapSerialize;
+	private Logger logger;
 	
 	public World(Synchronizer<Server> serverSynchronizer, String name, int width, int height) {
+		super("world-"+name);
+		this.logger = LoggerFactory.getLogger("world-"+name);
+		
 		this.asyncServer = serverSynchronizer;
 		this.name = name;
 		
@@ -33,13 +41,11 @@ public class World extends SynchronizedObject<World> {
 		this.height = height;
 		
 		Arrays.fill(tileMap, Tile.GRASS);
-		
-		StringBuilder b = new StringBuilder("[");
-		for (int i = 0; i < tileMap.length; i++) {
-			b.append('"').append(tileMap[i].ID).append("\",");
+		String[] s = new String[tileMap.length];
+		for (int i = 0; i < s.length; i++) {
+			s[i] = tileMap[i].name();
 		}
-		b.setCharAt(b.length()-1, ']');
-		this.bakedMapSerialize = b.toString();
+		this.bakedMapSerialize = List.of(s);
 	}
 	
 	public Tile getTileAt(int x, int y) {
@@ -49,12 +55,16 @@ public class World extends SynchronizedObject<World> {
 		return tileMap[width*y + x];
 	}
 	
-	public Path interpolatePath(Position from, Position to, double cellsPerSec, double startTimeNanos) {
-		return new Path(List.of(from, to), new LinearPosition(from, to, cellsPerSec, startTimeNanos));
+	public Path interpolatePath(Position from, Position to, double cellsPerSec, long startTimeNanos) {
+		return new Path(to, List.of(from, to), new LinearPosition(from, to, cellsPerSec, startTimeNanos), startTimeNanos);
 	}
 	
 	public int getWidth() {
 		return width;
+	}
+	
+	public Logger getLogger() {
+		return logger;
 	}
 	
 	public int getHeight() {
@@ -65,31 +75,51 @@ public class World extends SynchronizedObject<World> {
 		return nextEntityID++;
 	}
 	
-	public Synchronizer<EntityPlayer> joinPlayer(Player player) {
-		try {
-			EntityPlayer p = new EntityPlayer(this, getNextEntityID(), player, new Position(3, 3));
-			playerEntities.put(player, p);
-			PhasePlay creator = p.getPlayer().getCreator();
-			
-			creator.sendPacket(new PacketOutJoinworld(this, new Position(3, 3)));
-			
-			for (Entity asd : worldEntities.values()) {
-				creator.sendPacket(new PacketOutSpawnEntity(asd));
+	public Entity spawnEntity(EntityType type, Position pos) {
+		Entity createdEntity = null;
+		switch(type) {
+			case HUMAN: {
+				createdEntity = new EntityHuman(this, getNextEntityID(), pos);
+				break;
 			}
+		}
+		if(createdEntity == null) {
+			return null;
+		}
+		addEntity(createdEntity);
+		return createdEntity;
+	}
+	
+	private void addEntity(Entity entity) {
+		worldEntities.put(entity.getID(), entity);
+		broadcastPacket(new PacketOutSpawnEntity(entity));
+	}
+	
+	public Synchronizer<WorldPlayer> joinPlayer(Player player) {
+		try {
+			//sync world state to joining player
+			Position pos = new Position(3,3);
+			player.getConnection().sendPacket(new PacketOutJoinworld(this, pos));
+			for (Entity e : this.worldEntities.values()) {
+					player.getConnection().sendPacket(new PacketOutSpawnEntity(e));
+					player.getConnection().sendPacket(new PacketOutMoveentity(e));
+				}
+			//sync done
 			
-			worldEntities.put(p.getID(), p);
-			
-			broadcastPacket(new PacketOutSpawnEntity(p));
+			WorldPlayer wp = new WorldPlayer(this, player);
+			worldPlayers.put(player, wp);
+			EntityHuman h = wp.spawnTo(pos);
+			player.getConnection().sendPacket(new PacketOutFollowEntity(h));
 			broadcastMessage("§e" + player.getName() + " csatlakozott");
 			
-			player.getCreator().sendPacket(new PacketOutFollowEntity(p));
+			//player.followEntity(p.getID());
 			
 			//broadcast join
 			//send map packets
 			//list entities
 			//etc
 			
-			return p.getSynchronizer();
+			return wp.getSynchronizer();
 		}
 		catch (Throwable t) {
 			t.printStackTrace();
@@ -97,37 +127,53 @@ public class World extends SynchronizedObject<World> {
 		}
 	}
 	
-	public String serializeTileGrid() {
+	public List<String> serializeTileGrid() {
 		return bakedMapSerialize;
 	}
 	
+	public void cleanRemovedEntity(Entity e) {
+		if(e.isRemoved()) {
+			worldEntities.remove(e.getID());
+			broadcastPacket(new PacketOutDespawnEntity(e));
+		}
+	}
+	
 	public void leavePlayer(Player player) {
-		EntityPlayer oldEntity = playerEntities.remove(player);
-		worldEntities.remove(oldEntity.getID());
+		WorldPlayer oldEntity = worldPlayers.remove(player);
+		player.getConnection().sendPacket(new PacketOutLeaveWorld());
+		if(oldEntity.getEntity() != null) {
+			oldEntity.getEntity().remove();
+		}
 		oldEntity.getSynchronizer().changeObject(null);
 		broadcastMessage("§e"+player.getName()+ " lelépett");
-		broadcastPacket(new PacketOutDespawnEntity(oldEntity));
-		//broadcast leave
-		//send map leave packet
-		//etc
 	}
 	
 	public void broadcastMessage(String message) {
 		final String worldName = this.name;
-		asyncServer.sync(srv -> srv.getCommandMap().getConsoleCommandSender().sendMessage("[@"+worldName+"] "+message));
-		for (EntityPlayer value : playerEntities.values()) {
-			value.getPlayer().sendMessage(message);
-		}
+		logger.info(message);
+		broadcastPacket(new PacketOutChat(message));
 	}
 	
-	public void broadcastPacket(PacketOut packet) {
-		for (EntityPlayer value : playerEntities.values()) {
-			value.getPlayer().getCreator().sendPacket(packet);
+	public void broadcastPacket(PacketOut out) {
+		for (WorldPlayer wp : worldPlayers.values()) {
+			wp.getPlayer().getConnection().sendPacket(out);
 		}
 	}
 	
 	public Synchronizer<Server> getAsyncServer() {
 		return asyncServer;
+	}
+	
+	public void shutdown() {
+		for (WorldPlayer wp : worldPlayers.values()) {
+			wp.getPlayer().kick("A világ amiben tartózkodtál leállt.");
+		}
+		getSynchronizer().changeObject(null);
+		super.shutdown();
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 }

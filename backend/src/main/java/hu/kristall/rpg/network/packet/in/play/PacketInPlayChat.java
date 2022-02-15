@@ -1,8 +1,5 @@
 package hu.kristall.rpg.network.packet.in.play;
 
-import hu.kristall.rpg.Synchronizer;
-import hu.kristall.rpg.world.entity.EntityPlayer;
-
 public class PacketInPlayChat extends PacketInPlay {
 	
 	private String message;
@@ -14,21 +11,19 @@ public class PacketInPlayChat extends PacketInPlay {
 		}
 		if(message.charAt(0) == '/') {
 			// :/
-			//server.getCommandMap().executeCommand(, message.substring(1));
-			sender.sendMessage("§cEgyelőre nincsenek parancsok. :/");
-			return;
+			String commandMsg = message.substring(1);
+			this.getSender().getAsyncServer().sync(srv -> {
+				srv.getCommandMap().executeCommand(getSender().getPlayer(), commandMsg);
+			});
 		}
-		Synchronizer<EntityPlayer> p = sender.getAsyncEntity();
-		if(p == null) {
-			return;
+		else {
+			getSender().getPlayer().getAsyncEntity().sync(e -> {
+				if(e == null) {
+					return;
+				}
+				e.getWorld().broadcastMessage("§a"+e.getPlayer().getName()+" §7»§r "+message);
+			});
 		}
-		p.sync(e -> {
-			if(e == null) {
-				return;
-			}
-			e.getWorld().broadcastMessage("§a"+e.getPlayer().getName()+" §7»§r "+message);
-		});
-		//server.broadcastMessage("§aplayername §7»§r "+message);*/
 	}
 
 }

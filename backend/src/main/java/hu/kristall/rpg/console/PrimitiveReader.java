@@ -13,8 +13,16 @@ public class PrimitiveReader implements CommandSupplier {
 	}
 	
 	@Override
-	public void close() throws IOException {
-		reader.close();
+	public void close() {
+		try {
+			reader.close();
+		}
+		catch (IOException ignored) {}
+	}
+	
+	@Override
+	public void sendMessage(String message) {
+		System.out.println(message);
 	}
 	
 	@Override

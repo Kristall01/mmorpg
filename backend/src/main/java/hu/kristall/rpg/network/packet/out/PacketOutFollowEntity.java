@@ -6,9 +6,12 @@ public class PacketOutFollowEntity extends PacketOut {
 	
 	int id;
 	
-	public PacketOutFollowEntity(Entity e) {
+	public PacketOutFollowEntity(int entityID) {
 		super("followentity");
-		
-		this.id = e.getID();
+		this.id = entityID;
+	}
+	
+	public PacketOutFollowEntity(Entity e) {
+		this(e.getID());
 	}
 }
