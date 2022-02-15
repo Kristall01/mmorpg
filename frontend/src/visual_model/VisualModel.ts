@@ -22,6 +22,7 @@ class VisualModel {
 	private zoomTarget = 100;
 	private zoomFn: ZoomFn;
 	maxZoom: number = 40;
+	private _maxFPS: number | null = null;
 
 	constructor() {
 		this.triggerUpdate = () => {};
@@ -76,6 +77,15 @@ class VisualModel {
 		//let to = zoomValue * val;
 		this.zoomTarget = this.zoomTarget*val;
 		this.zoomFn = sinSmoothZoom(now, 500, this.zoomFn(now), this.zoomTarget);
+	}
+
+	set maxFPS(fps: number | null) {
+		this._maxFPS = fps;
+		this.triggerUpdate();
+	}
+
+	get maxFPS() {
+		return this._maxFPS;
 	}
 
 }

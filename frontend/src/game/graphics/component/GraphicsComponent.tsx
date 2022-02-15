@@ -15,6 +15,7 @@ class GraphicsComponent extends Component<props> {
 	private scheduler: RenderScheduler | null = null
 	private mixer: LayerMixer
 	private worldView: WorldView
+	private maxFPS: number | null = null;
 
 	constructor(props: props) {
 		super(props);
@@ -26,7 +27,12 @@ class GraphicsComponent extends Component<props> {
 		this.mixer.addLayer(this.worldView);
 	}
 
-	shouldComponentUpdate() {
+	shouldComponentUpdate(nextProps: Readonly<props>, nextState: Readonly<{}>, nextContext: any) {
+		let maxfpsCandidate = nextProps.model.maxFPS;
+		if(maxfpsCandidate !== this.maxFPS) {
+			this.maxFPS = maxfpsCandidate;
+			this.scheduler?.setMaxFps(maxfpsCandidate);
+		}
 		return false;
 	}
 

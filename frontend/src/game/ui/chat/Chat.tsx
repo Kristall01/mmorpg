@@ -35,6 +35,7 @@ const Chat = (): JSX.Element | null => {
 			visualModel.addChatEntry("§6§l[DEV] §r/dev parancsok:");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev camleak");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev maxzoom");
+			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev maxfps");
 			return;
 		}
 		cmd = cmd.substring(1);
@@ -53,6 +54,18 @@ const Chat = (): JSX.Element | null => {
 				visualModel.addChatEntry("§6§l[DEV] §rMaxzoom átállítva");
 			}
 			catch(ex) {}
+			return;
+		}
+		if(split[0] === 'maxfps') {
+			let maxfps: number | null = null;
+			if(split.length > 1) {
+				try {
+					maxfps = parseInt(split[1]);
+				}
+				catch(ex) {}
+			}
+			visualModel.maxFPS = maxfps;
+			visualModel.addChatEntry("§6§l[DEV] §rMaxFPS átállítva");
 			return;
 		}
 		visualModel.addChatEntry("§6§l[DEV] §rnincs ilyen parancs");
