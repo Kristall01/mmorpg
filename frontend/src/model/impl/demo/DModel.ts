@@ -12,13 +12,24 @@ import { Position } from "visual_model/VisualModel";
 
 const entitySpeed = 5;
 
-const netLag = 100;
+const netLag = 50;
 const startPos: Position = [5,5];
 
+let camleak = false;
+
 let tileGrid: string[] = [];
-for(let i = 0; i < 400; ++i) {
-	tileGrid.push("grass");
+let map = {width: 50, height: 8};
+for(let y = 0; y < map.height; ++y) {
+	for(let x = 0; x < map.width; ++x) {
+		if(x == 0 || x == map.width-1 || y == 0 || y == map.height-1) {
+			tileGrid.push("WATER");
+		}
+		else {
+			tileGrid.push("GRASS");
+		}
+	}
 }
+
 
 class DModel extends LogicModel {
 
@@ -34,7 +45,7 @@ class DModel extends LogicModel {
 			this.broadcastEvent({type: ModelEventType.CONNECTED});
 			setTimeout(() => {
 				this.broadcastEvent({type: ModelEventType.PLAY});
-				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], 20, 20, tileGrid));
+				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], map.width, map.height, tileGrid));
 				this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
 				this.broadcastSignal(new SignalEntityspawn(0, "test", startPos, entitySpeed));
@@ -82,17 +93,17 @@ class DModel extends LogicModel {
 
 	moveMeTo(x: number, y: number): void {
 		setTimeout(() => {
-			if(x > 25) {
-				x = 25;
+			if(x > map.width-1) {
+				x = map.width-1;
 			}
-			else if(x < 5) {
-				x = 5;
+			else if(x < 1) {
+				x = 1;
 			}
-			if(y > 25) {
-				y = 25;
+			if(y > map.height-1) {
+				y = map.height-1;
 			}
-			else if(y < 5) {
-				y = 5;
+			else if(y < 1) {
+				y = 1;
 			}
 
 			let t = performance.now();
