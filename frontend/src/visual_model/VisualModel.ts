@@ -11,8 +11,6 @@ export type Position = [number,number];
 
 type ZoomFn = (rendertime: number) => number;
 
-let zoomValue = 100;
-
 class VisualModel {
 	
 	private _world: World | null = null;
@@ -20,11 +18,15 @@ class VisualModel {
 	private triggerUpdate: () => void
 	chatOpen: boolean = false
 	focus: focus = focus.main
-	private zoomFn: ZoomFn = (rendertime: number) => zoomValue;
+	allowCamLeak: boolean = false;
+	private zoomTarget = 100;
+	private zoomFn: ZoomFn;
+	maxZoom: number = 40;
 
 	constructor() {
 		this.triggerUpdate = () => {};
 		this.handleSignal = this.handleSignal.bind(this);
+		this.zoomFn = (rendertime: number) => this.zoomTarget
 	}
 
 	setUpdateCallback(changeCallback: () => void) {
@@ -70,9 +72,28 @@ class VisualModel {
 
 	multiplyZoom(val: number) {
 		//let from = zoomValue;
+		let now = performance.now();
 		//let to = zoomValue * val;
-		zoomValue *= val;
+		this.zoomTarget = this.zoomTarget*val;
+		this.zoomFn = sinSmoothZoom(now, 500, this.zoomFn(now), this.zoomTarget);
 	}
+
+}
+
+const sinSmoothZoom = (fromTime: number, animationTime: number, fromZoom: number, toZoom: number): ZoomFn => {
+	let zoomDiff = fromZoom - toZoom;
+	let zoomEnd = fromTime + animationTime;
+	let timeWindow = zoomEnd - fromTime;
+
+	return (rendertime: number) =>  {
+		if(rendertime > zoomEnd) {
+			return toZoom;
+		}
+
+		let animationProgress = (rendertime - fromTime) / timeWindow;
+
+		return fromZoom - zoomDiff * Math.sin(animationProgress*(Math.PI/2));
+	};
 
 }
 
