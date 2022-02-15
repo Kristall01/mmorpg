@@ -30,6 +30,34 @@ const Chat = (): JSX.Element | null => {
 		setChatText(e.currentTarget.value);
 	}
 
+	const handleLocalCommand = (cmd: string) => {
+		if(cmd.length === 0) {
+			visualModel.addChatEntry("§6§l[DEV] §r/dev parancsok:");
+			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev camleak");
+			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev maxzoom");
+			return;
+		}
+		cmd = cmd.substring(1);
+		let split = cmd.split(" ");
+		if(split[0] === "camleak") {
+			visualModel.allowCamLeak = !visualModel.allowCamLeak;
+			visualModel.addChatEntry("§6§l[DEV] §rCamleak átállítva");
+			return;
+		}
+		if(split[0] === "maxzoom") {
+			if(split.length === 1) {
+				return;
+			}
+			try {
+				visualModel.maxZoom = parseInt(split[1]);
+				visualModel.addChatEntry("§6§l[DEV] §rMaxzoom átállítva");
+			}
+			catch(ex) {}
+			return;
+		}
+		visualModel.addChatEntry("§6§l[DEV] §rnincs ilyen parancs");
+	}
+
 	const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
 		if(e.key === "Escape") {
 			setChatText("");
@@ -39,8 +67,14 @@ const Chat = (): JSX.Element | null => {
 		}
 		if(e.key === "Enter") {
 			let chattext = e.currentTarget.value;
-			if(chattext.trim().length !== 0) {
-				logicModel.sendChatMessage(e.currentTarget.value);
+			chattext = chattext.trim();
+			if(chattext.length !== 0) {
+				if(chatText.startsWith("/dev")) {
+					handleLocalCommand(chatText.substring(4));
+				}
+				else {
+					logicModel.sendChatMessage(chattext);
+				}
 			}
 			setChatText("");
 			visualModel.setChatOpen(false);
