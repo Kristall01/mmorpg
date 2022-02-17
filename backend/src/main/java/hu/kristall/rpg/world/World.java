@@ -103,6 +103,9 @@ public class World extends SynchronizedObject<World> {
 			for (Entity e : this.worldEntities.values()) {
 					player.getConnection().sendPacket(new PacketOutSpawnEntity(e));
 					player.getConnection().sendPacket(new PacketOutMoveentity(e));
+					if(e.getName() != null) {
+						player.getConnection().sendPacket(new PacketOutEntityRename(e));
+					}
 				}
 			//sync done
 			

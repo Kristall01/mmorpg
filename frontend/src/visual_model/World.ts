@@ -53,9 +53,9 @@ class World {
 
 	followEntity(id: number) {
 		let e = this.getEntity(id);
-		if(e) {
+		if(e !== undefined) {
 			let a = e;
-			this.camPositionFn = (time) => a.getLocation(time);
+			this.camPositionFn = () => a.getLastPosition();
 		}
 	}
 

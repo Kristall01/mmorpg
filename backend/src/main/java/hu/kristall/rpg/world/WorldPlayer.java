@@ -53,6 +53,7 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 		if(this.entity == null || this.entity.isRemoved()) {
 			this.entity = (EntityHuman) world.spawnEntity(EntityType.HUMAN, pos);
 			this.entity.setWorldPlayer(this);
+			this.entity.setName(player.getName());
 		}
 		return this.entity;
 	}

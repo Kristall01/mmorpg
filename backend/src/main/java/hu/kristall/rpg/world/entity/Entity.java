@@ -1,6 +1,7 @@
 package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.network.packet.out.PacketOutEntityRename;
 import hu.kristall.rpg.network.packet.out.PacketOutEntityspeed;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.path.Path;
@@ -12,6 +13,7 @@ public abstract class Entity {
 	private final World world;
 	private double speed;
 	private boolean removed = false;
+	private String name;
 	
 	public Entity(World world, EntityType type, int entityID, double speed) {
 		this.type = type;
@@ -21,6 +23,15 @@ public abstract class Entity {
 	}
 	
 	public abstract Position getPosition();
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+		world.broadcastPacket(new PacketOutEntityRename(this));
+	}
 	
 	public EntityType type() {
 		return type;

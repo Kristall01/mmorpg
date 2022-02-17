@@ -9,33 +9,32 @@ export default class Entity {
 	nick: string | null = null
 	speed: number
 	cachedPosition: Position = [0,0];
+	cachedCanvasPosition: Position = [0,0];
+	name: string | null = null;
 
 	constructor(id: number, type: string, loc: Position, speed: number) {
 		this.id = id;
 		this.type = type;
-		this.setPositionFn(ConstPath(loc))
+		this.positionFn = ConstPath(loc);
 		this.speed = speed;
 	}
 
-	getLocation(rendertime: number) {
-		return this.positionFn(rendertime);
+	calculatePosition(rendertime: number) {
+		let pos = this.positionFn(rendertime);
+		this.cachedPosition = pos;
 	}
 
-	private setPositionFn(posFn :PathFn) {
-		this.positionFn = (time: number) => {
-			let loc = posFn(time);
-			this.cachedPosition = loc;
-			return loc;
-		}
-	}
-
-	lastPosition() {
+	getLastPosition() {
 		return this.cachedPosition;
+	}
+
+	setName(name: string | null) {
+		this.name = name;
 	}
 
 	walkBy(startTime: number, points: Position[]) {
 		let now = performance.now();
-		this.setPositionFn(entityZigzagPath(this.getLocation(now), startTime, points, this.speed));
+		this.positionFn = entityZigzagPath(this.positionFn(now), startTime, points, this.speed);
 	}
 
 /* 	walk(startTime: number, from: Position, target: Position) {

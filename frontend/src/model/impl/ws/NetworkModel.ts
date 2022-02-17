@@ -8,6 +8,7 @@ import SignalEntityspeed from "model/signals/SignalEntityspeed";
 import SignalFocus from "model/signals/SignalFocus";
 import SignalJoinworld from "model/signals/SignalJoinworld";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
+import SignalRenameEntity from "model/signals/SignalRenameEntity";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 
@@ -48,6 +49,7 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("entityspeed", ({id, speed}) => new SignalEntityspeed(id, speed));
 		this.addPacketSignal("joinworld", ({tileGrid, width, height, spawnX, spawnY}) => new SignalJoinworld(spawnX, spawnY, width, height, tileGrid));
 		this.addPacketSignal("leaveworld", () => new SignalLeaveworld());
+		this.addPacketSignal("entityrename", ({id, newname}) => new SignalRenameEntity(id, newname));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 

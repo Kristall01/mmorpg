@@ -1,4 +1,4 @@
-import VisualModel from "visual_model/VisualModel";
+import VisualModel, { Position } from "visual_model/VisualModel";
 import { StatelessRenderable } from "../Renderable";
 import TexturePack from "../texture/TexturePack";
 
@@ -26,7 +26,7 @@ class WorldView extends StatelessRenderable {
 		this.texturePack = TexturePack.getInstance();
 	}
 
-	translateXY(x: number, y: number) {
+	translateXY(x: number, y: number): Position {
 		let {camX, camY, tileSize, camFocusX, camFocusY, width, height} = this.renderConfig;
 
 		return [
@@ -35,7 +35,7 @@ class WorldView extends StatelessRenderable {
 		];
 	}
 
-	translateCanvasXY(x: number, y: number) {
+	translateCanvasXY(x: number, y: number): Position {
 		let {tileSize, camFocusX, camFocusY, width, height, camX, camY} = this.renderConfig;
 
 		return [
@@ -187,8 +187,12 @@ class WorldView extends StatelessRenderable {
 			return;
 		}
 
+		for(let e of this.model.world.entities) {
+			e.calculatePosition(renderTime);
+		}
+
 		this.calculateRenderConfig(renderTime, width, height);
-		
+
 		let {camX, camY, tileSize, camFocusX, camFocusY} = this.renderConfig;
 
 		let mostleftX = camX - ((width * camFocusX)/tileSize);
@@ -220,9 +224,20 @@ class WorldView extends StatelessRenderable {
 		let halfBlockSize = blockSize/2;
 
 		for(let entity of this.model.world.entities) {
-			let [x,y] = entity.positionFn(renderTime);
-			let [cX, cY] = this.translateXY(x, y);
+			let [x,y] = entity.getLastPosition();
+			let translated = this.translateXY(x, y);
+			entity.cachedCanvasPosition = translated;
+			let [cX, cY] = translated;
 			this.ctx.fillRect(cX-halfBlockSize, cY-halfBlockSize, blockSize, blockSize);
+		}
+		this.ctx.fillStyle = "#000";
+		this.ctx.font = Math.round(tileSize/5)+"px Arial";
+		for(let entity of this.model.world.entities) {
+			let name = entity.name;
+			if(name !== null) {
+				let textWidth = this.ctx.measureText(name).width;
+				this.ctx.fillText(name, entity.cachedCanvasPosition[0]-textWidth/2, entity.cachedCanvasPosition[1]);
+			}
 		}
 	}
 	
