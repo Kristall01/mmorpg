@@ -3,7 +3,7 @@ import "./GraphicsComponent.scss";
 import VisualModel from "visual_model/VisualModel";
 import RenderScheduler from "../RenderScheduler";
 import LayerMixer from "../RenderableCombinator";
-import WorldView from "../layers/WorldView";
+import WorldView from "../worldview/WorldView";
 
 type props = {
 	model: VisualModel,

@@ -100,10 +100,11 @@ const sinSmoothZoom = (fromTime: number, animationTime: number, fromZoom: number
 			return toZoom;
 		}
 
-		let animationProgress = (rendertime - fromTime) / timeWindow;
+		let x = (rendertime - fromTime) / timeWindow;
 
-		return fromZoom - zoomDiff * Math.sin(animationProgress*(Math.PI/2));
-	};
+//		return fromZoom - zoomDiff * Math.sin(x*(Math.PI/2));
+		return fromZoom + zoomDiff * (Math.pow(x, 2) - (2*x));
+};
 
 }
 

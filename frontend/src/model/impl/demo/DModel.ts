@@ -6,11 +6,11 @@ import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalFocus from "model/signals/SignalFocus";
 import SignalJoinworld from "model/signals/SignalJoinworld";
-import { ConstPath, EntityConstPath, LinearPath, PathFn, zigzagPath } from "visual_model/Paths";
+import { ConstStatus, Direction, StatusFn, zigzagStatus } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 
-const entitySpeed = 5;
+const entitySpeed = 2;
 
 const netLag = 50;
 const startPos: Position = [5,5];
@@ -34,12 +34,12 @@ for(let y = 0; y < map.height; ++y) {
 class DModel extends LogicModel {
 
 	private name: string;
-	private positionFn: PathFn
+	private statusFn: StatusFn
 
 	constructor(callback: IEventReciever, username: string) {
 		super(callback);
 		this.name = username;
-		this.positionFn = ConstPath(startPos);
+		this.statusFn = ConstStatus(startPos, Direction.enum.map.SOUTH);
 
 		setTimeout(() => {
 			this.broadcastEvent({type: ModelEventType.CONNECTED});
@@ -48,11 +48,11 @@ class DModel extends LogicModel {
 				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], map.width, map.height, tileGrid));
 				this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
-				this.broadcastSignal(new SignalEntityspawn(0, "test", startPos, entitySpeed));
+				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed));
 				this.broadcastSignal(new SignalFocus(0));
-			}, 500);
+			}, 1);
 	
-		}, 500);
+		}, 1);
 
 	}
 
@@ -107,9 +107,9 @@ class DModel extends LogicModel {
 			}
 
 			let t = performance.now();
-			let currentPosition = this.positionFn(t)
-			let path: Position[] = [currentPosition, [x,y]];
-			this.positionFn = zigzagPath(t, path, entitySpeed);
+			let currentPosition = this.statusFn(t)
+			let path: Position[] = [currentPosition.position, [x,y]];
+			this.statusFn = zigzagStatus(t, path, entitySpeed);
 			setTimeout(() => {
 				this.broadcastSignal(new SignalEntitypath(0, t, path));
 			}, netLag/2);

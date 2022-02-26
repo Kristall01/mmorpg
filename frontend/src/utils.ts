@@ -11,3 +11,11 @@ export function linearMove(fromX: number, fromY: number, fromtime: number, toX: 
 		return [fromX + timeRatio*xDiff, fromY + timeRatio*yDiff];
 	}
 }
+
+export const enumValueOf = <T>(a: T, key: string): T[keyof T] | null => {
+	let et = a[key as keyof typeof a];
+	if(et !== undefined) {
+		return et;
+	}
+	return null;
+}

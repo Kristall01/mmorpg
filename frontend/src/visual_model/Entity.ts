@@ -1,31 +1,31 @@
-import { ConstPath, EntityLinearPath, entityZigzagPath, PathFn } from "./Paths"
+import { RenderContext } from "game/graphics/GraphicsUtils"
+import WorldView, { renderConfig } from "game/graphics/worldview/WorldView"
+import { EntityType } from "./EntityType"
+import { ConstStatus, Direction, entityZigzagStatus, Status, StatusFn } from "./Paths"
 import { Position } from "./VisualModel"
 
-export default class Entity {
+export default abstract class Entity {
 
 	id: number
-	type: string
-	positionFn: PathFn = null!
+	type: EntityType
+	statusFn: StatusFn = null!
 	nick: string | null = null
 	speed: number
-	cachedPosition: Position = [0,0];
+	cachedStatus: Status;
 	cachedCanvasPosition: Position = [0,0];
 	name: string | null = null;
 
-	constructor(id: number, type: string, loc: Position, speed: number) {
+	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction) {
 		this.id = id;
 		this.type = type;
-		this.positionFn = ConstPath(loc);
+		this.statusFn = ConstStatus(loc, facing);
+		this.cachedStatus = this.statusFn(performance.now());
 		this.speed = speed;
 	}
 
-	calculatePosition(rendertime: number) {
-		let pos = this.positionFn(rendertime);
-		this.cachedPosition = pos;
-	}
-
-	getLastPosition() {
-		return this.cachedPosition;
+	calculateStatus(rendertime: number) {
+		let pos = this.statusFn(rendertime);
+		this.cachedStatus = pos;
 	}
 
 	setName(name: string | null) {
@@ -34,7 +34,7 @@ export default class Entity {
 
 	walkBy(startTime: number, points: Position[]) {
 		let now = performance.now();
-		this.positionFn = entityZigzagPath(this.positionFn(now), startTime, points, this.speed);
+		this.statusFn = entityZigzagStatus(this.statusFn(now).position, startTime, points, this.speed);
 	}
 
 /* 	walk(startTime: number, from: Position, target: Position) {

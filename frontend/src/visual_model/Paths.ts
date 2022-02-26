@@ -3,25 +3,62 @@ import { Position } from "./VisualModel";
 const maxInterpolationDist = 3;
 const interpolationTimeMs = 100;
 
-export type PathFn = (rendertime: number) => Position
+export class Direction {
+
+	readonly ordinal: number;
+
+	private constructor(ordinal: number) {
+		this.ordinal = ordinal;
+	}
+
+	static readonly enum = {
+		map: {
+			SOUTH: new Direction(0),
+			NORTH: new Direction(1),
+			EAST: new Direction(2),
+			WEST: new Direction(3)},
+		values: new Array<Direction>()
+	}
+
+	static {
+		Direction.enum.values = Object.values(Direction.enum.map);
+	}
+
+}
+
+export interface Status {
+	position: Position,
+	moving: boolean,
+	facing: Direction
+}
+
+export type StatusFn = (rendertime: number) => Status
 
 const pointDistance = (pos0: Position, pos1: Position): number => {
 	return Math.sqrt(Math.pow(pos0[0] - pos1[0], 2) + Math.pow(pos0[1] - pos1[1], 2));
 }
 
-export const ConstPath = (l: Position): PathFn => {
-	return (rendertime: number) => l;
+export const ConstStatus = (l: Position, facing: Direction): StatusFn => {
+	return (rendertime: number) => ({
+		facing: facing,
+		moving: false,
+		position: l
+	});
 }
 
-export const EntityConstPath = (lastPosition: Position, l: Position): PathFn => {
-	return fixInterpolation(lastPosition, (rendertime: number) => l);
+export const EntityConstStatus = (lastPosition: Position, l: Position, facing: Direction): StatusFn => {
+	return fixInterpolation(lastPosition, (rendertime: number) => ({
+		facing: facing,
+		moving: false,
+		position: l
+	}));
 }
 
-export const EntityLinearPath = (lastPosition: Position, startTimeMs: number, from: Position, to: Position, cellsPerSec: number): PathFn => {
-	return fixInterpolation(lastPosition, LinearPath(startTimeMs, from, to, cellsPerSec));
+export const EntityLinearStatus = (lastPosition: Position, startTimeMs: number, from: Position, to: Position, cellsPerSec: number): StatusFn => {
+	return fixInterpolation(lastPosition, LinearStatus(startTimeMs, from, to, cellsPerSec));
 }
 
-export const LinearPath = (startTimeMs: number, from: Position, to: Position, cellsPerSec: number): PathFn => {
+export const LinearStatus = (startTimeMs: number, from: Position, to: Position, cellsPerSec: number): StatusFn => {
 
 	let xDiff = to[0] - from[0];
 	let yDiff = to[1] - from[1];
@@ -30,18 +67,45 @@ export const LinearPath = (startTimeMs: number, from: Position, to: Position, ce
 	let totalTime = totalDistance / cellsPerSec * 1000;
 	let endTime = startTimeMs + totalTime;
 
-	return (currentTimeMs: number): Position => {
+	return (currentTimeMs: number): Status => {
 		if(currentTimeMs > endTime) {
-			return to;
+			return ({
+				facing: Direction.enum.map.SOUTH,
+				moving: false,
+				position: to
+			});
 		}
-		return [
-			from[0] + xDiff * ((currentTimeMs - startTimeMs) / totalTime),
-			from[1] + yDiff * ((currentTimeMs - startTimeMs) / totalTime)
-		]
+		return ({
+			facing: Direction.enum.map.SOUTH,
+			moving: true,
+			position: [
+				from[0] + xDiff * ((currentTimeMs - startTimeMs) / totalTime),
+				from[1] + yDiff * ((currentTimeMs - startTimeMs) / totalTime)
+			]
+		});
 	}
 }
 
-export const zigzagPath = (startTimeMs: number, points: Position[], cellsPerSec: number): PathFn => {
+const calculatedDirection = (x: number, y: number): Direction => {
+	let enumMap = Direction.enum.map;
+
+	//edge case
+	if(x == 0 && y == 0) {
+		return enumMap.SOUTH;
+	}
+	
+	let absX = Math.abs(x);
+	let absY = Math.abs(y);
+
+
+	if(absX < absY) {
+		//verticalAxisDirection
+		return y >= 0 ? enumMap.SOUTH : enumMap.NORTH;
+	}
+	return x >= 0 ? enumMap.EAST : enumMap.WEST;
+}
+
+export const zigzagStatus = (startTimeMs: number, points: Position[], cellsPerSec: number): StatusFn => {
 	let timePoints: number[] = [];
 	let totalDist = 0;
 	let totalTime = 0;
@@ -61,11 +125,10 @@ export const zigzagPath = (startTimeMs: number, points: Position[], cellsPerSec:
 
 	let lastPoint = points[points.length-1];
 
-	let constFn = () => lastPoint;
+	let fnVariable: StatusFn = null!;
+	let lastDirection: Direction = calculatedDirection(points[1][0] - points[0][0], points[1][1] - points[0][1]);
 
-	let fnVariable: PathFn = null!;
-
-	let runningFn = (currentTimeMs: number): Position => {
+	let runningFn = (currentTimeMs: number): Status => {
 
 		let i = index;
 		for(;i < timePoints.length-1; ++i) {
@@ -75,57 +138,76 @@ export const zigzagPath = (startTimeMs: number, points: Position[], cellsPerSec:
 		}
 		index = i;
 		if(i === timePoints.length-1) {
-			fnVariable = constFn;
-			return lastPoint;
+			fnVariable = ConstStatus(lastPoint, lastDirection);
+			return fnVariable(currentTimeMs);
 		}
 
 		let xDiff = points[i+1][0] - points[i][0];
 		let yDiff = points[i+1][1] - points[i][1];
 
-		return [
+		let returnedPos: Position = [
+			points[i][0] + xDiff * ((currentTimeMs - timePoints[i]) / (timePoints[i+1] - timePoints[i])),
+			points[i][1] + yDiff * ((currentTimeMs - timePoints[i]) / (timePoints[i+1] - timePoints[i])),
+		];
+
+		lastDirection = calculatedDirection(xDiff, yDiff);
+
+		return ({
+			moving: true,
+			position: returnedPos,
+			facing: lastDirection
+		});
+
+/* 		return [
 			points[i][0] + xDiff * ((currentTimeMs - timePoints[i]) / (timePoints[i+1] - timePoints[i])),
 			points[i][1] + yDiff * ((currentTimeMs - timePoints[i]) / (timePoints[i+1] - timePoints[i])),
 		]
-	}
+ */	}
 
 	fnVariable = runningFn;
 
 	return time => fnVariable(time);
 };
 
-export const entityZigzagPath = (lastPosition: Position, startTimeMs: number, points: Position[], cellsPerSec: number): PathFn => {
-	return fixInterpolation(lastPosition, zigzagPath(startTimeMs, points, cellsPerSec));
+export const entityZigzagStatus = (lastPosition: Position, startTimeMs: number, points: Position[], cellsPerSec: number): StatusFn => {
+	return fixInterpolation(lastPosition, zigzagStatus(startTimeMs, points, cellsPerSec));
 }
 
-const line = (from: Position, to: Position, fromTime: number, totalTime: number): PathFn => {
+const line = (from: Position, to: Position, fromTime: number, totalTime: number): StatusFn => {
 	let xDiff = to[0] - from[0];
 	let yDiff = to[1] - from[1];
 
-	return (currentTimeMs: number) => {
-		return [
-			from[0] + xDiff * ((currentTimeMs - fromTime) / totalTime),
-			from[1] + yDiff * ((currentTimeMs - fromTime) / totalTime)
-		]
+	return (currentTimeMs: number): Status => {
+		return {
+			facing: calculatedDirection(xDiff, yDiff),
+			moving: true,
+			position: [
+				from[0] + xDiff * ((currentTimeMs - fromTime) / totalTime),
+				from[1] + yDiff * ((currentTimeMs - fromTime) / totalTime)
+			]
+		}
 	}
 }
 
-const fixInterpolation = (startPosition: Position, primiteFn: PathFn): PathFn => {
+const fixInterpolation = (startPosition: Position, primitiveFn: StatusFn): StatusFn => {
 	let now = performance.now();
-	let firstPosition = primiteFn(now+interpolationTimeMs);
+	let firstStatus = primitiveFn(now+interpolationTimeMs);
+
+	let firstPosition = firstStatus.position;
 
 	let positionsDist = Math.sqrt(Math.pow(startPosition[0] - firstPosition[0], 2) + Math.pow(startPosition[1] - firstPosition[1], 2));
 	if(positionsDist > maxInterpolationDist) {
-		return primiteFn;
+		return primitiveFn;
 	}
 
 	let fixFn = line(startPosition, firstPosition, now, interpolationTimeMs);
 	let lastTime = now+interpolationTimeMs;
-	return (currentTimeMs: number): Position => {
+	return (currentTimeMs: number): Status => {
 		if(currentTimeMs < lastTime) {
 			return fixFn(currentTimeMs);
 		}
 		else {
-			return primiteFn(currentTimeMs);
+			return primitiveFn(currentTimeMs);
 		}
 	}
 }

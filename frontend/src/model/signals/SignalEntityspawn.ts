@@ -1,4 +1,6 @@
 import { SignalIn } from "model/Definitions";
+import { enumValueOf } from "utils";
+import { EntityType } from "visual_model/EntityType";
 import VisualModel, { Position } from "visual_model/VisualModel";
 
 export default class SignalEntityspawn implements SignalIn {
@@ -16,7 +18,11 @@ export default class SignalEntityspawn implements SignalIn {
 	}
 
 	execute(model: VisualModel) {
-		model.world?.spawnEntity(this.id, this.type, this.pos, this.speed);
+		let t = enumValueOf(EntityType.enum.map, this.type);
+		if(t === null) {
+			t = EntityType.enum.map.UNKNOWN;
+		}
+		model.world?.spawnEntity(this.id, t, this.pos, this.speed);
 	}
 
 }

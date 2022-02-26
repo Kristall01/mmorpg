@@ -2,14 +2,16 @@ import LogicModel from "model/LogicModel";
 import React, { createContext, createRef } from "react";
 import VisualModel, {focus, Position} from "visual_model/VisualModel";
 import GraphicsComponent from "./graphics/component/GraphicsComponent";
-import WorldView from "./graphics/layers/WorldView";
+import WorldView from "./graphics/worldview/WorldView";
 import Chat from "./ui/chat/Chat";
 
 import "./GameView.scss";
+import CozyPack from "./graphics/texture/CozyPack";
 
 export type props = {
 	logicModel: LogicModel
-	visualModel: VisualModel
+	visualModel: VisualModel,
+	cozypack: CozyPack
 }
 
 export type Models = [LogicModel, VisualModel];
@@ -35,7 +37,7 @@ export default class GameView extends React.Component<props, {}> {
 
 		this.visualModel.setUpdateCallback(() => this.handleModelUpdate());
 
-		this.worldView = new WorldView(this.visualModel);
+		this.worldView = new WorldView(this.visualModel, props.cozypack);
 	}
 
 	componentWillUnmount() {

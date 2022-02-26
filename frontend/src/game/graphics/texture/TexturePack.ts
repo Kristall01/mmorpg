@@ -5,16 +5,15 @@ import Texture from "./Texture";
 
 class TexturePack {
 
-	private static texturePackInstance: TexturePack = null!
+	private static texturePackInstance: TexturePack = new TexturePack()!
 
 	private textureMap: Map<string, Texture> = new Map();
 	private defaultTexture: Texture = new EmptyTexture();
 
-	private constructor() {
-		this.textureMap = new Map();
-	}
+	private constructor() {}
 
 	public static async loadAllTextures(url: string) {
+		this.texturePackInstance.loadTextures(url);
 		let t = new TexturePack();
 		await t.loadTextures(url);
 		TexturePack.texturePackInstance = t;

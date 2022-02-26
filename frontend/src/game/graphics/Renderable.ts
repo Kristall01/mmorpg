@@ -10,12 +10,16 @@ export default interface Renderable {
 
 export abstract class StatelessRenderable implements Renderable {
 
-	protected ctx: RenderContext = null!;
+	private _ctx: RenderContext = null!;
 
 	unmount(): void {}
 
 	mount(ctx: RenderContext): void {
-		this.ctx = ctx
+		this._ctx = ctx
+	}
+
+	get ctx() {
+		return this._ctx;
 	}
 
 	abstract render(renderTime: number, width: number, height: number): void

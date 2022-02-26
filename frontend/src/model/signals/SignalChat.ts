@@ -3,7 +3,7 @@ import VisualModel from "visual_model/VisualModel";
 
 export default class SignalChat implements SignalIn {
 
-	message: string = null!
+	message: string;
 
 	constructor(message: string) {
 		this.message = message;

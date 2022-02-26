@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import MenuContext from "MenuContext";
 import MenuScene from "phases/menu/MenuScene";
 import TexturePack from "game/graphics/texture/TexturePack";
+import CozyPack from "game/graphics/texture/CozyPack";
 
 const LoadingScene = () => {
 
@@ -12,17 +13,20 @@ const LoadingScene = () => {
 
 	useEffect(() => {
 		(async () => {
+			let pack: CozyPack;
 			try {
 				await TexturePack.loadAllTextures("/textures/texturepack.json");
+				pack = await CozyPack.createPack("/textures/cozy/");
 			}
 			catch(err) {
+				console.error(err);
 				if(mounted) {
 					setText("Betöltési hiba.");
 				}
 				return;
 			}
 			if(mounted) {
-				setMenu(() => <MenuScene />);
+				setMenu(() => <MenuScene cozyPack={pack}/>);
 			}
 		})();
 		return () => {

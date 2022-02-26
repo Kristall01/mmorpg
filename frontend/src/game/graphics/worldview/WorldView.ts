@@ -1,8 +1,11 @@
 import VisualModel, { Position } from "visual_model/VisualModel";
+import { RenderContext } from "../GraphicsUtils";
 import { StatelessRenderable } from "../Renderable";
+import CozyPack from "../texture/CozyPack";
 import TexturePack from "../texture/TexturePack";
+import { renderEntity } from "./EntityRenderer";
 
-interface renderConfig {
+export interface renderConfig {
 	camX: number
 	camY: number
 	tileSize: number
@@ -10,6 +13,7 @@ interface renderConfig {
 	height: number
 	camFocusX: number
 	camFocusY: number
+	rendertime: number
 }
 
 class WorldView extends StatelessRenderable {
@@ -18,9 +22,12 @@ class WorldView extends StatelessRenderable {
 	private texturePack: TexturePack
 	private model: VisualModel
 	private renderConfig: renderConfig = null!
+	readonly cozyPack: CozyPack;
 
-	constructor(model: VisualModel) {
+	constructor(model: VisualModel, cozypack: CozyPack) {
 		super();
+
+		this.cozyPack = cozypack;
 
 		this.model = model;
 		this.texturePack = TexturePack.getInstance();
@@ -114,6 +121,7 @@ class WorldView extends StatelessRenderable {
 			height: height,
 			camFocusX: camFocusX,
 			camFocusY: camFocusY,
+			rendertime: rendertime,
 		};
 
 	}
@@ -188,7 +196,7 @@ class WorldView extends StatelessRenderable {
 		}
 
 		for(let e of this.model.world.entities) {
-			e.calculatePosition(renderTime);
+			e.calculateStatus(renderTime);
 		}
 
 		this.calculateRenderConfig(renderTime, width, height);
@@ -217,13 +225,17 @@ class WorldView extends StatelessRenderable {
 				this.model.world.getTextureAt(floorX, floorY).drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 			}
 		}
-		this.ctx.fillStyle = "yellow";
-
-		let blockSize = tileSize/2;
-
-		let halfBlockSize = blockSize/2;
+		//this.ctx.fillStyle = "yellow";
 
 		for(let entity of this.model.world.entities) {
+			renderEntity(this, entity, this.renderConfig);
+		}
+
+		// for(let entity of this.model.world.entities) {
+		// 	entity.render(this.renderConfig, this, this.ctx);
+		// }
+
+/* 		for(let entity of this.model.world.entities) {
 			let [x,y] = entity.getLastPosition();
 			let translated = this.translateXY(x, y);
 			entity.cachedCanvasPosition = translated;
@@ -239,7 +251,7 @@ class WorldView extends StatelessRenderable {
 				this.ctx.fillText(name, entity.cachedCanvasPosition[0]-textWidth/2, entity.cachedCanvasPosition[1]);
 			}
 		}
-	}
+ */	}
 	
 
 }

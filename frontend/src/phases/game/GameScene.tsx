@@ -1,3 +1,4 @@
+import CozyPack from "game/graphics/texture/CozyPack";
 import GameView from "game/GameView";
 import MenuContext from "MenuContext";
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
@@ -10,6 +11,7 @@ import "./GameScene.scss";
 
 type props = {
 	modelGenerator: (callback: IEventReciever) => LogicModel
+	cozyPack: CozyPack
 }
 
 type state = {
@@ -51,7 +53,7 @@ class GameScene extends Component<props, state>  {
 					this.change(event.data, true);
 				}
 				else {
-					this.context(<MenuScene />);
+					this.context(<MenuScene cozyPack={this.props.cozyPack} />);
 				}
 			}
 		}
@@ -75,10 +77,10 @@ class GameScene extends Component<props, state>  {
 				<div className="text">
 					{this.state.text}
 				</div>
-				{this.state.ended ? <button onClick={() => this.context(<MenuScene />)}>Vissza a menübe</button> : null}
+				{this.state.ended ? <button onClick={() => this.context(<MenuScene cozyPack={this.props.cozyPack} />)}>Vissza a menübe</button> : null}
 			</div>
 		}
-		return <GameView logicModel={this.model!} visualModel={this.state.model} />
+		return <GameView cozypack={this.props.cozyPack} logicModel={this.model!} visualModel={this.state.model} />
 	}
 
 }

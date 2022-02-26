@@ -1,5 +1,6 @@
 import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
+import SignalChangeClothes from "model/signals/SignalChangeClothes";
 import SignalChat from "model/signals/SignalChat";
 import SignalEntityDespawn from "model/signals/SignalEntityDespawn";
 import SignalEntitypath from "model/signals/SignalEntitypath";
@@ -43,13 +44,14 @@ class NetworkModel extends LogicModel {
 			}
  			return new SignalEntitypath(id, this.convertServerNanos(startNanos), points);
 		})
-		this.addPacketSignal("spawnentity", ({x, y, ID, speed}) => new SignalEntityspawn(ID, "player", [x,y], speed));
+		this.addPacketSignal("spawnentity", ({x, y, ID, speed, type}) => new SignalEntityspawn(ID, type, [x,y], speed));
 		this.addPacketSignal("despawnentity", ({id}) => new SignalEntityDespawn(id));
 		this.addPacketSignal("followentity", ({id}) => new SignalFocus(id));
 		this.addPacketSignal("entityspeed", ({id, speed}) => new SignalEntityspeed(id, speed));
 		this.addPacketSignal("joinworld", ({tileGrid, width, height, spawnX, spawnY}) => new SignalJoinworld(spawnX, spawnY, width, height, tileGrid));
 		this.addPacketSignal("leaveworld", () => new SignalLeaveworld());
 		this.addPacketSignal("entityrename", ({id, newname}) => new SignalRenameEntity(id, newname));
+		this.addPacketSignal("clothes", ({clothes, id}) => new SignalChangeClothes(id, clothes));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
@@ -96,7 +98,6 @@ class NetworkModel extends LogicModel {
 		})
 
 		this.ws.addEventListener("close", () => {
-			console.log("ws closed");
 			this.endConnection("network error: connection closed prematurely")
 		});
 	}
