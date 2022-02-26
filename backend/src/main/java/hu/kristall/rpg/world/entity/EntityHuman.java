@@ -1,9 +1,13 @@
 package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.network.PlayerConnection;
+import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
 import hu.kristall.rpg.network.packet.out.PacketOutMoveentity;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.WorldPlayer;
+import hu.kristall.rpg.world.entity.cozy.Cloth;
+import hu.kristall.rpg.world.entity.cozy.ClothPack;
 import hu.kristall.rpg.world.path.ConstantPosition;
 import hu.kristall.rpg.world.path.Path;
 
@@ -13,6 +17,7 @@ public class EntityHuman extends Entity {
 	
 	private WorldPlayer worldPlayer;
 	private Path lastPath;
+	private ClothPack clothes = new ClothPack(Cloth.NO_TOP, Cloth.NO_BOTTOM, Cloth.NO_SHOES);
 	
 	public EntityHuman(World world, int entityID, Position startPosition) {
 		super(world,EntityType.HUMAN,  entityID, 2);
@@ -37,12 +42,25 @@ public class EntityHuman extends Entity {
 		return lastPath;
 	}
 	
+	public void setClothes(ClothPack clothes) {
+		this.clothes = clothes;
+		getWorld().broadcastPacket(new PacketOutChangeClothes(this));
+	}
+	
+	public ClothPack getClothes() {
+		return clothes;
+	}
+	
 	@Override
 	public void move(Position to) {
 		long now = System.nanoTime();
-		Path p = this.getWorld().interpolatePath(getPosition(), to, getSpeed(), now);
-		this.lastPath = p;
+		this.lastPath = this.getWorld().interpolatePath(getPosition(), to, getSpeed(), now);
 		getWorld().broadcastPacket(new PacketOutMoveentity(this));
 	}
 	
+	@Override
+	public void sendStatusFor(PlayerConnection conn) {
+		super.sendStatusFor(conn);
+		conn.sendPacket(new PacketOutChangeClothes(this));
+	}
 }

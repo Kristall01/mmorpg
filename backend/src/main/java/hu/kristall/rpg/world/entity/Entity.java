@@ -1,8 +1,11 @@
 package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutEntityRename;
 import hu.kristall.rpg.network.packet.out.PacketOutEntityspeed;
+import hu.kristall.rpg.network.packet.out.PacketOutMoveentity;
+import hu.kristall.rpg.network.packet.out.PacketOutSpawnEntity;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.path.Path;
 
@@ -66,6 +69,14 @@ public abstract class Entity {
 		this.speed = newSpeed;
 		this.world.broadcastPacket(new PacketOutEntityspeed(this));
 		this.move(getLastPath().getTarget());
+	}
+	
+	public void sendStatusFor(PlayerConnection conn) {
+		conn.sendPacket(new PacketOutSpawnEntity(this));
+		conn.sendPacket(new PacketOutMoveentity(this));
+		if(getName() != null) {
+			conn.sendPacket(new PacketOutEntityRename(this));
+		}
 	}
 	
 }

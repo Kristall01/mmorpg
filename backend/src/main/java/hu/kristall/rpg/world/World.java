@@ -1,6 +1,7 @@
 package hu.kristall.rpg.world;
 
 import hu.kristall.rpg.*;
+import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
@@ -22,7 +23,7 @@ public class World extends SynchronizedObject<World> {
 	private Tile defaultTile;
 	private final int width, height;
 	private HashMap<Player, WorldPlayer> worldPlayers = new HashMap<>();
-	private HashMap<Integer, Entity> worldEntities = new HashMap<Integer, Entity>();
+	private HashMap<Integer, Entity> worldEntities = new HashMap<>();
 	private String name;
 	private Synchronizer<Server> asyncServer;
 	private int nextEntityID = 0;
@@ -99,20 +100,18 @@ public class World extends SynchronizedObject<World> {
 		try {
 			//sync world state to joining player
 			Position pos = new Position(3,3);
-			player.getConnection().sendPacket(new PacketOutJoinworld(this, pos));
+			PlayerConnection connectingConnection = player.getConnection();
+			connectingConnection.sendPacket(new PacketOutJoinworld(this, pos));
 			for (Entity e : this.worldEntities.values()) {
-					player.getConnection().sendPacket(new PacketOutSpawnEntity(e));
-					player.getConnection().sendPacket(new PacketOutMoveentity(e));
-					if(e.getName() != null) {
-						player.getConnection().sendPacket(new PacketOutEntityRename(e));
-					}
-				}
+				e.sendStatusFor(connectingConnection);
+			}
+			
 			//sync done
 			
 			WorldPlayer wp = new WorldPlayer(this, player);
 			worldPlayers.put(player, wp);
 			EntityHuman h = wp.spawnTo(pos);
-			player.getConnection().sendPacket(new PacketOutFollowEntity(h));
+			connectingConnection.sendPacket(new PacketOutFollowEntity(h));
 			broadcastMessage("§e" + player.getName() + " csatlakozott");
 			
 			//player.followEntity(p.getID());
