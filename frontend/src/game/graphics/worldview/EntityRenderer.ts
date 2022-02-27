@@ -78,6 +78,24 @@ renderers[EntityType.enum.map.UNKNOWN.ordinal] = renderUnknown;
 
 export const renderEntity = (view: WorldView, e: Entity, renderConfig: renderConfig) => {
 	renderers[e.type.ordinal](view, e,renderConfig);
+	if(e.name !== null) {
+		view.ctx.font = '30px Roboto';
+
+		let metrics = view.ctx.measureText(e.name);
+		//let fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
+		let actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+		let textWidth = metrics.width;
+		let pos = e.cachedCanvasPosition;
+		let xy = [pos[0]-textWidth/2, pos[1]-(e.type.height*1.25*renderConfig.tileSize)];
+		view.ctx.textBaseline = "top";
+
+		view.ctx.fillStyle = "rgba(0,0,0,0.3)";
+		view.ctx.fillRect(xy[0]-5, xy[1]-5, textWidth+10, actualHeight+10);
+
+		view.ctx.fillStyle = "#fff";
+		view.ctx.fillText(e.name, xy[0], xy[1]);
+	}
 }
 
 

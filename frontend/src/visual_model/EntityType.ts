@@ -16,16 +16,18 @@
 export class EntityType {
 
 	readonly ordinal: number;
+	readonly height: number
 	private static nextOrdinal: number = 0;
 
-	private constructor() {
+	private constructor(height: number) {
+		this.height = height;
 		this.ordinal = EntityType.nextOrdinal++;
 	}
 
 	static readonly enum = {
 		map: {
-			HUMAN: new EntityType(),
-			UNKNOWN: new EntityType(),
+			HUMAN: new EntityType(1),
+			UNKNOWN: new EntityType(0),
 		},
 		values: new Array<EntityType>()
 	}
