@@ -1,5 +1,6 @@
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
 import LogicModel from "model/LogicModel";
+import SignalChangeClothes from "model/signals/SignalChangeClothes";
 import SignalChat from "model/signals/SignalChat";
 import SignalClarchat from "model/signals/SignalClearchat";
 import SignalEntitypath from "model/signals/SignalEntitypath";
@@ -51,6 +52,7 @@ class DModel extends LogicModel {
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
 				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed));
 				this.broadcastSignal(new SignalRenameEntity(0, username));
+				this.broadcastSignal(new SignalChangeClothes(0, ["SUIT", "PANTS_SUIT","SHOES"]));
 				this.broadcastSignal(new SignalFocus(0));
 			}, 1);
 	
