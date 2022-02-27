@@ -70,7 +70,10 @@ class World {
 		let e = this.getEntity(id);
 		if(e !== undefined) {
 			let a = e;
-			this.camPositionFn = () => a.cachedStatus.position;
+			this.camPositionFn = () => {
+				let pos = a.cachedStatus.position;
+				return [pos[0], pos[1]-(a.type.height/2)];
+			}
 		}
 	}
 
