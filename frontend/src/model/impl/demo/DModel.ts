@@ -6,6 +6,7 @@ import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalFocus from "model/signals/SignalFocus";
 import SignalJoinworld from "model/signals/SignalJoinworld";
+import SignalRenameEntity from "model/signals/SignalRenameEntity";
 import { ConstStatus, Direction, StatusFn, zigzagStatus } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
@@ -49,6 +50,7 @@ class DModel extends LogicModel {
 				this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
 				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed));
+				this.broadcastSignal(new SignalRenameEntity(0, username));
 				this.broadcastSignal(new SignalFocus(0));
 			}, 1);
 	
