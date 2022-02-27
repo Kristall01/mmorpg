@@ -100,7 +100,7 @@ const calculatedDirection = (x: number, y: number): Direction => {
 	let absY = Math.abs(y);
 
 
-	if(absX < absY) {
+	if(absX*2 < absY) {
 		//verticalAxisDirection
 		return y >= 0 ? enumMap.SOUTH : enumMap.NORTH;
 	}
