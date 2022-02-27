@@ -6,17 +6,19 @@ const interpolationTimeMs = 100;
 export class Direction {
 
 	readonly ordinal: number;
+	readonly modifier: readonly number[]
 
-	private constructor(ordinal: number) {
+	private constructor(ordinal: number, modifier: number[]) {
 		this.ordinal = ordinal;
+		this.modifier = Object.freeze(modifier);
 	}
 
 	static readonly enum = {
 		map: {
-			SOUTH: new Direction(0),
-			NORTH: new Direction(1),
-			EAST: new Direction(2),
-			WEST: new Direction(3)},
+			SOUTH: new Direction(0, [0,1]),
+			NORTH: new Direction(1, [0,-1]),
+			EAST: new Direction(2, [1,0]),
+			WEST: new Direction(3, [-1,0])},
 		values: new Array<Direction>()
 	}
 

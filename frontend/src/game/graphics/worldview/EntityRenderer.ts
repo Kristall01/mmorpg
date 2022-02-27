@@ -66,35 +66,7 @@ const renderUnknown = (view: WorldView, e: Entity, renderConfig: renderConfig) =
 	ctx.beginPath();
 	ctx.moveTo(cX, cY);
 
-	let xMod: number = 0, yMod: number = 0;
-
-	let DirectionMap = Direction.enum.map;
-
-	switch(e.cachedStatus.facing) {
-		case DirectionMap.EAST: {
-			xMod = 1;
-			yMod = 0;
-			break;
-		}
-		case DirectionMap.WEST: {
-			xMod = -1;
-			yMod = 0;
-			break;
-		}
-		case DirectionMap.NORTH: {
-			xMod = 0;
-			yMod = -1;
-			break;
-		}
-		case DirectionMap.SOUTH: {
-			xMod = 0;
-			yMod = 1;
-			break;
-		}
-		default: {
-			console.log("default block");
-		}
-	}
+	let [xMod, yMod] = e.cachedStatus.facing.modifier;
 	ctx.lineTo(cX + xMod*100, cY + yMod*100);
 	ctx.stroke();
 }
