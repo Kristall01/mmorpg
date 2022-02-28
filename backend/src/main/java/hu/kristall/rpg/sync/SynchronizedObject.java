@@ -13,7 +13,7 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 	
 	private final ExecutorService executor;
 	private final Synchronizer<T> synchronizer;
-	private Logger taskPoolLogger = LoggerFactory.getLogger("");
+	private Logger taskPoolLogger;
 	
 	protected SynchronizedObject(String threadName) {
 		this(Executors.newSingleThreadExecutor(r -> new Thread(r, threadName)));
