@@ -67,7 +67,7 @@ export default class GameView extends React.Component<props, {}> {
 				return;
 			}
 		}
-		this.visualModel.multiplyZoom(1 - (e.deltaY / 1000));
+		this.visualModel.multiplyZoom(1 - (e.deltaY / 500));
 	}
 
 	handleMouseDown(e: React.MouseEvent) {
