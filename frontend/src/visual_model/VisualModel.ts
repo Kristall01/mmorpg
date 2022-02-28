@@ -75,8 +75,9 @@ class VisualModel {
 		//let from = zoomValue;
 		let now = performance.now();
 		//let to = zoomValue * val;
-		this.zoomTarget = this.zoomTarget*val;
-		this.zoomFn = sinSmoothZoom(now, 500, this.zoomFn(now), this.zoomTarget);
+		let target = this.zoomTarget*val;
+		this.zoomFn = sinSmoothZoom(now, 500, this.zoomFn(now), target);
+		this.zoomTarget = target;
 	}
 
 	set maxFPS(fps: number | null) {
