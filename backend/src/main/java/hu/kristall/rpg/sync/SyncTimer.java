@@ -47,6 +47,13 @@ public class SyncTimer extends Timer implements ISyncTimer {
 		return t;
 	}
 	
+	@Override
+	public Cancelable schedule(Runnable task, long delay) {
+		SyncTask t = new SyncTask(runner, task);
+		super.schedule(t, delay);
+		return t;
+	}
+	
 	private static class SyncTask extends TimerTask implements Cancelable {
 		
 		private final Runnable r;
