@@ -19,7 +19,7 @@ class VisualModel {
 	chatOpen: boolean = false
 	focus: focus = focus.main
 	allowCamLeak: boolean = false;
-	private zoomTarget = 100;
+	private zoomTarget = 200;
 	private zoomFn: ZoomFn;
 	maxZoom: number = 40;
 	private _maxFPS: number | null = null;
