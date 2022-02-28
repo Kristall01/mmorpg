@@ -14,10 +14,16 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 	private final ExecutorService executor;
 	private final Synchronizer<T> synchronizer;
 	private Logger taskPoolLogger;
+	private SyncTimer timer;
 	
 	protected SynchronizedObject(String threadName) {
 		this(Executors.newSingleThreadExecutor(r -> new Thread(r, threadName)));
 		this.taskPoolLogger = LoggerFactory.getLogger(threadName+"-task-pool");
+		this.timer = new SyncTimer(this);
+	}
+	
+	public ISyncTimer getTimer() {
+		return timer;
 	}
 	
 	protected SynchronizedObject() {
@@ -42,6 +48,7 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 	protected void shutdown() {
 		taskPoolLogger.info("shutting down...");
 		executor.shutdown();
+		timer.cancel();
 		taskPoolLogger.info("shutdown done");
 	}
 	
