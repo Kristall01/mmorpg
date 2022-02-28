@@ -20,7 +20,7 @@ const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => {
 	let sinceTime = status.moving ? renderConfig.rendertime - human.activityStart : 0;
 	activity.human(human.skin).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*1.5, sinceTime);
 	for(let clothes of human.clothes) {
-		activity.getCozyCloth(clothes).ofColor(ClothColor.enum.map.WHITE).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*1.5, sinceTime);
+		activity.getCozyCloth(clothes).ofColor(ClothColor.enum.map.BLACK).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*1.5, sinceTime);
 	}
 }
 
