@@ -35,6 +35,9 @@ const MenuScene = (props: props) => {
 		if(address === null) {
 			return;
 		}
+		if(address.length === 0) {
+			address = "ws://localhost:8080/ws";
+		}
 		setMenu(() => <GameScene cozyPack={props.cozyPack} modelGenerator={(a) => new NetworkModel(a, address!, name!)} />)
 	}
 

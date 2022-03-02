@@ -1,5 +1,7 @@
 import { convertToHtml } from "game/ui/chat/textconverter";
 import { SignalIn } from "model/Definitions";
+import Entity from "./Entity";
+import { LabelType, WorldLabel } from "./Label";
 import World from "./World";
 
 export enum focus {
@@ -23,6 +25,7 @@ class VisualModel {
 	private zoomFn: ZoomFn;
 	maxZoom: number = 40;
 	private _maxFPS: number | null = null;
+	private _dead: boolean = false;
 
 	constructor() {
 		this.triggerUpdate = () => {};
@@ -40,6 +43,15 @@ class VisualModel {
 
 	public leaveWorld() {
 		this._world = null;
+	}
+
+	get dead() {
+		return this._dead;
+	}
+
+	set dead(dead: boolean) {
+		this._dead = dead;
+		this.triggerUpdate();
 	}
 
 	get world() {
@@ -88,6 +100,16 @@ class VisualModel {
 	get maxFPS() {
 		return this._maxFPS;
 	}
+
+	showLabelFor(text: string, labelType: LabelType, entity: Entity) {
+		let pos = entity.cachedCanvasPosition;
+		//drawDamageLabel(view.ctx, [pos[0], top+(eHeight*0.75)], (renderConfig.rendertime % 1000)/750, "20");
+		this.world?.addLabel(new WorldLabel(text, labelType, entity));
+/* 		let eHeight = entity.type.height*1.25 * renderConfig.tileSize;
+		this.world?.addLabel(new WorldLabel(text, labelType, t => {
+			return [pos[0], top+(eHeight*0.75)];
+		}));
+ */	}
 
 }
 

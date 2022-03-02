@@ -20,8 +20,8 @@ export default class HumanEntity extends Entity {
 		Cloth.enum.map.SHOES,
  */	];
 
-	constructor(id: number, loc: Position, speed: number, facing: Direction) {
-		super(id, EntityType.enum.map.HUMAN, loc, speed, facing);
+	constructor(id: number, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number) {
+		super(id, EntityType.enum.map.HUMAN, loc, speed, facing, hp, maxHp);
 	}
 
 	walkBy(startTime: number, points: Position[]): void {

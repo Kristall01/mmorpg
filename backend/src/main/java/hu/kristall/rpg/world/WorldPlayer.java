@@ -46,7 +46,7 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 	}
 	
 	public EntityHuman getEntity() {
-		return entity;
+		return entity.isRemoved() ? null : entity;
 	}
 	
 	public EntityHuman spawnTo(Position pos) {
@@ -58,4 +58,7 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 		return this.entity;
 	}
 	
+	public boolean hasEntity() {
+		return !(entity == null || entity.isRemoved());
+	}
 }

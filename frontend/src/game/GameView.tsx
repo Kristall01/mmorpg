@@ -7,6 +7,7 @@ import Chat from "./ui/chat/Chat";
 
 import "./GameView.scss";
 import CozyPack from "./graphics/texture/CozyPack";
+import DeadLayer from "./ui/deadlayer/DeadLayer";
 
 export type props = {
 	logicModel: LogicModel
@@ -96,7 +97,7 @@ export default class GameView extends React.Component<props, {}> {
 	}
 
 	render(): React.ReactNode {
-		return (
+		let content = (
 			<div
 				onWheel={e => this.handleWheel(e)}
 				onMouseDown={e => this.handleMouseDown(e)}
@@ -114,6 +115,12 @@ export default class GameView extends React.Component<props, {}> {
 				</ModelContext.Provider>
 			</div>
 		)
+		if(this.visualModel.dead) {
+			return <DeadLayer>{content}</DeadLayer>
+		}
+		else {
+			return content;
+		}
 	}
 
 }

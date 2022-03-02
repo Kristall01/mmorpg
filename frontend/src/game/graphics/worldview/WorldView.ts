@@ -4,6 +4,7 @@ import { StatelessRenderable } from "../Renderable";
 import CozyPack from "../texture/CozyPack";
 import TexturePack from "../texture/TexturePack";
 import { renderEntity } from "./EntityRenderer";
+import { renderLabel, renderLabels } from "./LabelsRenderer";
 
 export interface renderConfig {
 	camX: number
@@ -231,6 +232,7 @@ class WorldView extends StatelessRenderable {
 			renderEntity(this, entity, this.renderConfig);
 		}
 
+		renderLabels(this, this.model.world, this.renderConfig);
 		// for(let entity of this.model.world.entities) {
 		// 	entity.render(this.renderConfig, this, this.ctx);
 		// }
@@ -251,7 +253,8 @@ class WorldView extends StatelessRenderable {
 				this.ctx.fillText(name, entity.cachedCanvasPosition[0]-textWidth/2, entity.cachedCanvasPosition[1]);
 			}
 		}
- */	}
+	 	*/	
+	}
 	
 
 }

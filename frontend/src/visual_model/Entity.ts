@@ -14,13 +14,18 @@ export default abstract class Entity {
 	cachedStatus: Status;
 	cachedCanvasPosition: Position = [0,0];
 	name: string | null = null;
+	private _hp: number
+	maxHp: number
+	alive: boolean = true
 
-	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction) {
+	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number) {
 		this.id = id;
 		this.type = type;
 		this.statusFn = ConstStatus(loc, facing);
 		this.cachedStatus = this.statusFn(performance.now());
 		this.speed = speed;
+		this._hp = hp;
+		this.maxHp = maxHp;
 	}
 
 	calculateStatus(rendertime: number) {
@@ -35,6 +40,24 @@ export default abstract class Entity {
 	walkBy(startTime: number, points: Position[]) {
 		let now = performance.now();
 		this.statusFn = entityZigzagStatus(this.statusFn(now).position, startTime, points, this.speed);
+	}
+
+	get hp() {
+		return this._hp;
+	}
+
+	set hp(amount: number) {
+		if(amount > this.maxHp) {
+			amount = this.maxHp;
+		}
+		else if(amount < 0) {
+			amount = 0;
+		}
+		this._hp = amount;
+	}
+
+	setDead(alive: boolean) {
+		this.alive = !alive;
 	}
 
 /* 	walk(startTime: number, from: Position, target: Position) {

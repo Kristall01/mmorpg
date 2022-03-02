@@ -120,6 +120,12 @@ public class World extends SynchronizedObject<World> {
 			//send map packets
 			//list entities
 			//etc
+			getTimer().schedule(() -> {
+				WorldPlayer wp0 = worldPlayers.get(player);
+				if(wp0 != null && wp0.hasEntity()) {
+					wp0.getEntity().damage((20));
+				}
+			}, 2000 );
 			
 			return wp.getSynchronizer();
 		}
