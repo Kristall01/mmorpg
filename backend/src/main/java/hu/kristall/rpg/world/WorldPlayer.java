@@ -41,6 +41,11 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 	}
 	
 	@Override
+	public boolean isShutdown() {
+		return world.isShutdown();
+	}
+	
+	@Override
 	public Synchronizer<WorldPlayer> getSynchronizer() {
 		return synchronizer;
 	}
