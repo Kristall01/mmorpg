@@ -68,6 +68,12 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - name: list files
+    - run: |
+        apt update
+        apt install tree
+        tree -halt
 
     - name: Build and push Docker images
       run: |
