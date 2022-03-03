@@ -170,7 +170,6 @@ public class World extends SynchronizedObject<World> {
 		for (WorldPlayer wp : worldPlayers.values()) {
 			wp.getPlayer().kick("A világ amiben tartózkodtál leállt.");
 		}
-		getSynchronizer().changeObject(null);
 		super.shutdown();
 	}
 	

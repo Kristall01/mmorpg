@@ -7,4 +7,6 @@ public interface TaskRunner {
 	
 	Future<?> runTask(Runnable task);
 	<T> Future<T> computeTask(Callable<T> c);
+	boolean isShutdown();
+	
 }

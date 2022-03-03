@@ -46,6 +46,11 @@ public class AsyncExecutor implements TaskRunner {
 	}
 	
 	@Override
+	public boolean isShutdown() {
+		return executorService.isShutdown();
+	}
+	
+	@Override
 	public <T> Future<T> computeTask(Callable<T> c) {
 		return executorService.submit(c);
 	}
