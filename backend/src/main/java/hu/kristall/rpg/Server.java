@@ -27,10 +27,10 @@ public class Server extends SynchronizedObject<Server> {
 	private boolean stopping = false;
 	private Logger logger = LoggerFactory.getLogger("server");
 	
-	private Server() {
+	private Server(String servePath) {
 		super("server");
 		try {
-			this.networkServer = new NetworkServer(this);
+			this.networkServer = new NetworkServer(this, servePath);
 			lang = new Lang();
 			lang.loadConfigFromJar("lang.cfg");
 			
@@ -79,8 +79,8 @@ public class Server extends SynchronizedObject<Server> {
 		});
 	}
 	
-	public static Synchronizer<Server> createServer() {
-		Server s = new Server();
+	public static Synchronizer<Server> createServer(String servePath) {
+		Server s = new Server(servePath);
 		return s.getSynchronizer();
 	}
 	
