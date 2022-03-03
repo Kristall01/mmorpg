@@ -74,7 +74,6 @@ public class Server extends SynchronizedObject<Server> {
 		}
 		getSynchronizer().sync(srv -> {
 			this.worldsManager.shutdown();
-			this.getSynchronizer().changeObject(null);
 			getSynchronizer().sync(s -> super.shutdown());
 		});
 	}
