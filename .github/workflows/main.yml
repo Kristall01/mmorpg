@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+        
+      - name: setup JDK
+        uses: actions/setup-java@v3.0.0
+        with:
+          java-version: 11
+          distribution: jdk
+        
+      - name: build backend
+        run: sh build.sh backend
+        
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+        
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.0.0
+        with:
+          node-version: 16
+          
+      - name: build frontend      
+        run: sh build.sh frontend
+  
+  docker_deploy:
+    runs-on: ubuntu-latest
+    needs: [build_backend, build_frontend]
+    steps:
+    - name: Login to DockerHub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v2.9.0
+      with:
+        push: true
+        tags: kristall01/mmorpg:latest
