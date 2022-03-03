@@ -7,4 +7,4 @@ COPY ${backend} /server/server.jar
 COPY ${frontend} /server/frontend
 ENV port=8080
 ENV serve=frontend
-RUN ["java","-jar","server.jar"]
+CMD ["java","-jar","server.jar"]
