@@ -3,6 +3,7 @@ package hu.kristall.rpg.network;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.sync.Synchronizer;
 import io.javalin.Javalin;
+import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.*;
 
 import java.util.Map;
@@ -17,11 +18,13 @@ public class NetworkServer {
 	private boolean wsAdded = false;
 	private AtomicBoolean stopping = new AtomicBoolean(false);
 	
-	public NetworkServer(Server server) {
+	public NetworkServer(Server server, String servePath) {
 		this.asyncServer = server.getSynchronizer();
 		Javalin httpServer = Javalin.create(c -> {
 			c.showJavalinBanner = false;
-			//c.addStaticFiles("/hdd/teams_records/szakdolgozat/game/build", Location.EXTERNAL);
+			if(servePath != null) {
+				c.addStaticFiles(servePath, Location.EXTERNAL);
+			}
 		});
 		this.javalinServer = httpServer;
 		httpServer.start(8080);
