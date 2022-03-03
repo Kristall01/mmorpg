@@ -49,7 +49,6 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build and push Docker images
-      uses: docker/build-push-action@v2.9.0
-      with:
-        push: true
-        tags: kristall01/mmorpg:latest
+      run: |
+        docker image build -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:$(date +%s) .
+        docker image push ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg
