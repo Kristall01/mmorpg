@@ -2,10 +2,13 @@ import hu.kristall.rpg.ChatColor;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.console.FilteredConsolePrinter;
 import hu.kristall.rpg.console.InputReader;
+import hu.kristall.rpg.network.NetworkServer;
 import hu.kristall.rpg.sync.Synchronizer;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 	
@@ -66,9 +69,23 @@ public class Main {
 			System.setErr(new FilteredConsolePrinter(System.err, ChatColor::translateColorCodes));
 		}
 		
+		NetworkServer networkServer = new NetworkServer();
 		Synchronizer<Server> s = Server.createServer();
+		Map<String, Server> servers = new HashMap<String, Server>();
+		networkServer.addServer("s0", s);
+		networkServer.addServer("s1", s);
+		networkServer.addServer("s2", s);
 		InputReader reader = new InputReader(s);
 		
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			
+			networkServer.stop();
+			s.sync(srv -> {
+				if(srv != null) {
+					srv.shutdown();
+				}
+			});
+		}));
 	}
 	
 }

@@ -3,7 +3,6 @@ package hu.kristall.rpg;
 import hu.kristall.rpg.command.CommandCollections;
 import hu.kristall.rpg.command.CommandMap;
 import hu.kristall.rpg.lang.Lang;
-import hu.kristall.rpg.network.NetworkServer;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
@@ -17,7 +16,6 @@ import java.util.function.Consumer;
 
 public class Server extends SynchronizedObject<Server> {
 	
-	private NetworkServer networkServer;
 	private CommandMap commandMap;
 	//private InputReader inputReader;
 	private Lang lang;
@@ -30,14 +28,13 @@ public class Server extends SynchronizedObject<Server> {
 	private Server() {
 		super("server");
 		try {
-			this.networkServer = new NetworkServer(this);
+			//this.networkServer = new NetworkServer(this);
 			lang = new Lang();
 			lang.loadConfigFromJar("lang.cfg");
 			
 			commandMap = CommandCollections.base(this);
 			//this.inputReader = new InputReader(text -> getSynchronizer().sync(srv -> srv.getCommandMap().executeConsoleCommand(text)), this.commandMap);
 			this.worldsManager = new WorldsManager(this);
-			this.networkServer.startAcceptingConnections();
 			this.worldsManager.createWorld("w0", 20, 20);
 			this.worldsManager.createWorld("w1", 15, 15);
 			this.worldsManager.createWorld("w2", 10, 10);
@@ -68,13 +65,11 @@ public class Server extends SynchronizedObject<Server> {
 		}
 		this.stopping = true;
 		logger.info("shutting down server");
-		networkServer.stop();
 		for (Consumer<Server> shutdownListener : shutdownListeners) {
 			shutdownListener.accept(this);
 		}
 		getSynchronizer().sync(srv -> {
 			this.worldsManager.shutdown();
-			this.getSynchronizer().changeObject(null);
 			getSynchronizer().sync(s -> super.shutdown());
 		});
 	}
@@ -92,10 +87,6 @@ public class Server extends SynchronizedObject<Server> {
 	
 	public CommandMap getCommandMap() {
 		return commandMap;
-	}
-	
-	public NetworkServer getNetworkServer() {
-		return networkServer;
 	}
 	
 	public WorldsManager getWorldsManager() {

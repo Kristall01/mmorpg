@@ -12,18 +12,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NetworkServer {
 	
 	private final Map<WsContext, NetworkConnection> connections = new ConcurrentHashMap<>();
-	private final Synchronizer<Server> asyncServer;
+	//private final Synchronizer<Server> asyncServer;
 	private Javalin javalinServer;
-	private boolean wsAdded = false;
 	private AtomicBoolean stopping = new AtomicBoolean(false);
+	private Map<String, Synchronizer<Server>> servers = new ConcurrentHashMap<>();
 	
-	public NetworkServer(Server server) {
-		this.asyncServer = server.getSynchronizer();
+	public NetworkServer() {
+		//this.asyncServer = server.getSynchronizer();
 		Javalin httpServer = Javalin.create(c -> {
 			c.showJavalinBanner = false;
 			//c.addStaticFiles("/hdd/teams_records/szakdolgozat/game/build", Location.EXTERNAL);
 		});
 		this.javalinServer = httpServer;
+		javalinServer.ws("/{server}", ws -> {
+			ws.onConnect(this::handleConnect);
+			ws.onMessage(this::handleConnectionMessage);
+			ws.onError(this::handleConnectionError);
+			ws.onClose(this::handleConnectionClose);
+		});
 		httpServer.start(8080);
 	}
 	
@@ -34,7 +40,20 @@ public class NetworkServer {
 	}
 	
 	private void handleConnectionClose(WsCloseContext ctx) {
-		connections.remove(ctx).handleConnectionClose();
+		NetworkConnection conn = connections.remove(ctx);
+		if(conn != null) {
+			conn.handleConnectionClose();
+		}
+	}
+	
+	public void addServer(String ID, Synchronizer<Server> server) {
+		server.sync(srv -> {
+			if(srv == null) {
+				return;
+			}
+			srv.addShutdownListener(shutdown -> servers.remove(ID));
+			this.servers.put(ID, server);
+		});
 	}
 	
 	private void handleConnect(WsConnectContext ctx) {
@@ -42,7 +61,12 @@ public class NetworkServer {
 			ctx.closeSession();
 			return;
 		}
-		connections.put(ctx, new WebsocketPlayerConnection(this.asyncServer, ctx));
+		Synchronizer<Server> srv = servers.get(ctx.pathParam("server"));
+		if(srv == null) {
+			ctx.closeSession();
+			return;
+		}
+		connections.put(ctx, new WebsocketPlayerConnection(srv, ctx));
 	}
 	
 	private void handleConnectionError(WsErrorContext wsErrorContext) {
@@ -50,24 +74,14 @@ public class NetworkServer {
 	}
 	
 	public void stop() {
+		if(stopping.get()) {
+			return;
+		}
 		stopping.set(true);
 		for (NetworkConnection value : connections.values()) {
 			value.close("server stopping");
 		}
 		javalinServer.stop();
-	}
-	
-	public void startAcceptingConnections() {
-		if(wsAdded) {
-			throw new IllegalStateException("ws is already added");
-		}
-		this.wsAdded =  true;
-		javalinServer.ws("/ws", ws -> {
-			ws.onConnect(this::handleConnect);
-			ws.onMessage(this::handleConnectionMessage);
-			ws.onError(this::handleConnectionError);
-			ws.onClose(this::handleConnectionClose);
-		});
 	}
 	
 }
