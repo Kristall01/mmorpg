@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: backend
-          path: artifacts/backend.jar
+          path: ./artifacts/backend.jar
         
   build_frontend:
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: frontend
-          path: artifacts/frontend
+          path: ./artifacts/frontend
 
   
   docker_deploy:
@@ -69,13 +69,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         
-    - name: list files
-      run: |
-        apt update
-        apt install tree
-        tree -halt
-
     - name: Build and push Docker images
       run: |
-        docker image build --build-arg backend=./artifacts/backend/backend.jar --build-arg frontend=./artifacts/frontend/frontend  -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:$(date +%s) .
+        docker image build --build-arg backend=./artifacts/backend/backend.jar --build-arg frontend=./artifacts/frontend/frontend -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:$(date +%s) .
         docker image push ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg
