@@ -27,21 +27,21 @@ public class CommandClothes extends SimpleCommand {
 			
 			sender.sendMessage("§afelsők:");
 			for (Cloth value : Cloth.values()) {
-				if(value.isTop()) {
+				if(value.bitmap == 4) {
 					sender.sendMessage(" -§7 §r"+value.name());
 				}
 			}
 			
 			sender.sendMessage("§aalsók:");
 			for (Cloth value : Cloth.values()) {
-				if(value.isBottom()) {
+				if(value.bitmap == 2) {
 					sender.sendMessage(" -§7 §r"+value.name());
 				}
 			}
 			
 			sender.sendMessage("§acipők:");
 			for (Cloth value : Cloth.values()) {
-				if(value.isBottom()) {
+				if(value.bitmap == 1) {
 					sender.sendMessage(" -§7 §r"+value.name());
 				}
 			}
