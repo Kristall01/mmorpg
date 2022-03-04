@@ -12,7 +12,7 @@ jobs:
           mkdir -p ~/.ssh
           echo ${{ secrets.PRIVATE_SSH_KEY }} > ~/id_rsa
           echo ${{ secrets.PUBLIC_SSH_KEY }} > ~/id_rsa.pub
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
           
         
 #      mkdir -p ~/.ssh
