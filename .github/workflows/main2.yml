@@ -1,4 +1,4 @@
-name: CI
+name: deploy ssh
 
 on:
   workflow_dispatch:
@@ -7,9 +7,18 @@ jobs:
   upgrade:
     runs-on: ubuntu-latest
     steps:
-      - name: copy ssh key
+      - name: copy ssh keys
         run: |
           mkdir -p ~/.ssh
           echo ${{ secrets.SSH_PRIVATE_KEY }} > ~/id_rsa
           echo ${{ secrets.SSH_PUBLIC_KEY }} > ~/id_rsa.pub
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "${{ secrets.SSH_COMMAND }}"
+
+      - name: upgrade
+        run: |
+          - name: executing remote ssh commands using password
+            uses: appleboy/ssh-action@master
+            with:
+              host: ${{ secrets.SSH_HOST }}
+              username: ${{ secrets.SSH_USER }}
+              script: ${{ secrets.SSH_COMMAND }}
+              key: ${{ secrets.SSH_PRIVATE_KEY }}
