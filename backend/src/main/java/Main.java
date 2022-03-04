@@ -65,7 +65,7 @@ public class Main {
 			System.setOut(new FilteredConsolePrinter(System.out, ChatColor::translateColorCodes));
 			System.setErr(new FilteredConsolePrinter(System.err, ChatColor::translateColorCodes));
 		}
-		String servePath = args.length == 0 ? null : String.join(" ", args);
+		String servePath = System.getenv("serve");
 		Synchronizer<Server> s = Server.createServer(servePath);
 		InputReader reader = new InputReader(s);
 		
