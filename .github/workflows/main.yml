@@ -50,7 +50,7 @@ jobs:
         
       - name: ZIP files
         run: |
-          cd ./artifacts; zip -q -r frontend.zip frontend
+          cd ./artifacts && zip -q -r frontend.zip frontend
         
       - name: save frontend artifact
         uses: actions/upload-artifact@v2
