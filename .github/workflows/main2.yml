@@ -12,14 +12,4 @@ jobs:
           mkdir -p ~/.ssh
           echo ${{ secrets.SSH_PRIVATE_KEY }} > ~/id_rsa
           echo ${{ secrets.SSH_PUBLIC_KEY }} > ~/id_rsa.pub
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
-          
-        
-#      mkdir -p ~/.ssh
-#    steps:
-#    - uses: garygrossgarten/github-action-ssh@release
-#      with:
-#        command: ${{ secrets.SSH_COMMAND }}
-#        host: ${{ secrets.SSH_HOST }}
-#        username: ${{ secrets.SSH_USER }}
-#        privateKey: ${{ secrets.SSH_KEY }}
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "${{ secrets.SSH_COMMAND }}"
