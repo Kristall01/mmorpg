@@ -52,6 +52,12 @@ jobs:
         run: zip -q -r frontend.zip frontend
         working-directory: ./artifacts
         
+      - name: list files
+        run: |
+          apt update
+          apt install -y tree
+          tree -halt .
+        
       - name: save frontend artifact
         uses: actions/upload-artifact@v2
         with:
