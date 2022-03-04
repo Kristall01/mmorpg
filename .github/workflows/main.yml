@@ -49,8 +49,8 @@ jobs:
         uses: montudor/action-zip@v1.0.0
         
       - name: ZIP files
-        run: |
-          cd ./artifacts && zip -q -r frontend.zip frontend
+        run: zip -q -r frontend.zip frontend
+        working-directory: ./artifacts
         
       - name: save frontend artifact
         uses: actions/upload-artifact@v2
