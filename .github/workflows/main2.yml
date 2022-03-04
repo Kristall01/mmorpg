@@ -7,5 +7,9 @@ jobs:
   upgrade:
     runs-on: ubuntu-latest
     steps:
-      - name: asd
-        run: echo ${{ secrets.SSH_KEY }} | ssh -i /dev/stdin ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
+    - uses: garygrossgarten/github-action-ssh@release
+      with:
+        command: ${{ secrets.SSH_COMMAND }}
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        privateKey: ${{ secrets.SSH_KEY }}
