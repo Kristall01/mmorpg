@@ -1,0 +1,11 @@
+name: CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: asd
+        run: echo ${{ secrets.SSH_KEY }} | ssh -i /dev/stdin ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
