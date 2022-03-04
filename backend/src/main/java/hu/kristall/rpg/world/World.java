@@ -93,7 +93,9 @@ public class World extends SynchronizedObject<World> {
 	
 	private void addEntity(Entity entity) {
 		worldEntities.put(entity.getID(), entity);
-		broadcastPacket(new PacketOutSpawnEntity(entity));
+		for (WorldPlayer value : worldPlayers.values()) {
+			entity.sendStatusFor(value.getPlayer().getConnection());
+		}
 	}
 	
 	public Synchronizer<WorldPlayer> joinPlayer(Player player) {

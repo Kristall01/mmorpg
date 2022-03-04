@@ -31,6 +31,10 @@ public enum Cloth {
 		this.transparent = transparent;
 	}
 	
+	public boolean isComplete() {
+		return (bitmap & 7) == 7;
+	}
+	
 	public boolean isTop() {
 		return (bitmap & 4) == 4;
 	}
