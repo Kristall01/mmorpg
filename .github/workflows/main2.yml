@@ -10,12 +10,9 @@ jobs:
       - name: copy ssh key
         run: |
           mkdir -p ~/.ssh
-          cd ~/.ssh
-          echo ${{ secrets.PRIVATE_SSH_KEY }} > id_rsa
-          echo ${{ secrets.PUBLIC_SSH_KEY }} > id_rsa.pub
-          cd ..
-      - name: connect & upgrade
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
+          echo ${{ secrets.PRIVATE_SSH_KEY }} > ~/id_rsa
+          echo ${{ secrets.PUBLIC_SSH_KEY }} > ~/id_rsa.pub
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
           
         
 #      mkdir -p ~/.ssh
