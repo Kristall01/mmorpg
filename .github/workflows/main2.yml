@@ -7,9 +7,22 @@ jobs:
   upgrade:
     runs-on: ubuntu-latest
     steps:
-    - uses: garygrossgarten/github-action-ssh@release
-      with:
-        command: ${{ secrets.SSH_COMMAND }}
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        privateKey: ${{ secrets.SSH_KEY }}
+      - name: copy ssh key
+        run: |
+          mkdir -p ~/.ssh
+          cd ~/.ssh
+          echo ${{ secrets.PRIVATE_SSH_KEY }} > id_rsa
+          echo ${{ secrets.PUBLIC_SSH_KEY }} > id_rsa.pub
+          cd ..
+      - name: connect & upgrade
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} ${{ secrets.SSH_COMMAND }}
+          
+        
+#      mkdir -p ~/.ssh
+#    steps:
+#    - uses: garygrossgarten/github-action-ssh@release
+#      with:
+#        command: ${{ secrets.SSH_COMMAND }}
+#        host: ${{ secrets.SSH_HOST }}
+#        username: ${{ secrets.SSH_USER }}
+#        privateKey: ${{ secrets.SSH_KEY }}
