@@ -81,7 +81,10 @@ jobs:
         path: ./artifacts
         
     - name: unzip frontend
-      run: unzip ./artifacts/frontend/frontend.zip
+      run: |
+        mkdir unzipped
+        unzip ./frontend.zip -d ./unzipped
+      working-directory: ./artifacts/frontend
     
     - name: Login to DockerHub
       uses: docker/login-action@v1
@@ -91,7 +94,7 @@ jobs:
         
     - name: Build and push Docker images
       run: |
-        docker image build --build-arg backend=./artifacts/backend/backend.jar --build-arg frontend=./frontend -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:$(date +%s) .
+        docker image build --no-cache --build-arg backend=./artifacts/backend/backend.jar --build-arg frontend=./artifacts/frontend/unzipped/frontend -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:$(date +%s) .
         docker image push ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg
   
   ssh_deploy:
