@@ -108,7 +108,7 @@ export default class GameView extends React.Component<props, {}> {
 				onMouseMove={e => this.handleMouseMove(e)}
 			>
 				<ModelContext.Provider value={[this.logicModel, this.visualModel]}>
-					<GraphicsComponent model={this.visualModel} view={this.worldView} />
+					<GraphicsComponent renderable={this.worldView} />
 					<Chat />
 					<button onClick={() => this.logicModel.disconnect()} className="dc-button">Disconnect</button>
 				</ModelContext.Provider>
