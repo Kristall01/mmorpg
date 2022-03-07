@@ -1,9 +1,11 @@
 import VisualModel, { Position } from "visual_model/VisualModel";
+import World from "visual_model/World";
 import { RenderContext } from "../GraphicsUtils";
 import { StatelessRenderable } from "../Renderable";
 import CozyPack from "../texture/CozyPack";
 import TexturePack from "../texture/TexturePack";
 import { renderEntity } from "./EntityRenderer";
+import TileCache from "./TileCache";
 
 export interface renderConfig {
 	camX: number
@@ -20,17 +22,19 @@ class WorldView extends StatelessRenderable {
 
 	//private camPosition: CameraPositionFn = (rendertime: number) => center;
 	private texturePack: TexturePack
-	private model: VisualModel
 	private renderConfig: renderConfig = null!
 	readonly cozyPack: CozyPack;
+	private tileCache: TileCache;
+	private world: World
+	private model: VisualModel
 
-	constructor(model: VisualModel, cozypack: CozyPack) {
+	constructor(world: World, cozypack: CozyPack, texturePack: TexturePack) {
 		super();
-
+		this.model = world.model;
+		this.world = world;
+		this.texturePack = texturePack;
 		this.cozyPack = cozypack;
-
-		this.model = model;
-		this.texturePack = TexturePack.getInstance();
+		this.tileCache = new TileCache(this);
 	}
 
 	translateXY(x: number, y: number): Position {
@@ -52,7 +56,7 @@ class WorldView extends StatelessRenderable {
 	}
 
 	calculateRenderConfig(rendertime: number, width: number, height: number) {
-		let world = this.model.world!;
+		let world = this.world;
 
 		let camProps = world.camPosition(rendertime);
 
@@ -90,7 +94,7 @@ class WorldView extends StatelessRenderable {
 				camY = minCamY;
 			}
 			else {
-				let maxCamY = ((height * camFocusY)/zoom) + this.model.world!.height - (height/zoom);
+				let maxCamY = ((height * camFocusY)/zoom) + this.world.height - (height/zoom);
 				if(maxCamY < camY) {
 					camY = maxCamY;
 				}
@@ -106,7 +110,7 @@ class WorldView extends StatelessRenderable {
 				camX = minCamX;
 			}
 			else {
-				let maxCamX = ((width * camFocusX)/zoom) + this.model.world!.width - (width/zoom);
+				let maxCamX = ((width * camFocusX)/zoom) + this.world.width - (width/zoom);
 				if(maxCamX < camX) {
 					camX = maxCamX;
 				}
@@ -128,10 +132,10 @@ class WorldView extends StatelessRenderable {
 
 
 	/* calculateRenderConfig(rendertime: number, width: number, height: number) {
-		let camProps = this.model.world!.camPosition(rendertime);
+		let camProps = this.world.camPosition(rendertime);
 
-		let minHorizontalZoom = width / this.model.world!.width;
-		let minVerticalZoom: number = height / this.model.world!.height;
+		let minHorizontalZoom = width / this.world.width;
+		let minVerticalZoom: number = height / this.world.height;
 
 		let zoom = this.model.zoomAt(rendertime);
 
@@ -158,7 +162,7 @@ class WorldView extends StatelessRenderable {
 			camX = minCamX;
 		}
 		else {
-			let maxCamX = ((width * camFocusX)/zoom) + this.model.world!.width - (width/zoom);
+			let maxCamX = ((width * camFocusX)/zoom) + this.world.width - (width/zoom);
 			if(maxCamX < camX) {
 				camX = maxCamX;
 			}
@@ -169,7 +173,7 @@ class WorldView extends StatelessRenderable {
 			camY = minCamY;
 		}
 		else {
-			let maxCamY = ((height * camFocusY)/zoom) + this.model.world!.height - (height/zoom);
+			let maxCamY = ((height * camFocusY)/zoom) + this.world.height - (height/zoom);
 			if(maxCamY < camY) {
 				camY = maxCamY;
 			}
@@ -189,13 +193,13 @@ class WorldView extends StatelessRenderable {
 	render(renderTime: number, width: number, height: number): void {
 		this.ctx.imageSmoothingEnabled = false;
 
-		if(this.model.world === null || this.model.world.width < 1 || this.model.world.height < 1) {
+		if(this.world.width < 1 || this.world.height < 1) {
 			this.ctx.fillStyle = "#000";
 			this.ctx.fillRect(0, 0, width, height);
 			return;
 		}
 
-		for(let e of this.model.world.entities) {
+		for(let e of this.world.entities) {
 			e.calculateStatus(renderTime);
 		}
 
@@ -222,20 +226,20 @@ class WorldView extends StatelessRenderable {
 				//let tileYPos = (height * (1-camFocusY)) - ((-camY + floorY+1) * tileSize);
 
 				//let [translatedX, translatedY] = this.translateXY(floorX, floorY);
-				this.model.world.getTextureAt(floorX, floorY).drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
+				this.world.getTextureAt(floorX, floorY).drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 			}
 		}
 		//this.ctx.fillStyle = "yellow";
 
-		for(let entity of this.model.world.entities) {
+		for(let entity of this.world.entities) {
 			renderEntity(this, entity, this.renderConfig);
 		}
 
-		// for(let entity of this.model.world.entities) {
+		// for(let entity of this.world.entities) {
 		// 	entity.render(this.renderConfig, this, this.ctx);
 		// }
 
-/* 		for(let entity of this.model.world.entities) {
+/* 		for(let entity of this.world.entities) {
 			let [x,y] = entity.getLastPosition();
 			let translated = this.translateXY(x, y);
 			entity.cachedCanvasPosition = translated;
@@ -244,7 +248,7 @@ class WorldView extends StatelessRenderable {
 		}
 		this.ctx.fillStyle = "#000";
 		this.ctx.font = Math.round(tileSize/5)+"px Arial";
-		for(let entity of this.model.world.entities) {
+		for(let entity of this.world.entities) {
 			let name = entity.name;
 			if(name !== null) {
 				let textWidth = this.ctx.measureText(name).width;

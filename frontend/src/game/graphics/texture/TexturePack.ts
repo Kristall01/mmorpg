@@ -10,17 +10,13 @@ class TexturePack {
 	private textureMap: Map<string, Texture> = new Map();
 	private defaultTexture: Texture = new EmptyTexture();
 
-	private constructor() {}
+	constructor() {}
 
 	public static async loadAllTextures(url: string) {
 		this.texturePackInstance.loadTextures(url);
 		let t = new TexturePack();
 		await t.loadTextures(url);
 		TexturePack.texturePackInstance = t;
-	}
-
-	public static getInstance() {
-		return this.texturePackInstance;
 	}
 
 	private async loadTextures(url: string) {

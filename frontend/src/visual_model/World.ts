@@ -12,17 +12,19 @@ class World {
 
 	public width: number
 	public height: number
-	private pack: TexturePack = null!
+	//private pack: TexturePack = null!
 	private textureMatrix: Array<Texture>
 	private _entities: Map<number, Entity> = new Map();
 	private humanTextures: null = null;
 	camPositionFn: (rendertime: number) => Position;
+	public readonly model: VisualModel
 
-	constructor(parent: VisualModel, width: number, height: number, tileGrid: string[], camStart: Position) {
+	constructor(model: VisualModel, width: number, height: number, tileGrid: string[], camStart: Position) {
+		this.model = model;
 		this.width = width;
 		this.height = height;
 		this.textureMatrix = new Array(width*height);
-		this.pack = TexturePack.getInstance();
+//		this.pack = TexturePack.getInstance();
 		this.camPositionFn = () => camStart;
 
 		for(let i = 0; i < tileGrid.length; ++i) {
@@ -83,17 +85,6 @@ class World {
 
 	private indexToPos(i: number) {
 		return [i % this.width, Math.round(i / this.width)];
-	}
-
-	getTextureAt(x: number, y: number): Texture {
-		if(x < 0 || y < 0 || x >= this.width || y >= this.height) {
-			return this.pack.getDefaultTexture();
-		}
-		let a = this.textureMatrix[this.posToIndex([x,y])];
-		if(!a) {
-			console.log("err");
-		}
-		return a;
 	}
 
 }

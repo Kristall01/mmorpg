@@ -8,10 +8,11 @@ import { Component, Context, createContext, useState } from "react";
 import VisualModel from "visual_model/VisualModel";
 
 import "./GameScene.scss";
+import ImageStore from "game/ImageStore";
 
 type props = {
 	modelGenerator: (callback: IEventReciever) => LogicModel
-	cozyPack: CozyPack
+	imageStore: ImageStore
 }
 
 type state = {
@@ -53,7 +54,7 @@ class GameScene extends Component<props, state>  {
 					this.change(event.data, true);
 				}
 				else {
-					this.context(<MenuScene cozyPack={this.props.cozyPack} />);
+					this.context(<MenuScene imageStore={this.props.imageStore} />);
 				}
 			}
 		}
@@ -77,10 +78,10 @@ class GameScene extends Component<props, state>  {
 				<div className="text">
 					{this.state.text}
 				</div>
-				{this.state.ended ? <button onClick={() => this.context(<MenuScene cozyPack={this.props.cozyPack} />)}>Vissza a menübe</button> : null}
+				{this.state.ended ? <button onClick={() => this.context(<MenuScene imageStore={this.props.imageStore} />)}>Vissza a menübe</button> : null}
 			</div>
 		}
-		return <GameView cozypack={this.props.cozyPack} logicModel={this.model!} visualModel={this.state.model} />
+		return <GameView imageStore={this.props.imageStore} logicModel={this.model!} visualModel={this.state.model} />
 	}
 
 }

@@ -7,11 +7,13 @@ import Chat from "./ui/chat/Chat";
 
 import "./GameView.scss";
 import CozyPack from "./graphics/texture/CozyPack";
+import ImageStore from "./ImageStore";
+import TexturePack from "./graphics/texture/TexturePack";
 
 export type props = {
 	logicModel: LogicModel
 	visualModel: VisualModel,
-	cozypack: CozyPack
+	imageStore: ImageStore
 }
 
 export type Models = [LogicModel, VisualModel];
@@ -25,6 +27,8 @@ export default class GameView extends React.Component<props, {}> {
 	private visualModel: VisualModel
 	private mainRef = createRef<HTMLDivElement>();
 	private intervalTask: number | undefined = undefined
+	private cozyPack: CozyPack
+	private texturePack: TexturePack
 
 	private mousePositionX: number = 0;
 	private mousePositionY: number = 0;
@@ -32,12 +36,14 @@ export default class GameView extends React.Component<props, {}> {
 	constructor(props: props) {
 		super(props);
 
+		this.cozyPack = new CozyPack(this.props.imageStore);
+		this.texturePack = new TexturePack();
+
 		this.logicModel = props.logicModel;
 		this.visualModel = props.visualModel;
 
-		this.visualModel.setUpdateCallback(() => this.handleModelUpdate());
-
-		this.worldView = new WorldView(this.visualModel, props.cozypack);
+		this.visualModel.addUpdateListener((type) => this.handleModelUpdate());
+		this.worldView = new WorldView(this.visualModel, this.cozyPack, this.texturePack);
 	}
 
 	componentWillUnmount() {
