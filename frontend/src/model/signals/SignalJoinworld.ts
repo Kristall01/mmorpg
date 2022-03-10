@@ -1,3 +1,4 @@
+import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
 import VisualModel from "visual_model/VisualModel";
 
@@ -7,14 +8,14 @@ export default class SignalJoinworld implements SignalIn {
 	spawnY: number;
 	width: number;
 	height: number;
-	tileGrid: string[]
+	tileGrid: Matrix<string>
 
 	constructor(spawnX: number, spawnY: number, width: number, height: number, tileGrid: string[]) {
 		this.spawnX = spawnX;
 		this.spawnY = spawnY;
 		this.width = width;
 		this.height = height;
-		this.tileGrid = tileGrid;
+		this.tileGrid = Matrix.fromArray(width, height, tileGrid);
 	}
 
 	execute(model: VisualModel): void {

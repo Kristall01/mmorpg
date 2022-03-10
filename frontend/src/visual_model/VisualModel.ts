@@ -1,5 +1,7 @@
 import { convertToHtml } from "game/ui/chat/textconverter";
+import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
+import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
 export enum focus {
@@ -9,37 +11,38 @@ export enum focus {
 
 export type Position = [number,number];
 
+
 type ZoomFn = (rendertime: number) => number;
 
-class VisualModel {
+export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps";
+
+class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
 	private _world: World | null = null;
 	public chatlog: Array<string> = []
-	private triggerUpdate: () => void
 	chatOpen: boolean = false
 	focus: focus = focus.main
 	allowCamLeak: boolean = false;
 	private zoomTarget = 200;
 	private zoomFn: ZoomFn;
-	maxZoom: number = 40;
+	maxZoom: number = 50;
 	private _maxFPS: number | null = null;
+	private listeners = []
 
 	constructor() {
-		this.triggerUpdate = () => {};
+		super();
 		this.handleSignal = this.handleSignal.bind(this);
 		this.zoomFn = (rendertime: number) => this.zoomTarget
 	}
 
-	setUpdateCallback(changeCallback: () => void) {
-		this.triggerUpdate = changeCallback;
-	}
-
-	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: string[], camStart: Position) {
+	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
+		this.triggerUpdate("world");
 	}
 
 	public leaveWorld() {
 		this._world = null;
+		this.triggerUpdate("world");
 	}
 
 	get world() {
@@ -48,19 +51,19 @@ class VisualModel {
 
 	addChatEntry(text: string) {
 		this.chatlog = [...this.chatlog, convertToHtml(text)];
-		this.triggerUpdate();
+		this.triggerUpdate("chatlog");
 	}
 
 	clearChat() {
 		this.chatlog = [];
-		this.triggerUpdate();
+		this.triggerUpdate("chatlog");
 	}
 
 	setChatOpen(value: boolean) {
 		this.chatOpen = value;
 		this.focus = value ? focus.chat : focus.main;
 		
-		this.triggerUpdate();
+		this.triggerUpdate("chat-open");
 	}
 
 	handleSignal(signal: SignalIn) {
@@ -78,11 +81,12 @@ class VisualModel {
 		let target = this.zoomTarget*val;
 		this.zoomFn = sinSmoothZoom(now, 500, this.zoomFn(now), target);
 		this.zoomTarget = target;
+		this.triggerUpdate("zoom");
 	}
 
 	set maxFPS(fps: number | null) {
 		this._maxFPS = fps;
-		this.triggerUpdate();
+		this.triggerUpdate("maxfps");
 	}
 
 	get maxFPS() {
