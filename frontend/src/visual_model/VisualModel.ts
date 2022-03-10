@@ -25,7 +25,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	allowCamLeak: boolean = false;
 	private zoomTarget = 200;
 	private zoomFn: ZoomFn;
-	maxZoom: number = 40;
+	maxZoom: number = 50;
 	private _maxFPS: number | null = null;
 	private listeners = []
 

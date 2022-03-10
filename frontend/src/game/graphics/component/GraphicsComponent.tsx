@@ -40,6 +40,10 @@ class GraphicsComponent extends Component<props> {
 			this.maxFPS = maxfpsCandidate;
 			this.scheduler?.setMaxFps(maxfpsCandidate);
 		}
+		if(nextProps.renderable !== this.renderable) {
+			this.renderable = nextProps.renderable;
+			this.scheduler?.setScene(this.renderable);
+		}
 		return false;
 	}
 
@@ -52,6 +56,12 @@ class GraphicsComponent extends Component<props> {
 			this.scheduler = new RenderScheduler(parent);
 			this.scheduler.setScene(this.renderable);
 			this.scheduler.setMaxFps(this.maxFPS);
+		}
+	}
+
+	componentWillUnmount() {
+		if(this.scheduler !== null) {
+			this.scheduler.setScene(null);
 		}
 	}
 

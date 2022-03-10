@@ -26,9 +26,9 @@ export default class Matrix<T> {
 		}
 	}
 
-	elementAt(p: Position) {
-		if(p[0] < 0 || p[1] < 0 || p[0] > this.width || p[1] > this.height) {
-			throw new Error("IllegalMatrixPosition: "+JSON.stringify(p));
+	elementAt(p: Position): T | null {
+		if(p[0] < 0 || p[1] < 0 || p[0] >= this.width || p[1] >= this.height) {
+			return null;
 		}
 		return this.elements[p[1]][p[0]];
 	}

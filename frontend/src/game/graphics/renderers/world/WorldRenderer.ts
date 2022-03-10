@@ -2,7 +2,9 @@ import { StatelessRenderable } from "game/graphics/Renderable";
 import CozyPack from "game/graphics/texture/CozyPack";
 import Texture from "game/graphics/texture/Texture";
 import TexturePack from "game/graphics/texture/TexturePack";
+import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
+import { DEFAULT_MAX_VERSION } from "tls";
 import VisualModel, { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";
 import { renderEntity } from "./EntityRenderer";
@@ -18,7 +20,7 @@ export interface RenderConfig {
 	rendertime: number
 }
 
-class WorldView extends StatelessRenderable {
+class WorldRenderer extends StatelessRenderable {
 
 	//private camPosition: CameraPositionFn = (rendertime: number) => center;
 	private texturePack: TexturePack
@@ -28,13 +30,13 @@ class WorldView extends StatelessRenderable {
 	private model: VisualModel
 	private tileTextures: Matrix<Texture>;
 
-	constructor(world: World, cozypack: CozyPack, texturePack: TexturePack) {
+	constructor(world: World, visuals: VisualResources) {
 		super();
 		this.model = world.model;
 		this.world = world;
-		this.texturePack = texturePack;
-		this.cozyPack = cozypack;
-		this.tileTextures = world.tileGrid.map(texturePack.getTexture);
+		this.texturePack = visuals.textures;
+		this.cozyPack = visuals.cozy;
+		this.tileTextures = world.tileGrid.map(t => visuals.textures.getTexture(t));
 	}
 
 	translateXY(x: number, y: number): Position {
@@ -69,22 +71,31 @@ class WorldView extends StatelessRenderable {
 		let camY = camProps[1];
 
 		if(!this.model.allowCamLeak) {
+//			if(zoom > 50) {
+//				zoom = 50;
+//			}
+//			else {
+				let minHorizontalZoom = width / world.width;
+				let minVerticalZoom: number = height / world.height;
 
-			let minHorizontalZoom = width / world.width;
-			let minVerticalZoom: number = height / world.height;
+				//zoom = Math.max(zoom, Math.min(minVerticalZoom, minHorizontalZoom, 100));
 
-			if(zoom < minVerticalZoom) {
-				zoom = minVerticalZoom;
+				console.log("minHorizontalZoom:",minHorizontalZoom);
+				console.log("minVerticalZoom:",minVerticalZoom);
+
+	//			zoom = Math.min(zoom, Math.max(100, minVerticalZoom, minHorizontalZoom))
+			if(zoom < Math.min(minVerticalZoom, 100)) {
+				zoom = Math.min(minVerticalZoom, 100);
 			}
-			if(zoom < minHorizontalZoom) {
-				zoom = minHorizontalZoom;
+			if(zoom < Math.min(minHorizontalZoom, 100)) {
+				zoom = Math.min(minHorizontalZoom, 100);
 			}
 		}
+		zoom = Math.min(zoom, 400);
 
-		if(zoom < this.model.maxZoom) {
+ 		if(zoom < this.model.maxZoom) {
 			zoom = this.model.maxZoom;
 		}
-
 		if(height > world.height*zoom) {
 			camY = camFocusY * world.height;
 		}
@@ -226,7 +237,14 @@ class WorldView extends StatelessRenderable {
 				//let tileYPos = (height * (1-camFocusY)) - ((-camY + floorY+1) * tileSize);
 
 				//let [translatedX, translatedY] = this.translateXY(floorX, floorY);
-				this.tileTextures.elementAt([floorX, floorY]).drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
+				let t = this.tileTextures.elementAt([floorX, floorY]);
+				if(t === null) {
+					t = this.texturePack.getDefaultTexture();
+				}
+				if(t === undefined) {
+					console.error("error");
+				}
+				t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 			}
 		}
 		//this.ctx.fillStyle = "yellow";
@@ -260,4 +278,4 @@ class WorldView extends StatelessRenderable {
 
 }
 
-export default WorldView;
+export default WorldRenderer;

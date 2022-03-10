@@ -9,10 +9,11 @@ import VisualModel from "visual_model/VisualModel";
 
 import "./GameScene.scss";
 import ImageStore from "game/ImageStore";
+import VisualResources from "game/VisualResources";
 
 type props = {
 	modelGenerator: (callback: IEventReciever) => LogicModel
-	imageStore: ImageStore
+	visuals: VisualResources
 }
 
 type state = {
@@ -54,7 +55,7 @@ class GameScene extends Component<props, state>  {
 					this.change(event.data, true);
 				}
 				else {
-					this.context(<MenuScene imageStore={this.props.imageStore} />);
+					this.context(<MenuScene visuals={this.props.visuals} />);
 				}
 			}
 		}
@@ -78,10 +79,10 @@ class GameScene extends Component<props, state>  {
 				<div className="text">
 					{this.state.text}
 				</div>
-				{this.state.ended ? <button onClick={() => this.context(<MenuScene imageStore={this.props.imageStore} />)}>Vissza a menübe</button> : null}
+				{this.state.ended ? <button onClick={() => this.context(<MenuScene visuals={this.props.visuals} />)}>Vissza a menübe</button> : null}
 			</div>
 		}
-		return <GameView imageStore={this.props.imageStore} logicModel={this.model!} visualModel={this.state.model} />
+		return <GameView visuals={this.props.visuals} logicModel={this.model!} visualModel={this.state.model} />
 	}
 
 }

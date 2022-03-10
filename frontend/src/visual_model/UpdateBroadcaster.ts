@@ -6,8 +6,14 @@ export default class UpdateBroadcaster<T> extends EventTarget {
 		this.dispatchEvent(new CustomEvent(modelUpdateEventType, {detail: type}));
 	}
 
-	addUpdateListener(listener: (type: T) => void) {
-		this.addEventListener(modelUpdateEventType, (e: any) => listener(e.detail));
+	addUpdateListener(listener: (type: T) => void): EventListener {
+		let changedListener = (e: any) => listener(e.detail);
+		this.addEventListener(modelUpdateEventType, changedListener);
+		return changedListener;
+	}
+
+	removeUpdateListener(t: EventListener) {
+		this.removeEventListener(modelUpdateEventType, t);
 	}
 
 }

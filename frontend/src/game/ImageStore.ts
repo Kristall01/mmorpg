@@ -27,11 +27,8 @@ export interface ImageResource {
 export default class ImageStore {
 
 	private images: Map<string, ImageResource> = new Map();
-	private static cacheStores: Map<string, ImageStore> = new Map();
 
 	private loadDir(base: string, dir: jsondir): Promise<unknown> {
-
-		let a: HTMLImageElement = null!;
 
 		let entries = Object.entries(dir);
 		let proms: Array<Promise<unknown>> = new Array(entries.length);
@@ -85,16 +82,6 @@ export default class ImageStore {
 		}
 		catch(err) {}
 		await zipReader.close();
-	}
-
-	public static async getOrCreateStore(id: string, init: (s: ImageStore) => Promise<void>): Promise<ImageStore> {
-		let cachedStore = ImageStore.cacheStores.get(id);
-		if(cachedStore === undefined) {
-			cachedStore = new ImageStore();
-			await init(cachedStore);
-			ImageStore.cacheStores.set(id, cachedStore);
-		}
-		return cachedStore;
 	}
 
 	get(key: string): ImageResource {
