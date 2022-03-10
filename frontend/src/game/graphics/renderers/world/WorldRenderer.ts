@@ -1,13 +1,13 @@
+import { StatelessRenderable } from "game/graphics/Renderable";
+import CozyPack from "game/graphics/texture/CozyPack";
+import Texture from "game/graphics/texture/Texture";
+import TexturePack from "game/graphics/texture/TexturePack";
+import Matrix from "Matrix";
 import VisualModel, { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";
-import { RenderContext } from "../GraphicsUtils";
-import { StatelessRenderable } from "../Renderable";
-import CozyPack from "../texture/CozyPack";
-import TexturePack from "../texture/TexturePack";
 import { renderEntity } from "./EntityRenderer";
-import TileCache from "./TileCache";
 
-export interface renderConfig {
+export interface RenderConfig {
 	camX: number
 	camY: number
 	tileSize: number
@@ -22,11 +22,11 @@ class WorldView extends StatelessRenderable {
 
 	//private camPosition: CameraPositionFn = (rendertime: number) => center;
 	private texturePack: TexturePack
-	private renderConfig: renderConfig = null!
+	private renderConfig: RenderConfig = null!
 	readonly cozyPack: CozyPack;
-	private tileCache: TileCache;
 	private world: World
 	private model: VisualModel
+	private tileTextures: Matrix<Texture>;
 
 	constructor(world: World, cozypack: CozyPack, texturePack: TexturePack) {
 		super();
@@ -34,7 +34,7 @@ class WorldView extends StatelessRenderable {
 		this.world = world;
 		this.texturePack = texturePack;
 		this.cozyPack = cozypack;
-		this.tileCache = new TileCache(this);
+		this.tileTextures = world.tileGrid.map(texturePack.getTexture);
 	}
 
 	translateXY(x: number, y: number): Position {
@@ -226,7 +226,7 @@ class WorldView extends StatelessRenderable {
 				//let tileYPos = (height * (1-camFocusY)) - ((-camY + floorY+1) * tileSize);
 
 				//let [translatedX, translatedY] = this.translateXY(floorX, floorY);
-				this.world.getTextureAt(floorX, floorY).drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
+				this.tileTextures.elementAt([floorX, floorY]).drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 			}
 		}
 		//this.ctx.fillStyle = "yellow";

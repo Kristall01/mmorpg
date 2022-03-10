@@ -1,4 +1,5 @@
 import { convertToHtml } from "game/ui/chat/textconverter";
+import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
@@ -10,9 +11,12 @@ export enum focus {
 
 export type Position = [number,number];
 
+
 type ZoomFn = (rendertime: number) => number;
 
-class VisualModel extends UpdateBroadcaster {
+export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps";
+
+class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
 	private _world: World | null = null;
 	public chatlog: Array<string> = []
@@ -31,7 +35,7 @@ class VisualModel extends UpdateBroadcaster {
 		this.zoomFn = (rendertime: number) => this.zoomTarget
 	}
 
-	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: string[], camStart: Position) {
+	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
 		this.triggerUpdate("world");
 	}

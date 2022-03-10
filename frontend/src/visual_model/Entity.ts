@@ -1,11 +1,10 @@
 import { RenderContext } from "game/graphics/GraphicsUtils"
-import WorldView, { renderConfig } from "game/graphics/worldview/WorldView"
 import { EntityType } from "./EntityType"
 import { ConstStatus, Direction, entityZigzagStatus, Status, StatusFn } from "./Paths"
 import UpdateBroadcaster from "./UpdateBroadcaster"
 import { Position } from "./VisualModel"
 
-export default abstract class Entity extends UpdateBroadcaster {
+export default abstract class Entity {
 
 	id: number
 	type: EntityType
@@ -17,7 +16,6 @@ export default abstract class Entity extends UpdateBroadcaster {
 	name: string | null = null;
 
 	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction) {
-		super();
 		this.id = id;
 		this.type = type;
 		this.statusFn = ConstStatus(loc, facing);

@@ -2,7 +2,7 @@ import LogicModel from "model/LogicModel";
 import React, { createContext, createRef } from "react";
 import VisualModel, {focus, Position} from "visual_model/VisualModel";
 import GraphicsComponent from "./graphics/component/GraphicsComponent";
-import WorldView from "./graphics/worldview/WorldView";
+import WorldRenderer from "./graphics/renderers/world/WorldRenderer";
 import Chat from "./ui/chat/Chat";
 
 import "./GameView.scss";
@@ -22,7 +22,6 @@ export const ModelContext = createContext<Models>(null!);
 
 export default class GameView extends React.Component<props, {}> {
 
-	private worldView: WorldView
 	private logicModel: LogicModel
 	private visualModel: VisualModel
 	private mainRef = createRef<HTMLDivElement>();
@@ -35,6 +34,8 @@ export default class GameView extends React.Component<props, {}> {
 
 	constructor(props: props) {
 		super(props);
+		let {imageStore, logicModel, visualModel} = props;
+		this.visualModel = visualModel;
 
 		this.cozyPack = new CozyPack(this.props.imageStore);
 		this.texturePack = new TexturePack();
@@ -43,7 +44,7 @@ export default class GameView extends React.Component<props, {}> {
 		this.visualModel = props.visualModel;
 
 		this.visualModel.addUpdateListener((type) => this.handleModelUpdate());
-		this.worldView = new WorldView(this.visualModel, this.cozyPack, this.texturePack);
+		//this.worldView = new WorldView(this.visualModel.world, this.cozyPack, this.texturePack);
 	}
 
 	componentWillUnmount() {
@@ -82,7 +83,7 @@ export default class GameView extends React.Component<props, {}> {
 		}
 
 		const moveToOffset = (a: number, b: number) => {
-			let [logicX, logicY] = this.worldView.translateCanvasXY(a, b);
+			let [logicX, logicY] = this.worldRenderer.translateCanvasXY(a, b);
 			this.logicModel.moveMeTo(logicX, logicY);
 		}
 
@@ -114,7 +115,7 @@ export default class GameView extends React.Component<props, {}> {
 				onMouseMove={e => this.handleMouseMove(e)}
 			>
 				<ModelContext.Provider value={[this.logicModel, this.visualModel]}>
-					<GraphicsComponent renderable={this.worldView} />
+					<GraphicsComponent renderable={this.worldRenderer} />
 					<Chat />
 					<button onClick={() => this.logicModel.disconnect()} className="dc-button">Disconnect</button>
 				</ModelContext.Provider>

@@ -16,8 +16,7 @@ const LoadingScene = () => {
 		(async () => {
 			let imageStore: ImageStore;
 			try {
-				imageStore = new ImageStore();
-				await imageStore.loadZip("/imagestore.zip");
+				imageStore = await ImageStore.getOrCreateStore("main", s => imageStore.loadZip("/imagestore.zip"));
 				//let cozyPack = new CozyPack(imageStore);
 				//let texturePack = new TexturePack(imageStore, "/textures/texturepack.json");
 			}

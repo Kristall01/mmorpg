@@ -3,7 +3,6 @@ import "./GraphicsComponent.scss";
 import VisualModel from "visual_model/VisualModel";
 import RenderScheduler from "../RenderScheduler";
 import LayerMixer from "../RenderableCombinator";
-import WorldView from "../worldview/WorldView";
 import Renderable from "../Renderable";
 
 type props = {

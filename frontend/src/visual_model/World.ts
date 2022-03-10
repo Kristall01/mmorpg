@@ -7,29 +7,28 @@ import { EntityType } from "./EntityType";
 import UnknownEntity from "./entity/UnknownEntity";
 import HumanEntity from "./entity/HumanEntity";
 import { Direction } from "./Paths";
+import Matrix from "Matrix";
 
 class World {
 
 	public width: number
 	public height: number
-	//private pack: TexturePack = null!
-	private textureMatrix: Array<Texture>
 	private _entities: Map<number, Entity> = new Map();
-	private humanTextures: null = null;
+	//private humanTextures: null = null;
 	camPositionFn: (rendertime: number) => Position;
 	public readonly model: VisualModel
+	public readonly tileGrid: Matrix<string>
 
-	constructor(model: VisualModel, width: number, height: number, tileGrid: string[], camStart: Position) {
+	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
+		this.tileGrid = tileGrid;
 		this.model = model;
 		this.width = width;
 		this.height = height;
-		this.textureMatrix = new Array(width*height);
+		//this.textureMatrix = world
 //		this.pack = TexturePack.getInstance();
 		this.camPositionFn = () => camStart;
 
-		for(let i = 0; i < tileGrid.length; ++i) {
-			this.textureMatrix[i] = this.pack.getTexture(tileGrid[i]);
-		}
+		//this.tex
 	}
 
 	get entities(): IterableIterator<Entity> {

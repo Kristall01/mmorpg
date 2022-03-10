@@ -1,12 +1,12 @@
 const modelUpdateEventType = "model-update";
 
-export default class UpdateBroadcaster extends EventTarget {
+export default class UpdateBroadcaster<T> extends EventTarget {
 
-	public triggerUpdate(type: string) {
+	public triggerUpdate(type: T) {
 		this.dispatchEvent(new CustomEvent(modelUpdateEventType, {detail: type}));
 	}
 
-	addUpdateListener(listener: (type: string) => void) {
+	addUpdateListener(listener: (type: T) => void) {
 		this.addEventListener(modelUpdateEventType, (e: any) => listener(e.detail));
 	}
 
