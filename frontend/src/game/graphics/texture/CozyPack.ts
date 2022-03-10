@@ -1,4 +1,5 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
+import ImageStore from "game/ImageStore";
 import { sortAndDeduplicateDiagnostics } from "typescript";
 import { enumValueOf } from "utils";
 import { Activity, Cloth, ClothColor, PrimitiveFrametime, Skintone } from "visual_model/human/HumanAssetConfig";
@@ -55,23 +56,6 @@ const CozySize = 32;
 
 } */
 
-const loadImage = (path: string): Promise<HTMLImageElement> => {
-	return new Promise((accept,reject) => {
-		let a = new Image();
-		a.src = path;
-		if(a.complete) {
-			accept(a);
-			return;
-		}
-		a.addEventListener("load", () => {
-			accept(a);
-		});
-		a.addEventListener("error", err => {
-			reject(err);
-		});
-	});
-}
-
 interface Drawable {
 	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number): void
 }
@@ -85,79 +69,6 @@ interface HumanSprite {
 interface HumanPack {
 
 	ofSkin(skin: Skintone): HumanSprite
-
-}
-
-interface jsondir {
-	[key: string]: jsondir | null
-}
-
-class ImageStore {
-
-	private images: Map<string, HTMLImageElement> = new Map();
-
-	private loadDir(base: string, dir: jsondir): Promise<unknown> {
-		let entries = Object.entries(dir);
-		let proms: Array<Promise<unknown>> = new Array(entries.length);
-		for(let i = 0; i < entries.length; ++i) {
-			let [key, val] = entries[i];
-			if(val === null) {
-				let merged = base+key;
-				proms[i] = loadImage(merged).then(i => this.images.set(key, i));
-			}
-			else {
-				proms[i] = this.loadDir(base+key+"/", val);
-			}
-		}
-		return Promise.all(proms);
-	}
-
-	public async load(packJsonPath: string, packBasePath: string) {
-		let rawData = await fetch(packJsonPath);
-		let data: jsondir = await rawData.json();
-		await this.loadDir(packBasePath, data);
-	}
-
-	private async asd(entry: Promise<Blob>, path: string): Promise<undefined> {
-		let index = path.lastIndexOf('/');
-		if(index !== -1) {
-			path = path.substring(index+1);
-		}
-		const e = await entry;
-		const i = await loadImage(URL.createObjectURL(e));
-		this.images.set(path, i);
-		return undefined;
-	}
-
-	public async loadZip(path: string) {
-		let zipjs: any = (window as any)["zip"];
-
-		let zipBuffer = new Uint8Array(await (await fetch(path)).arrayBuffer());
-		let zipReader = new zipjs.ZipReader(new zipjs.Uint8ArrayReader(zipBuffer));
-		try {
-			let entries = await zipReader.getEntries();
-			let promises = [];
-
-			for(let i = 0; i < entries.length; ++i) {
-				if(entries[i].directory) {
-					continue;
-				}
-				promises.push(this.asd(entries[i].getData(new zipjs.BlobWriter("image/png")), entries[i].filename));
-			}
-			await Promise.all(promises);
-			console.log(this.images);
-		}
-		catch(err) {}
-		await zipReader.close();
-	}
-
-	get(key: string): HTMLImageElement {
-		let img = this.images.get(key);
-		if(img === undefined) {
-			throw new Error(`'${key}' image not found`);
-		}
-		return img;
-	}
 
 }
 
@@ -236,7 +147,7 @@ class ColoredCozyCloth implements CozyCloth {
 	private clothTextures: Sprite[];
 
 	constructor(key: Activity, cloth: Cloth, images: ImageStore) {
-		let baseSprite = new Sprite(images.get(`${cloth.id}_${key.id}.png`), key.frametimes);
+		let baseSprite = new Sprite(images.get(`${cloth.id}_${key.id}.png`).img, key.frametimes);
 		let colorValues = ClothColor.enum.values;
 		this.clothTextures = new Array(colorValues.length);
 		for(let i = 0; i < colorValues.length; ++i) {
@@ -256,7 +167,7 @@ class ColorlessCozyCloth implements CozyCloth {
 	private clothTexture: Sprite;
 
 	constructor(key: Activity, cloth: Cloth, images: ImageStore) {
-		this.clothTexture = new Sprite(images.get(`${cloth.id}_${key.id}.png`), key.frametimes);
+		this.clothTexture = new Sprite(images.get(`${cloth.id}_${key.id}.png`).img, key.frametimes);
 	}
 
 	ofColor(color: ClothColor): Sprite {
@@ -274,7 +185,7 @@ class CozyActivity {
 	constructor(key: Activity, images: ImageStore) {
 		this.skinTones = new Array<Sprite>(8);
 		for(let i = 0; i < 8; ++i) {
-			this.skinTones[i] = new Sprite(images.get(`char${i}_${key.id}.png`), key.frametimes);
+			this.skinTones[i] = new Sprite(images.get(`char${i}_${key.id}.png`).img, key.frametimes);
 		}
 		let clothEnum = Cloth.enum.values;
 		this.clothes = new Array<CozyCloth>(clothEnum.length);
@@ -303,7 +214,7 @@ export default class CozyPack {
 	private activities: CozyActivity[];
 	private images: ImageStore;
 
-	private constructor(images: ImageStore) {
+	public constructor(images: ImageStore) {
 		this.images = images;
 
 		let objectValues = Activity.enum.values;
@@ -328,12 +239,6 @@ export default class CozyPack {
 		return this.activities[act.ordinal];
 	}
 
-	static async createPack(base: string): Promise<CozyPack> {
-		let images = new ImageStore();
-		//await images.load(base+"index.json", base);
-		await images.loadZip("/cozy.zip");
-		return new CozyPack(images);
-	}
 
 }
 
