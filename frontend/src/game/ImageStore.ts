@@ -78,7 +78,6 @@ export default class ImageStore {
 				promises.push(this.loadBlob(await entries[i].getData(new zipjs.BlobWriter("image/png")), entries[i].filename));
 			}
 			await Promise.all(promises);
-			console.log(this.images);
 		}
 		catch(err) {}
 		await zipReader.close();

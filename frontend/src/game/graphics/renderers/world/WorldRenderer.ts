@@ -80,8 +80,6 @@ class WorldRenderer extends StatelessRenderable {
 
 				//zoom = Math.max(zoom, Math.min(minVerticalZoom, minHorizontalZoom, 100));
 
-				console.log("minHorizontalZoom:",minHorizontalZoom);
-				console.log("minVerticalZoom:",minVerticalZoom);
 
 	//			zoom = Math.min(zoom, Math.max(100, minVerticalZoom, minHorizontalZoom))
 			if(zoom < Math.min(minVerticalZoom, 100)) {
