@@ -4,6 +4,8 @@ import MenuContext from "MenuContext";
 import MenuScene from "phases/menu/MenuScene";
 import TexturePack from "game/graphics/texture/TexturePack";
 import CozyPack from "game/graphics/texture/CozyPack";
+import ImageStore from "game/ImageStore";
+import VisualResources from "game/VisualResources";
 
 const LoadingScene = () => {
 
@@ -13,10 +15,9 @@ const LoadingScene = () => {
 
 	useEffect(() => {
 		(async () => {
-			let pack: CozyPack;
+			let visualResources: VisualResources;
 			try {
-				await TexturePack.loadAllTextures("/textures/texturepack.json");
-				pack = await CozyPack.createPack("/textures/cozy/");
+				visualResources = await VisualResources.load();
 			}
 			catch(err) {
 				console.error(err);
@@ -26,7 +27,7 @@ const LoadingScene = () => {
 				return;
 			}
 			if(mounted) {
-				setMenu(() => <MenuScene cozyPack={pack}/>);
+				setMenu(() => <MenuScene visuals={visualResources}/>);
 			}
 		})();
 		return () => {

@@ -118,9 +118,6 @@ export abstract class PrimitiveFrametime {
 	}
 
 	protected calculateTimeFunction(times: number[]): stepFunction {
-		if(times === undefined || times === null) {
-			console.log("asd");
-		}
 		if(times.length == 0) {
 			return (t: number) => 0;
 		}

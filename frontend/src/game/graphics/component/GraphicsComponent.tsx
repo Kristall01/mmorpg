@@ -3,35 +3,46 @@ import "./GraphicsComponent.scss";
 import VisualModel from "visual_model/VisualModel";
 import RenderScheduler from "../RenderScheduler";
 import LayerMixer from "../RenderableCombinator";
-import WorldView from "../worldview/WorldView";
+import Renderable from "../Renderable";
 
 type props = {
-	model: VisualModel,
-	view: WorldView
+	renderable: Renderable,
+	maxFPS?: number | null
 }
 
 class GraphicsComponent extends Component<props> {
 
 	private scheduler: RenderScheduler | null = null
-	private mixer: LayerMixer
-	private worldView: WorldView
+	//private mixer: LayerMixer
+	//private worldView: WorldView
 	private maxFPS: number | null = null;
+	private renderable: Renderable
 
 	constructor(props: props) {
 		super(props);
+		let {maxFPS = null, renderable} = props;
+		this.renderable = renderable;
+		this.maxFPS = maxFPS;
 
-		let model = props.model;
-		this.worldView = props.view;
+		/* let model = props.model;
+		this.worldView = props.view; */
 
-		this.mixer = new LayerMixer();
-		this.mixer.addLayer(this.worldView);
+		//this.mixer = new LayerMixer();
+		//this.mixer.addLayer(this.worldView);
 	}
 
 	shouldComponentUpdate(nextProps: Readonly<props>, nextState: Readonly<{}>, nextContext: any) {
-		let maxfpsCandidate = nextProps.model.maxFPS;
+		let maxfpsCandidate = nextProps.maxFPS;
+		if(maxfpsCandidate === undefined) {
+			return false;
+		}
 		if(maxfpsCandidate !== this.maxFPS) {
 			this.maxFPS = maxfpsCandidate;
 			this.scheduler?.setMaxFps(maxfpsCandidate);
+		}
+		if(nextProps.renderable !== this.renderable) {
+			this.renderable = nextProps.renderable;
+			this.scheduler?.setScene(this.renderable);
 		}
 		return false;
 	}
@@ -43,8 +54,14 @@ class GraphicsComponent extends Component<props> {
 		}
 		if(parent !== null) {
 			this.scheduler = new RenderScheduler(parent);
-			this.scheduler.setScene(this.mixer);
-			this.scheduler.setMaxFps(null);
+			this.scheduler.setScene(this.renderable);
+			this.scheduler.setMaxFps(this.maxFPS);
+		}
+	}
+
+	componentWillUnmount() {
+		if(this.scheduler !== null) {
+			this.scheduler.setScene(null);
 		}
 	}
 
