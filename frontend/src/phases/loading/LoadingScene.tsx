@@ -7,7 +7,11 @@ import CozyPack from "game/graphics/texture/CozyPack";
 import ImageStore from "game/ImageStore";
 import VisualResources from "game/VisualResources";
 
-const LoadingScene = () => {
+export type props = {
+	nextScene: (v: VisualResources) => React.SetStateAction<JSX.Element>
+}
+
+const LoadingScene = ({nextScene}: props) => {
 
 	let [text, setText] = useState("Betöltés...");
 	let [mounted, setMounted] = useState(true);
@@ -27,7 +31,7 @@ const LoadingScene = () => {
 				return;
 			}
 			if(mounted) {
-				setMenu(() => <MenuScene visuals={visualResources}/>);
+				setMenu(nextScene(visualResources));
 			}
 		})();
 		return () => {
