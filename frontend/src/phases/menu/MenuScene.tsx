@@ -7,6 +7,8 @@ import NetworkModel from "model/impl/ws/NetworkModel";
 import CozyPack from "game/graphics/texture/CozyPack";
 import ImageStore from "game/ImageStore";
 import VisualResources from "game/VisualResources";
+import LogicModel from "model/LogicModel";
+import { IEventReciever } from "model/Definitions";
 
 interface props {
 	visuals: VisualResources
@@ -25,7 +27,7 @@ const MenuScene = ({visuals}: props) => {
 			alert("A névnek legalább 3 karakternek kell lennie.");
 			return;
 		}
-		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new DModel(a, name!)} />)
+		start((a) => new DModel(a, name!));
 	}
 
 	const startLocalhostModel = () => {
@@ -37,7 +39,11 @@ const MenuScene = ({visuals}: props) => {
 		if(address === null) {
 			return;
 		}
-		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new NetworkModel(a, address!, name!)} />)
+		start((a) => new NetworkModel(a, address!, name!));
+	}
+
+	const start = (generator: (callback: IEventReciever) => LogicModel) =>  {
+		setMenu(() => <GameScene disconnectHandler={() => setMenu(<MenuScene visuals={visuals} />)} visuals={visuals} modelGenerator={generator} />)
 	}
 
 	return (

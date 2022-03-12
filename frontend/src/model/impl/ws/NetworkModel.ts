@@ -1,3 +1,4 @@
+import Matrix from "Matrix";
 import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
@@ -48,7 +49,7 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("despawnentity", ({id}) => new SignalEntityDespawn(id));
 		this.addPacketSignal("followentity", ({id}) => new SignalFocus(id));
 		this.addPacketSignal("entityspeed", ({id, speed}) => new SignalEntityspeed(id, speed));
-		this.addPacketSignal("joinworld", ({tileGrid, width, height, spawnX, spawnY}) => new SignalJoinworld(spawnX, spawnY, width, height, tileGrid));
+		this.addPacketSignal("joinworld", ({tileGrid, width, height, spawnX, spawnY}) => new SignalJoinworld(spawnX, spawnY, width, height, Matrix.fromArray(width, height, tileGrid)));
 		this.addPacketSignal("leaveworld", () => new SignalLeaveworld());
 		this.addPacketSignal("entityrename", ({id, newname}) => new SignalRenameEntity(id, newname));
 		this.addPacketSignal("clothes", ({clothes, id}) => new SignalChangeClothes(id, clothes));

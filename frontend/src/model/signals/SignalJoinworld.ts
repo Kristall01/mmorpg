@@ -6,20 +6,16 @@ export default class SignalJoinworld implements SignalIn {
 
 	spawnX: number;
 	spawnY: number;
-	width: number;
-	height: number;
 	tileGrid: Matrix<string>
 
-	constructor(spawnX: number, spawnY: number, width: number, height: number, tileGrid: string[]) {
+	constructor(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>) {
 		this.spawnX = spawnX;
 		this.spawnY = spawnY;
-		this.width = width;
-		this.height = height;
-		this.tileGrid = Matrix.fromArray(width, height, tileGrid);
+		this.tileGrid = tileGrid;
 	}
 
 	execute(model: VisualModel): void {
-		model.joinWorld(this.spawnX, this.spawnY, this.width, this.height, this.tileGrid, [this.spawnX, this.spawnY]);
+		model.joinWorld(this.spawnX, this.spawnY, this.tileGrid.width, this.tileGrid.height, this.tileGrid, [this.spawnX, this.spawnY]);
 	}
 
 }

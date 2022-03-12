@@ -1,5 +1,6 @@
 import ImageStore, { loadImage } from "game/ImageStore";
 import AnimatedGlobalColumnTexture from "./AnimatedGlobalColumnTexture";
+import ColorTexture from "./ColorTexture";
 import EmptyTexture from "./EmptyTexture";
 import StaticTexture from "./StaticTexture";
 import Texture, { ofType } from "./Texture";
@@ -12,6 +13,7 @@ class TexturePack {
 
 	constructor(images: ImageStore) {
 		this.images = images;
+		this.addTexture("?", new ColorTexture("#f00"));
 	}
 
 	public addTexture(key: string, t: Texture) {

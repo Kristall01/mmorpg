@@ -33,6 +33,13 @@ export default class Matrix<T> {
 		return this.elements[p[1]][p[0]];
 	}
 
+	setElementAt(p: Position, t: T) {
+		if(p[0] < 0 || p[1] < 0 || p[0] >= this.width || p[1] >= this.height) {
+			throw new Error("IllegalMatrixIndex: "+JSON.stringify(p));
+		}
+		this.elements[p[1]][p[0]] = t;
+	}
+
 	map<U>(f: (element: T) => U): Matrix<U> {
 		let m = new Matrix<U>(this.width, this.height);
 		m.fill(([x,y]) => f(this.elements[y][x]));
@@ -53,6 +60,7 @@ export default class Matrix<T> {
 		}
 		return p[0] + (p[1] * this.width);
 	}
+
 
 	static fromArray<T>(width: number, height: number, a: Array<T>): Matrix<T> {
 		if(Math.round((width * height)) != a.length) {

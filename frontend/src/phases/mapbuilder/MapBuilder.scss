@@ -1,0 +1,154 @@
+.map-builder-component {
+	display: flex;
+	width: 100%;
+	height: 100%;
+
+	.button {
+		width: 100%;
+		height: 40px;
+		display: flex;
+		background-color: #3c66ff;
+		color: white;
+		border-radius: 7px;
+		justify-content: center;
+		align-items: center;
+		user-select: none;
+		transition: background-color .2s;
+		font-size: 20px;
+
+		&:hover {
+			cursor: pointer;
+			background-color: #355ce6;
+		}
+	}
+
+	.buttonlist {
+		padding: 30px;
+		display: flex;
+		gap: 15px;
+		flex-direction: column;
+	}
+
+	.side {
+		display: flex;
+		height: 100%;
+
+		.navigation-component {
+			display: flex;
+			height: 100%;
+
+			.options {
+				background-color: #2c2c2c;
+				width: 70px;
+
+				.nav-option {
+					color: rgba(255, 255, 255, 0.4);
+					height: 70px;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					border: 3px solid transparent;
+					user-select: none;
+					font-size: 25px;
+
+					&.active {
+						color: white;
+						border-left-color: white;
+					}
+
+					&:hover {
+						color: white;
+						cursor: pointer;
+					}
+
+				}
+			}
+
+			.content {
+				background-color: #f3f3f3;
+				width: 300px;
+				height: 100%;
+			}
+		}
+
+	}
+
+	.center {
+		display: flex;
+		flex: 1;
+		height: 100%;
+		overflow: auto;
+
+		> * {
+			margin: auto;
+			padding: 100px;
+		}
+
+		.tilegrid {
+			display: inline-flex;
+			flex-direction: column;
+			border: 1px solid black;
+
+			.row {
+				display: inline-flex;
+				flex-grow: 0;
+
+				.cell {
+					background-color: aqua;
+					border: 1px solid black;
+
+					img {
+						width: 100%;
+						height: 100%;
+						display: block;
+						image-rendering: pixelated;
+					}
+				}
+			}
+		}
+	}
+
+	.tile-browser-component {
+
+		.tilelist {
+			color: black;
+			.tileline {
+				width: 100%;
+				height: 30px;
+				display: flex;
+				align-items: center;
+
+				justify-content: space-between;
+
+				&.active {
+					background-color: rgba(127,127,127,.5);
+
+					&:hover {
+						background-color: rgba(127,127,127,.5);
+					}
+				}
+
+				&:hover {
+					cursor: pointer;
+					background-color: rgba(127,127,127,.25);
+				}
+
+				.text {
+					padding: 0 20px;
+				}
+
+				.right {
+					height: 80%;
+					img {
+						object-fit: cover;
+						height: 100%;
+						width: 100%;
+					}
+				}
+
+			}
+		}
+	}
+
+
+}

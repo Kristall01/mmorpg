@@ -1,3 +1,4 @@
+import Matrix from "Matrix";
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
@@ -15,31 +16,32 @@ import { Position } from "visual_model/VisualModel";
 const entitySpeed = 2;
 
 const netLag = 50;
-const startPos: Position = [5,5];
+const startPos: Position = [0,0];
 
 let camleak = false;
 
-let tileGrid: string[] = [];
-let map = {width: 50, height: 8};
-for(let y = 0; y < map.height; ++y) {
-	for(let x = 0; x < map.width; ++x) {
-		if(x == 0 || x == map.width-1 || y == 0 || y == map.height-1) {
-			tileGrid.push("WATER");
-		}
-		else {
-			tileGrid.push("GRASS");
-		}
-	}
-}
 
+
+let map = {width: 50, height: 8};
+let m = new Matrix<string>(50, 8);
+m.fill(([x,y]) => {
+	if(x == 0 || x == map.width-1 || y == 0 || y == map.height-1) {
+		return "WATER";
+	}
+	else {
+		return "GRASS";
+	}
+});
 
 class DModel extends LogicModel {
 
 	private name: string;
 	private statusFn: StatusFn
+	private tiles: Matrix<string>
 
-	constructor(callback: IEventReciever, username: string) {
+	constructor(callback: IEventReciever, username: string, tilegrid: Matrix<string> = m) {
 		super(callback);
+		this.tiles = tilegrid;
 		this.name = username;
 		this.statusFn = ConstStatus(startPos, Direction.enum.map.SOUTH);
 
@@ -47,7 +49,7 @@ class DModel extends LogicModel {
 			this.broadcastEvent({type: ModelEventType.CONNECTED});
 			setTimeout(() => {
 				this.broadcastEvent({type: ModelEventType.PLAY});
-				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], map.width, map.height, tileGrid));
+				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], tilegrid.width, tilegrid.height, tilegrid));
 				this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
 				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed));
@@ -97,17 +99,17 @@ class DModel extends LogicModel {
 
 	moveMeTo(x: number, y: number): void {
 		setTimeout(() => {
-			if(x > map.width-1) {
-				x = map.width-1;
+			if(x > this.tiles.width) {
+				x = this.tiles.width;
 			}
-			else if(x < 1) {
-				x = 1;
+			else if(x < 0) {
+				x = 0;
 			}
-			if(y > map.height-1) {
-				y = map.height-1;
+			if(y > this.tiles.height) {
+				y = this.tiles.height;
 			}
-			else if(y < 1) {
-				y = 1;
+			else if(y < 0) {
+				y = 0;
 			}
 
 			let t = performance.now();

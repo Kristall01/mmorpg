@@ -13,7 +13,8 @@ import VisualResources from "game/VisualResources";
 
 type props = {
 	modelGenerator: (callback: IEventReciever) => LogicModel
-	visuals: VisualResources
+	visuals: VisualResources,
+	disconnectHandler: () => void
 }
 
 type state = {
@@ -55,7 +56,7 @@ class GameScene extends Component<props, state>  {
 					this.change(event.data, true);
 				}
 				else {
-					this.context(<MenuScene visuals={this.props.visuals} />);
+					this.props.disconnectHandler();
 				}
 			}
 		}
@@ -73,13 +74,17 @@ class GameScene extends Component<props, state>  {
 		this.model = this.props.modelGenerator({handleEvent: this.handleEvent, handleSignal: this.state.model.handleSignal});
 	}
 
+	componentWillUnmount() {
+		this.model?.disconnect();
+	}
+
 	render() {
 		if(this.state.text) {
 			return <div className="game-phase-component">
 				<div className="text">
 					{this.state.text}
 				</div>
-				{this.state.ended ? <button onClick={() => this.context(<MenuScene visuals={this.props.visuals} />)}>Vissza a menübe</button> : null}
+				{this.state.ended ? <button onClick={() => this.context(<MenuScene visuals={this.props.visuals} />)}>Vissza</button> : null}
 			</div>
 		}
 		return <GameView visuals={this.props.visuals} logicModel={this.model!} visualModel={this.state.model} />
