@@ -103,12 +103,12 @@ class RenderScheduler extends EventTarget {
 	}
 
 	_subscribeToEvents() {
-		this._resizeObserver = new ResizeObserver(() => {});
-		this._resizeObserver.observe(this._baseElement);
-		new ResizeObserver((e) => {
+		let observer = new ResizeObserver((e) => {
 			let {width, height} = e[0].contentRect;
 			this.resize(width, height);
-		}).observe(this._baseElement);
+		})
+		observer.observe(this._baseElement);
+		this._resizeObserver = observer;
 
 		document.addEventListener("visibilitychange", () => {
 			if (document.hidden){
