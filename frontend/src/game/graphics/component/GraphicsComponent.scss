@@ -4,6 +4,10 @@
 	overflow: hidden;
 	position: relative;
 	pointer-events: none;
+
+	canvas {
+		display: block;
+	}
 }
 
 .fpscounter {
