@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { MapbuildModelContext } from '../MapBuilder';
-import TileGrid from '../model/TileGrid';
+import { MapbuildModelContext } from '../../MapBuilder';
+import TextureGridModel from '../../model/TextureGridModel';
 
 const GridEditor = ({}) => {
 
@@ -11,7 +11,7 @@ const GridEditor = ({}) => {
 	if(grid0 === null) {
 		return <div>no grid to edit :/</div>;
 	}
-	let grid: TileGrid = grid0;
+	let grid: TextureGridModel = grid0;
 	return (
 		<div className="buttonlist">
 			<div className="button" onClick={() => grid.expandTop(1)}>expand top</div>

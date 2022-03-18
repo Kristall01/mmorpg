@@ -1,10 +1,10 @@
+import Texture from "game/graphics/texture/Texture";
 import Matrix from "Matrix";
 import { uptime } from "process";
 import { Position } from "visual_model/VisualModel";
-import MapbuildModel from "../MapbuildModel";
-import Tile from "./Tile";
+import MapbuildModel from "./MapbuildModel";
 
-export default class TileGrid extends Matrix<Tile | null> {
+export default class TextureGridModel extends Matrix<Texture | null> {
 
 	public readonly model: MapbuildModel;
 
@@ -13,27 +13,7 @@ export default class TileGrid extends Matrix<Tile | null> {
 		this.model = model;
 	}
 
-	setElementAt(p: Position, t: Tile | null) {
-		super.setElementAt(p, t);
-		this.model.update();
-	}
-
-	gridToIndex(x: number, y: number): number | null {
-		if(x < 0 || y < 0 || x > this.width || y > this.height) {
-			return null;
-		}
-		return this.width*y + x;
-	}
-
-	getWidth() {
-		return this.width;
-	}
-
-	getHeight() {
-		return this.height;
-	}
-
-	private copyExpand(t: TileGrid, xShift: number, yShift: number) {
+	private copyExpand(t: TextureGridModel, xShift: number, yShift: number) {
 		for(let y = 0; y < this.height; ++y) {
 			for(let x = 0; x < this.width; ++x) {
 				t.setElementAt([x+xShift,y+yShift], this.elementAt([x,y]));
@@ -43,22 +23,22 @@ export default class TileGrid extends Matrix<Tile | null> {
 	}
 
 	expandRight(amount: number): void {
-		let t = new TileGrid(this.model, this.width+amount, this.height);
+		let t = new TextureGridModel(this.model, this.width+amount, this.height);
 		this.copyExpand(t, 0, 0);
 	}
 
 	expandLeft(amount: number) {
-		let t = new TileGrid(this.model, this.width+amount, this.height);
+		let t = new TextureGridModel(this.model, this.width+amount, this.height);
 		this.copyExpand(t, amount, 0);
 	}
 
 	expandTop(amount: number) {
-		let t = new TileGrid(this.model, this.width, this.height+amount);
+		let t = new TextureGridModel(this.model, this.width, this.height+amount);
 		this.copyExpand(t, 0, amount);
 	}
 
 	expandBottom(amount: number) {
-		let t = new TileGrid(this.model, this.width, this.height+amount);
+		let t = new TextureGridModel(this.model, this.width, this.height+amount);
 		this.copyExpand(t, 0, 0);
 	}
 

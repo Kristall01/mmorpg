@@ -2,13 +2,14 @@ import { Position } from "visual_model/VisualModel";
 import { RenderContext } from "../GraphicsUtils";
 import Texture from "./Texture";
 
-export default class StaticTexture implements Texture {
+export default class StaticTexture extends Texture {
 
 	private img: HTMLImageElement
 	private width: number
 	private height: number
 
-	constructor(img: HTMLImageElement) {
+	constructor(id: string, img: HTMLImageElement) {
+		super(id);
 		this.img = img;
 		this.width = img.width;
 		this.height = img.height;

@@ -8,6 +8,7 @@ import UnknownEntity from "./entity/UnknownEntity";
 import HumanEntity from "./entity/HumanEntity";
 import { Direction } from "./Paths";
 import Matrix from "Matrix";
+import Level from "./Level";
 
 class World {
 
@@ -17,10 +18,10 @@ class World {
 	//private humanTextures: null = null;
 	camPositionFn: (rendertime: number) => Position;
 	public readonly model: VisualModel
-	public readonly tileGrid: Matrix<string>
+	public readonly level: Level
 
-	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
-		this.tileGrid = tileGrid;
+	constructor(model: VisualModel, width: number, height: number, level: Level, camStart: Position) {
+		this.level = level;
 		this.model = model;
 		this.width = width;
 		this.height = height;

@@ -2,7 +2,11 @@ import { Position } from "visual_model/VisualModel";
 import { RenderContext } from "../GraphicsUtils";
 import Texture from "./Texture";
 
-export default class EmptyTexture implements Texture {
+export default class EmptyTexture extends Texture {
+
+	constructor(id: string) {
+		super(id);
+	}
 
 	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number): void {
 		ctx.fillStyle = "#000";

@@ -8,12 +8,12 @@ import Texture, { ofType } from "./Texture";
 class TexturePack {
 
 	private textureMap: Map<string, Texture> = new Map();
-	private defaultTexture: Texture = new EmptyTexture();
+	private defaultTexture: Texture = new EmptyTexture("empty");
 	private images: ImageStore
 
 	constructor(images: ImageStore) {
 		this.images = images;
-		this.addTexture("?", new ColorTexture("#f00"));
+		this.addTexture("?", new ColorTexture("blac", "#f00"));
 	}
 
 	public addTexture(key: string, t: Texture) {
@@ -27,7 +27,7 @@ class TexturePack {
 		Object.entries(textureJson).forEach((entryPair: [string, any]) => {
 			let val = entryPair[1];
 			let img = this.images.get(val.path);
-			this.addTexture(entryPair[0], ofType(entryPair[1].type, img.img, entryPair[1]));
+			this.addTexture(entryPair[0], ofType(entryPair[0], entryPair[1].type, img.img, entryPair[1]));
 		});
 
 /* 		imageTextures
@@ -37,6 +37,10 @@ class TexturePack {
 		}
 		this.defaultTexture = uncheckedDefaTexture;
  */	}
+
+ 	getTextures(): Iterable<Texture> {
+		return this.textureMap.values();
+	}
 
 	public getDefaultTexture(): Texture {
 		return this.defaultTexture;

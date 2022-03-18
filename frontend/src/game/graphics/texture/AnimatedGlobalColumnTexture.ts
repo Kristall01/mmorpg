@@ -2,7 +2,7 @@ import { Position } from "visual_model/VisualModel";
 import { RenderContext } from "../GraphicsUtils";
 import Texture from "./Texture";
 
-export default class AnimatedGlobalColumnTexture implements Texture {
+export default class AnimatedGlobalColumnTexture extends Texture {
 
 	private img: HTMLImageElement
 	private height: number
@@ -11,7 +11,8 @@ export default class AnimatedGlobalColumnTexture implements Texture {
 	private timeFrame: number
 	private sliceTime: number
 
-	constructor(img: HTMLImageElement, sliceTime: number, slices?: number) {
+	constructor(id: string, img: HTMLImageElement, sliceTime: number, slices?: number) {
+		super(id);
 		this.img = img;
 		this.height = img.height;
 		this.width = img.width;

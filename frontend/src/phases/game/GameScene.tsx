@@ -26,6 +26,7 @@ type state = {
 class GameScene extends Component<props, state>  {
 
 	private model: LogicModel | null = null
+	private dcCalled: boolean = false;
 
 	static contextType = MenuContext;
 
@@ -39,6 +40,14 @@ class GameScene extends Component<props, state>  {
 			model: new VisualModel(),
 			ended: false
 		}
+	}
+
+	private callDc() {
+		if(this.dcCalled) {
+			return;
+		}
+		this.dcCalled = true;
+		this.props.disconnectHandler();
 	}
 
 	handleEvent(event: ModelEvent) {
@@ -56,7 +65,7 @@ class GameScene extends Component<props, state>  {
 					this.change(event.data, true);
 				}
 				else {
-					this.props.disconnectHandler();
+					this.callDc();
 				}
 			}
 		}
@@ -76,6 +85,7 @@ class GameScene extends Component<props, state>  {
 
 	componentWillUnmount() {
 		this.model?.disconnect();
+		this.callDc();
 	}
 
 	render() {
@@ -84,7 +94,7 @@ class GameScene extends Component<props, state>  {
 				<div className="text">
 					{this.state.text}
 				</div>
-				{this.state.ended ? <button onClick={() => this.context(<MenuScene visuals={this.props.visuals} />)}>Vissza</button> : null}
+				{this.state.ended ? <button onClick={() => this.callDc()}>Vissza</button> : null}
 			</div>
 		}
 		return <GameView visuals={this.props.visuals} logicModel={this.model!} visualModel={this.state.model} />

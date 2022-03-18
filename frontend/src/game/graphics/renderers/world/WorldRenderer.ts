@@ -28,7 +28,7 @@ class WorldRenderer extends StatelessRenderable {
 	readonly cozyPack: CozyPack;
 	private world: World
 	private model: VisualModel
-	private tileTextures: Matrix<Texture>;
+	private tileTextureLayers: Array<Matrix<Texture>>;
 
 	constructor(world: World, visuals: VisualResources) {
 		super();
@@ -36,7 +36,7 @@ class WorldRenderer extends StatelessRenderable {
 		this.world = world;
 		this.texturePack = visuals.textures;
 		this.cozyPack = visuals.cozy;
-		this.tileTextures = world.tileGrid.map(t => visuals.textures.getTexture(t));
+		this.tileTextureLayers = Array.from(world.level.getLayers());
 	}
 
 	translateXY(x: number, y: number): Position {
@@ -227,22 +227,21 @@ class WorldRenderer extends StatelessRenderable {
 		mostLeftRender = Math.floor(mostLeftRender);
 		mostTopRender = Math.floor(mostTopRender);
 
-		for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
-			for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
-				let floorX = Math.floor(x);
-				let floorY = Math.floor(y);
-				//let tileXPos = (width * camFocusX) + ((-camX + floorX) * tileSize);
-				//let tileYPos = (height * (1-camFocusY)) - ((-camY + floorY+1) * tileSize);
-
-				//let [translatedX, translatedY] = this.translateXY(floorX, floorY);
-				let t = this.tileTextures.elementAt([floorX, floorY]);
-				if(t === null) {
-					t = this.texturePack.getDefaultTexture();
+		for(let layer = 0; layer < this.tileTextureLayers.length; ++layer) {
+			for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
+				for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
+					let floorX = Math.floor(x);
+					let floorY = Math.floor(y);
+					//let tileXPos = (width * camFocusX) + ((-camX + floorX) * tileSize);
+					//let tileYPos = (height * (1-camFocusY)) - ((-camY + floorY+1) * tileSize);
+	
+					//let [translatedX, translatedY] = this.translateXY(floorX, floorY);
+					let t = this.tileTextureLayers[layer].elementAt([floorX, floorY]);
+					if(t === null) {
+						t = this.texturePack.getDefaultTexture();
+					}
+					t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 				}
-				if(t === undefined) {
-					console.error("error");
-				}
-				t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 			}
 		}
 		//this.ctx.fillStyle = "yellow";

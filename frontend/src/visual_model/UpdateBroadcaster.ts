@@ -12,7 +12,7 @@ export default class UpdateBroadcaster<T> extends EventTarget {
 		return changedListener;
 	}
 
-	removeUpdateListener(t: EventListener) {
+	removeUpdateListener(t: EventListener | null) {
 		this.removeEventListener(modelUpdateEventType, t);
 	}
 

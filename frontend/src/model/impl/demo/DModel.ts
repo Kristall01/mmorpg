@@ -9,23 +9,20 @@ import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalFocus from "model/signals/SignalFocus";
 import SignalJoinworld from "model/signals/SignalJoinworld";
 import SignalRenameEntity from "model/signals/SignalRenameEntity";
+import Level from "visual_model/Level";
 import { ConstStatus, Direction, StatusFn, zigzagStatus } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 
-const entitySpeed = 2;
-
-const netLag = 50;
+const netLag = 0;
 const startPos: Position = [0,0];
 
-let camleak = false;
 
-
-
-let map = {width: 50, height: 8};
+let level = new Level(50, 8);
+level.addLayer()
 let m = new Matrix<string>(50, 8);
 m.fill(([x,y]) => {
-	if(x == 0 || x == map.width-1 || y == 0 || y == map.height-1) {
+	if(x == 0 || x == level.width-1 || y == 0 || y == level.height-1) {
 		return "WATER";
 	}
 	else {
@@ -33,26 +30,39 @@ m.fill(([x,y]) => {
 	}
 });
 
+export interface DModelConfig {
+	tilegrid?: Matrix<string>
+	speed?: number
+}
+
+let defaultConfig: DModelConfig = {
+	tilegrid: m,
+	speed: 2
+}
+
 class DModel extends LogicModel {
 
 	private name: string;
 	private statusFn: StatusFn
 	private tiles: Matrix<string>
+	private entitySpeed: number = 2;
 
-	constructor(callback: IEventReciever, username: string, tilegrid: Matrix<string> = m) {
+	constructor(callback: IEventReciever, username: string, options?: DModelConfig) {
 		super(callback);
-		this.tiles = tilegrid;
+		let {speed, tilegrid} = (options === undefined) ? defaultConfig : Object.assign({}, defaultConfig, options);
+		this.tiles = tilegrid!
 		this.name = username;
+		this.entitySpeed = speed!;
 		this.statusFn = ConstStatus(startPos, Direction.enum.map.SOUTH);
 
 		setTimeout(() => {
 			this.broadcastEvent({type: ModelEventType.CONNECTED});
 			setTimeout(() => {
 				this.broadcastEvent({type: ModelEventType.PLAY});
-				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], tilegrid.width, tilegrid.height, tilegrid));
+				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], tilegrid!.width, tilegrid!.height, level));
 				this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
-				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed));
+				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, speed!));
 				this.broadcastSignal(new SignalRenameEntity(0, username));
 				this.broadcastSignal(new SignalChangeClothes(0, ["SUIT", "PANTS_SUIT","SHOES"]));
 				this.broadcastSignal(new SignalFocus(0));
@@ -115,7 +125,7 @@ class DModel extends LogicModel {
 			let t = performance.now();
 			let currentPosition = this.statusFn(t)
 			let path: Position[] = [currentPosition.position, [x,y]];
-			this.statusFn = zigzagStatus(t, path, entitySpeed);
+			this.statusFn = zigzagStatus(t, path, this.entitySpeed);
 			setTimeout(() => {
 				this.broadcastSignal(new SignalEntitypath(0, t, path));
 			}, netLag/2);

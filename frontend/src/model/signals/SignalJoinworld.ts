@@ -1,21 +1,27 @@
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
+import Level from "visual_model/Level";
 import VisualModel from "visual_model/VisualModel";
 
 export default class SignalJoinworld implements SignalIn {
 
 	spawnX: number;
 	spawnY: number;
-	tileGrid: Matrix<string>
+	level: Level;
+	width: number;
+	height: number;
 
-	constructor(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>) {
+	constructor(spawnX: number, spawnY: number, width: number, height: number, level: Level) {
 		this.spawnX = spawnX;
 		this.spawnY = spawnY;
-		this.tileGrid = tileGrid;
+		this.level = level;
+
+		this.width = width;
+		this.height = height;
 	}
 
 	execute(model: VisualModel): void {
-		model.joinWorld(this.spawnX, this.spawnY, this.tileGrid.width, this.tileGrid.height, this.tileGrid, [this.spawnX, this.spawnY]);
+		model.joinWorld(this.spawnX, this.spawnY, this.width, this.height, this.level, [this.spawnX, this.spawnY]);
 	}
 
 }

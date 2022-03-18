@@ -1,6 +1,9 @@
+import UpdateBroadcaster from "visual_model/UpdateBroadcaster";
 import { Position } from "visual_model/VisualModel";
 
-export default class Matrix<T> {
+export type Events = "change"
+
+export default class Matrix<T> extends UpdateBroadcaster<Events> {
 
 	public readonly width: number;
 	public readonly height: number;
@@ -8,6 +11,7 @@ export default class Matrix<T> {
 	protected elements: Array<Array<T>>;
 
 	constructor(width: number, height: number) {
+		super();
 		this.width = width;
 		this.height = height;
 		this.cells = width*height;
@@ -21,7 +25,8 @@ export default class Matrix<T> {
 	fill(filler: (p: Position) => T) {
 		for(let y = 0; y < this.height; ++y) {
 			for(let x = 0; x < this.width; ++x) {
-				this.elements[y][x] = filler([x,y]);
+				let p: Position = [x,y];
+				this.setElementAtUnsafe(p, filler(p));
 			}
 		}
 	}
@@ -33,11 +38,16 @@ export default class Matrix<T> {
 		return this.elements[p[1]][p[0]];
 	}
 
+	private setElementAtUnsafe(p: Position, t: T) {
+		this.elements[p[1]][p[0]] = t;
+		this.triggerUpdate("change");
+	}
+
 	setElementAt(p: Position, t: T) {
 		if(p[0] < 0 || p[1] < 0 || p[0] >= this.width || p[1] >= this.height) {
 			throw new Error("IllegalMatrixIndex: "+JSON.stringify(p));
 		}
-		this.elements[p[1]][p[0]] = t;
+		this.setElementAtUnsafe(p, t);
 	}
 
 	map<U>(f: (element: T) => U): Matrix<U> {

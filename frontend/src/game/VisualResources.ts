@@ -4,6 +4,8 @@ import ImageStore from "./ImageStore";
 
 export default class VisualResources {
 
+	private static instance: VisualResources | null = null;
+
 	public readonly cozy: CozyPack
 	public readonly textures: TexturePack
 	public readonly images: ImageStore
@@ -15,12 +17,18 @@ export default class VisualResources {
 	}
 
 	public static async load(): Promise<VisualResources> {
+		let baseInstance = VisualResources.instance;
+		if(baseInstance !== null) {
+			return baseInstance;
+		}
 		let images = new ImageStore();
 		await images.loadZip("imagestore.zip");
 		let cozy = new CozyPack(images);
 		let textures = new TexturePack(images);
 		await textures.loadPack("texturepack.json");
-		return new VisualResources(cozy, textures, images);
+		let instance = new VisualResources(cozy, textures, images);
+		VisualResources.instance = instance;
+		return instance;
 	}
 
 }

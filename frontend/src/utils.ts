@@ -1,3 +1,6 @@
+import React from "react";
+import UpdateBroadcaster from "visual_model/UpdateBroadcaster";
+
 export function linearMove(fromX: number, fromY: number, fromtime: number, toX: number, toY: number, toTime: number): (rendertime: number) => [number,number] {
 	let timeDiff = toTime - fromtime;
 	let xDiff = toX - fromX;

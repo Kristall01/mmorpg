@@ -1,23 +1,36 @@
-import GameView from 'game/GameView';
-import CozyPack from 'game/graphics/texture/CozyPack';
-import TexturePack from 'game/graphics/texture/TexturePack';
 import VisualResources from 'game/VisualResources';
 import DModel from 'model/impl/demo/DModel';
-import NetworkModel from 'model/impl/ws/NetworkModel';
 import GameScene from 'phases/game/GameScene';
-import React, { createContext, createRef, useEffect, useState } from 'react';
+import React, { createContext } from 'react';
 import './MapBuilder.scss';
-import MapbuildModel from './MapbuildModel';
-import Buttons from './menus/Buttons';
-import GridEditor from './menus/GridEditor';
-import TileBrowser from './menus/TileBrowser';
-import Navigation, { NavigationOption } from './Navigation';
-import TileGridGomponent from './TileGridComponent';
+import MapbuildModel, {EventTypes} from './model/MapbuildModel';
+import Buttons from './components/menus/Buttons';
+import GridEditor from './components/menus/GridEditor';
+import TileBrowser from './components/menus/TileBrowser';
+import Navigation from './components/Navigation';
+import TabExplorer from './components/tabs/TabExplorer';
+import GameView from 'game/GameView';
+import SubManager from 'SubManager';
+import { NavigationOption } from './model/navoptions/NavigationOption';
+import Persistence from './components/menus/Persistence';
+import Layers from './components/menus/Layers';
+import MenuContext from 'MenuContext';
+import { LandingPhase } from "phases/landing/LandingPhase"
+import { Events } from './model/NavigatorModel';
+import MainScreen from './components/MainScreen';
+import ProjectModel from './model/ProjectModel';
 
 export const MapbuildModelContext = createContext<MapbuildModel>(null!);
 export const VisualResourcesContext = createContext<VisualResources>(null!);
 
+export type props = {
+	poject: ProjectModel
+}
+
+/*
+
 const navOptions: NavigationOption[] = [
+	new NavigationOption()
 	{
 		element: () => <TileBrowser />,
 		icon: "fa-solid fa-block-brick",
@@ -43,19 +56,53 @@ const navOptions: NavigationOption[] = [
 		id: "play",
 		label: "play"
 	}
-]
+]*/
 
-export type props = {
-	visuals: VisualResources
-}
-
-class MapBuilder extends React.Component<props> {
+class MapBuilder extends React.Component<props, {}, typeof MenuContext> {
 
 	private model: MapbuildModel;
+	private updateHandler: EventListener | null = null
+	private subManager: SubManager = new SubManager();
+	private gameNavOpt: NavigationOption
 
 	constructor(props: props) {
 		super(props);
-		this.model = new MapbuildModel(() => this.forceUpdate());
+		let model = new MapbuildModel(props.poject);
+		let nav = model.navigator;
+		nav.createMenuOption("fa-solid fa-block-brick", "tiles", () => <TileBrowser />);
+		nav.createMenuOption("fa-solid fa-ellipsis", "options", () => <Buttons />);
+		nav.createMenuOption("fa-solid fa-crop", "edit grid", () => <GridEditor />);
+		nav.createMenuOption("fa-solid fa-layer-group", "manage layers", () => <Layers project={this.props.poject} />);
+		this.gameNavOpt = nav.createCustomOption("fa-solid fa-play", "start testing", () => {model.toggleGame()});
+		//this.gridNavOpt = 
+		this.model = model;
+	}
+
+	componentDidMount() {
+		this.subManager.subscribe(this.model, this.handleUpdateEvent.bind(this));
+		this.subManager.subscribe(this.model.navigator, this.handleNavigatorUpdate.bind(this));
+//		this.updateHandler = this.model.addUpdateListener(this.handleUpdateEvent.bind(this));
+	}
+
+	componentWillUnmount() {
+		this.subManager.removeAll();
+	}
+
+	private handleNavigatorUpdate(type: Events) {
+		if(type === "exit") {
+			this.context(() => <LandingPhase />);
+		}
+	}
+
+	private handleUpdateEvent(type: EventTypes) {
+		if(type === "game") {
+			if(this.model.isGameShown()) {
+				this.gameNavOpt.setConfig({icon: "fa-solid fa-pause", "label": "stop testing"});
+			}
+			else {
+				this.gameNavOpt.setConfig({icon: "fa-solid fa-play", "label": "start testing"});
+			}
+		}
 	}
 
 	onWheel(e: React.WheelEvent) {
@@ -67,26 +114,15 @@ class MapBuilder extends React.Component<props> {
 	}
 
 	render() {
-		let grid = this.model.getGrid();
-		let gridComponent = grid === null ? null : <TileGridGomponent grid={grid} cellSize={this.model.getWheel()} />
-
-		let centerComponent = null;
-		if(this.model.game && grid != null) {
-			centerComponent = <GameScene disconnectHandler={() => {}} visuals={this.props.visuals} modelGenerator={a => new DModel(a, "TESZT", grid?.map(a => a?.name || "?"))} />
-		}
-		else {
-			centerComponent = gridComponent;
-		}
-
 		return (
 			<MapbuildModelContext.Provider value={this.model}>
-				<VisualResourcesContext.Provider value={this.props.visuals}>
+				<VisualResourcesContext.Provider value={/* this.props.visuals */null!}>
 					<div className="map-builder-component">
 						<div className="side">
-							<Navigation options={navOptions}/>
+							<Navigation nav={this.model.navigator} />
 						</div>
 						<div className="center" onWheel={(e) => this.onWheel(e)}>
-							{centerComponent}
+							<MainScreen model={this.model}/>
 						</div>
 					</div>
 				</VisualResourcesContext.Provider>
@@ -95,5 +131,7 @@ class MapBuilder extends React.Component<props> {
 	}
 
 };
+
+MapBuilder.contextType = MenuContext;
 
 export default MapBuilder;

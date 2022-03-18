@@ -1,6 +1,7 @@
 import { convertToHtml } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
+import Level from "./Level";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
@@ -35,8 +36,8 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		this.zoomFn = (rendertime: number) => this.zoomTarget
 	}
 
-	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
-		this._world = new World(this, width, height, tileGrid, camStart);
+	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, level: Level, camStart: Position) {
+		this._world = new World(this, width, height, level, camStart);
 		this.triggerUpdate("world");
 	}
 

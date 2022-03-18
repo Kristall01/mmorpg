@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { MapbuildModelContext, VisualResourcesContext } from "../MapBuilder";
+import { MapbuildModelContext, VisualResourcesContext } from "../../MapBuilder";
 
 const TileBrowser = ({}) => {
 
@@ -8,20 +8,25 @@ const TileBrowser = ({}) => {
 
 	let tiles: Array<JSX.Element> = [];
 
-	for(let tile of model.getTiles()) {
+	for(let tile of model.getProject().getTexturePack().getTextures()) {
 		let className = ["tileline"];
-		if(model.getActiveTile()?.name === tile.name) {
+		if(model.getActiveTexture()?.id === tile.id) {
 			className.push("active");
 		}
-		let imgTag = tile.img ? <img src={tile.img} /> : null
+
+		//preview image disabled
+//		let imgTag = tile.img ? <img src={tile.img} /> : null
+		let imgTag = null;
 		tiles.push(<div onClick={() => {
 			model.setActiveTile(tile);
-		}} key={tile.name} className={className.join(" ")}>
+		}} key={tile.id} className={className.join(" ")}>
 			<div className="text">
-				{tile.name}
+				{tile.id}
 			</div>
 			<div className="right">
-				<img src={visuals.images.get(tile.img).src} />
+				{/*
+					<img src={visuals.images.get(tile.img).src} />
+				*/}
 			</div>
 		</div>);
 	}
