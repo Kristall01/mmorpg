@@ -1,6 +1,7 @@
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
+import SignalChangeHp from "model/signals/SignalChangeHp";
 import SignalChat from "model/signals/SignalChat";
 import SignalClarchat from "model/signals/SignalClearchat";
 import SignalEntitypath from "model/signals/SignalEntitypath";
@@ -50,7 +51,7 @@ class DModel extends LogicModel {
 				this.broadcastSignal(new SignalJoinworld(startPos[0], startPos[1], map.width, map.height, tileGrid));
 				this.broadcastSignal(new SignalChat("§eÜdv a chaten, "+this.name+"!"));
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
-				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed));
+				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed, 70, 100));
 				this.broadcastSignal(new SignalRenameEntity(0, username));
 				this.broadcastSignal(new SignalChangeClothes(0, ["SUIT", "PANTS_SUIT","SHOES"]));
 				this.broadcastSignal(new SignalFocus(0));
@@ -87,6 +88,28 @@ class DModel extends LogicModel {
 			case "clearchat": {
 				this.broadcastSignal(new SignalClarchat());
 				this.broadcastSignal(new SignalChat("§7§oChat törölve"));
+				break;
+			}
+			case "sethp": {
+				if(args.length < 1) {
+					this.broadcastSignal(new SignalChat("§cKevés paraméter"));
+					return;
+				}
+				let hp: number;
+				try {
+					hp = parseInt(args[0]);
+				}
+				catch(err) {
+					this.broadcastSignal(new SignalChat("Érvénytelen szám"));
+					return;
+				}
+				if(hp < 0) {
+					hp = 0;
+				}
+				else if(hp > 100) {
+					hp = 100;
+				}
+				this.broadcastSignal(new SignalChangeHp(0, hp));
 				break;
 			}
 			default: {

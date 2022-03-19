@@ -8,6 +8,7 @@ import { DEFAULT_MAX_VERSION } from "tls";
 import VisualModel, { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";
 import { renderEntity } from "./EntityRenderer";
+import { renderLabel, renderLabels } from "./LabelsRenderer";
 
 export interface RenderConfig {
 	camX: number
@@ -251,6 +252,8 @@ class WorldRenderer extends StatelessRenderable {
 			renderEntity(this, entity, this.renderConfig);
 		}
 
+		renderLabels(this, this.world, this.renderConfig);
+		// for(let entity of this.model.world.entities) {
 		// for(let entity of this.world.entities) {
 		// 	entity.render(this.renderConfig, this, this.ctx);
 		// }
@@ -271,7 +274,8 @@ class WorldRenderer extends StatelessRenderable {
 				this.ctx.fillText(name, entity.cachedCanvasPosition[0]-textWidth/2, entity.cachedCanvasPosition[1]);
 			}
 		}
- */	}
+	 	*/	
+	}
 	
 
 }

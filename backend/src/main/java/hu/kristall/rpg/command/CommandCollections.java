@@ -13,6 +13,7 @@ public class CommandCollections {
 		map.registerCommand(new CommandSpeed(map));
 		map.registerCommand(new CommandWorld(map));
 		map.registerCommand(new CommandClothes(map));
+		map.registerCommand(new CommandDmg(map));
 		return map;
 	}
 	

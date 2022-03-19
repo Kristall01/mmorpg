@@ -1,6 +1,8 @@
 import { convertToHtml } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
+import Entity from "./Entity";
+import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
@@ -14,7 +16,7 @@ export type Position = [number,number];
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps";
+export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -27,6 +29,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private zoomFn: ZoomFn;
 	maxZoom: number = 50;
 	private _maxFPS: number | null = null;
+	private _dead: boolean = false;
 	private listeners = []
 
 	constructor() {
@@ -43,6 +46,15 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	public leaveWorld() {
 		this._world = null;
 		this.triggerUpdate("world");
+	}
+
+	get dead() {
+		return this._dead;
+	}
+
+	set dead(dead: boolean) {
+		this._dead = dead;
+		this.triggerUpdate("dead");
 	}
 
 	get world() {
@@ -92,6 +104,16 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	get maxFPS() {
 		return this._maxFPS;
 	}
+
+	showLabelFor(text: string, labelType: LabelType, entity: Entity) {
+		let pos = entity.cachedCanvasPosition;
+		//drawDamageLabel(view.ctx, [pos[0], top+(eHeight*0.75)], (renderConfig.rendertime % 1000)/750, "20");
+		this.world?.addLabel(new WorldLabel(text, labelType, entity));
+/* 		let eHeight = entity.type.height*1.25 * renderConfig.tileSize;
+		this.world?.addLabel(new WorldLabel(text, labelType, t => {
+			return [pos[0], top+(eHeight*0.75)];
+		}));
+ */	}
 
 }
 

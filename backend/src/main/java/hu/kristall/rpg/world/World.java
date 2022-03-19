@@ -18,20 +18,24 @@ import java.util.HashMap;
 import java.util.List;
 
 public class World extends SynchronizedObject<World> {
-
-	private final Tile[] tileMap;
-	private Tile defaultTile;
-	private final int width, height;
-	private HashMap<Player, WorldPlayer> worldPlayers = new HashMap<>();
-	private HashMap<Integer, Entity> worldEntities = new HashMap<>();
-	private String name;
-	private Synchronizer<Server> asyncServer;
-	private int nextEntityID = 0;
-	private List<String> bakedMapSerialize;
-	private Logger logger;
 	
-	public World(Synchronizer<Server> serverSynchronizer, String name, int width, int height) {
+	protected final Tile[] tileMap;
+	protected Tile defaultTile;
+	protected final int width, height;
+	protected HashMap<AsyncPlayer, WorldPlayer> worldPlayers = new HashMap<>();
+	protected HashMap<Integer, Entity> worldEntities = new HashMap<>();
+	protected String name;
+	protected AsyncServer asyncServer;
+	protected int nextEntityID = 0;
+	protected List<String> bakedMapSerialize;
+	protected Logger logger;
+	private boolean shuttingDown = false;
+	private boolean defaultWorld;
+	
+	public World(AsyncServer serverSynchronizer, boolean defaultWorld, String name, int width, int height) {
 		super("world-"+name);
+		
+		this.defaultWorld = defaultWorld;
 		this.logger = LoggerFactory.getLogger("world-"+name);
 		
 		this.asyncServer = serverSynchronizer;
@@ -94,15 +98,15 @@ public class World extends SynchronizedObject<World> {
 	private void addEntity(Entity entity) {
 		worldEntities.put(entity.getID(), entity);
 		for (WorldPlayer value : worldPlayers.values()) {
-			entity.sendStatusFor(value.getPlayer().getConnection());
+			entity.sendStatusFor(value.getAsyncPlayer().connection);
 		}
 	}
 	
-	public Synchronizer<WorldPlayer> joinPlayer(Player player) {
+	public Synchronizer<WorldPlayer> joinPlayer(AsyncPlayer player) {
 		try {
 			//sync world state to joining player
 			Position pos = new Position(3,3);
-			PlayerConnection connectingConnection = player.getConnection();
+			PlayerConnection connectingConnection = player.connection;
 			connectingConnection.sendPacket(new PacketOutJoinworld(this, pos));
 			for (Entity e : this.worldEntities.values()) {
 				e.sendStatusFor(connectingConnection);
@@ -114,7 +118,7 @@ public class World extends SynchronizedObject<World> {
 			worldPlayers.put(player, wp);
 			EntityHuman h = wp.spawnTo(pos);
 			connectingConnection.sendPacket(new PacketOutFollowEntity(h));
-			broadcastMessage("§e" + player.getName() + " csatlakozott");
+			broadcastMessage("§e" + player.name + " csatlakozott");
 			
 			//player.followEntity(p.getID());
 			
@@ -122,6 +126,12 @@ public class World extends SynchronizedObject<World> {
 			//send map packets
 			//list entities
 			//etc
+			getTimer().schedule(() -> {
+				WorldPlayer wp0 = worldPlayers.get(player);
+				if(wp0 != null && wp0.hasEntity()) {
+					wp0.getEntity().damage((20));
+				}
+			}, 2000 );
 			
 			return wp.getSynchronizer();
 		}
@@ -142,14 +152,17 @@ public class World extends SynchronizedObject<World> {
 		}
 	}
 	
-	public void leavePlayer(Player player) {
+	public void leavePlayer(AsyncPlayer player) {
 		WorldPlayer oldEntity = worldPlayers.remove(player);
-		player.getConnection().sendPacket(new PacketOutLeaveWorld());
+		player.connection.sendPacket(new PacketOutLeaveWorld());
 		if(oldEntity.getEntity() != null) {
 			oldEntity.getEntity().remove();
 		}
 		oldEntity.getSynchronizer().changeObject(null);
-		broadcastMessage("§e"+player.getName()+ " lelépett");
+		broadcastMessage("§e"+player.name+ " lelépett");
+		if(shuttingDown && worldPlayers.size() == 0) {
+			super.shutdown();
+		}
 	}
 	
 	public void broadcastMessage(String message) {
@@ -160,17 +173,40 @@ public class World extends SynchronizedObject<World> {
 	
 	public void broadcastPacket(PacketOut out) {
 		for (WorldPlayer wp : worldPlayers.values()) {
-			wp.getPlayer().getConnection().sendPacket(out);
+			wp.getAsyncPlayer().connection.sendPacket(out);
 		}
 	}
 	
-	public Synchronizer<Server> getAsyncServer() {
+	public AsyncServer getAsyncServer() {
 		return asyncServer;
 	}
 	
-	public void shutdown() {
-		for (WorldPlayer wp : worldPlayers.values()) {
-			wp.getPlayer().kick("A világ amiben tartózkodtál leállt.");
+	public void shutdownWorld() {
+		/*if(this.shuttingDown) {
+			return;
+		}
+		if(this.defaultWorld) {
+			if(!asyncServer.isShuttingDown()) {
+				throw new IllegalStateException("default world cannot be shutdown unless server is stopping");
+			}
+			shuttingDown = true;
+			if(this.worldPlayers.size() == 0) {
+				super.shutdown();
+				return;
+			}
+			for (WorldPlayer wp : worldPlayers.values()) {
+				wp.getAsyncPlayer().sync(p -> p.kick("Szerver leállás"));
+			}
+			return;
+		}
+		shuttingDown = true;
+/*		if(this.defaultWorld) {
+			if(asyncServer.shuttingDown)
+		}
+		shuttingDown = true;
+		shutdownWorld0();*/
+		if(!asyncServer.isShuttingDown()) {
+			throw new IllegalStateException("worlds cannot be shut down while server is running");
 		}
 		super.shutdown();
 	}

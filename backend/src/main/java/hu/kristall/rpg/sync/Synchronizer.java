@@ -39,6 +39,11 @@ public class Synchronizer<T extends ISynchronized<T>> {
 	}
 	
 	public <U> Future<U> syncCompute(Function<T, U> task) {
+		synchronized(syncLock) {
+			if(taskRunner.isShutdown()) {
+				return null;
+			}
+		}
 		return taskRunner.computeTask(() -> {
 			synchronized(syncLock) {
 				return task.apply(returnedObject);
