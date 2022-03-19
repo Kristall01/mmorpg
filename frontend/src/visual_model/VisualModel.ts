@@ -6,24 +6,22 @@ import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
-export enum focus {
-	main,
-	chat
-}
+export type focus = "main" | "chat";
 
 export type Position = [number,number];
 
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead";
+export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
 	private _world: World | null = null;
 	public chatlog: Array<string> = []
 	chatOpen: boolean = false
-	focus: focus = focus.main
+	focus: focus = "main"
+	menuOpen: boolean = false;
 	allowCamLeak: boolean = false;
 	private zoomTarget = 200;
 	private zoomFn: ZoomFn;
@@ -73,9 +71,14 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 
 	setChatOpen(value: boolean) {
 		this.chatOpen = value;
-		this.focus = value ? focus.chat : focus.main;
+		this.focus = value ? "chat" : "main";
 		
 		this.triggerUpdate("chat-open");
+	}
+
+	setMenuOpen(value: boolean) {
+		this.menuOpen = value;
+		this.triggerUpdate("menu-open");
 	}
 
 	handleSignal(signal: SignalIn) {

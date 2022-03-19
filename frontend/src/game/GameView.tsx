@@ -12,6 +12,7 @@ import TexturePack from "./graphics/texture/TexturePack";
 import WorldView from "./graphics/world/WorldView";
 import ConditionalWorldView from "./graphics/world/ConditionalWorldView";
 import VisualResources from "./VisualResources";
+import EscapeMenu from "./ui/escapemenu/EscapeMenu";
 
 export type props = {
 	logicModel: LogicModel
@@ -42,13 +43,17 @@ export default class GameView extends React.Component<props, {}> {
 	}
 
 	handleModelUpdate() {
-		if(this.visualModel.focus === focus.main) {
+		if(this.visualModel.focus === "main") {
 			this.mainRef.current?.focus();
 		}
 		this.forceUpdate();
 	}
 
 	handleKeydown(e: React.KeyboardEvent) {
+		if(e.key === "Escape" && this.visualModel.focus === "main") {
+			this.visualModel.setMenuOpen(!this.visualModel.menuOpen);
+			return;
+		}
 		if(e.key === "Enter" && e.target === this.mainRef.current && this.visualModel.chatOpen === false) {
 			this.visualModel.setChatOpen(true);
 		}
@@ -60,6 +65,8 @@ export default class GameView extends React.Component<props, {}> {
 	}
 
 	render(): React.ReactNode {
+		let escapeMenu = this.visualModel.menuOpen ? <EscapeMenu /> : null;
+
 		let content = (
 			<div
 				tabIndex={0}
@@ -70,7 +77,7 @@ export default class GameView extends React.Component<props, {}> {
 				<ModelContext.Provider value={[this.logicModel, this.visualModel]}>
 					<ConditionalWorldView logicModel={this.logicModel} visualModel={this.visualModel} visuals={this.visuals} />
 					<Chat />
-					<button onClick={() => this.logicModel.disconnect()} className="dc-button">Disconnect</button>
+					{escapeMenu}
 				</ModelContext.Provider>
 			</div>
 		)

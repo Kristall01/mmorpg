@@ -72,7 +72,7 @@ const Chat = (): JSX.Element | null => {
 	}
 
 	const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-		if(e.key === "Escape") {
+		if(visualModel.focus === "chat" && e.key === "Escape") {
 			setChatText("");
 			visualModel.setChatOpen(false);
 			e.preventDefault();
@@ -100,7 +100,7 @@ const Chat = (): JSX.Element | null => {
 	}
 
 	useEffect(() => {
-		if(visualModel.focus === focus.chat) {
+		if(visualModel.focus === "chat") {
 			focusChat();
 		}
 		if(visualModel.chatOpen === false) {
