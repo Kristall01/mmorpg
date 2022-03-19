@@ -3,7 +3,8 @@ import AnimatedGlobalColumnTexture from "./AnimatedGlobalColumnTexture";
 import ColorTexture from "./ColorTexture";
 import EmptyTexture from "./EmptyTexture";
 import StaticTexture from "./StaticTexture";
-import Texture, { ofType } from "./Texture";
+import Texture from "./Texture";
+import createTexture from "./TextureFactory";
 
 class TexturePack {
 
@@ -27,7 +28,7 @@ class TexturePack {
 		Object.entries(textureJson).forEach((entryPair: [string, any]) => {
 			let val = entryPair[1];
 			let img = this.images.get(val.path);
-			this.addTexture(entryPair[0], ofType(entryPair[0], entryPair[1].type, img.img, entryPair[1]));
+			this.addTexture(entryPair[0], createTexture(entryPair[0], entryPair[1].type, img.img, entryPair[1]));
 		});
 
 /* 		imageTextures

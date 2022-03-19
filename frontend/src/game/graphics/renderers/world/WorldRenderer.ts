@@ -36,7 +36,16 @@ class WorldRenderer extends StatelessRenderable {
 		this.world = world;
 		this.texturePack = visuals.textures;
 		this.cozyPack = visuals.cozy;
-		this.tileTextureLayers = Array.from(world.level.getLayers());
+		this.tileTextureLayers = Array.from(world.level.getLayers()).map(a => a.map(e => {
+			if(e === null) {
+				return this.texturePack.getDefaultTexture();
+			}
+			let t: Texture | undefined = this.texturePack.getTexture(e);
+			if(t === undefined) {
+				return this.texturePack.getDefaultTexture();
+			}
+			return t;
+		}));
 	}
 
 	translateXY(x: number, y: number): Position {

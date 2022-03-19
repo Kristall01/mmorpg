@@ -12,7 +12,7 @@ export default abstract class ConnectedComponent<props = {},S = {}, SS = {}> ext
 		this.models = models;
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		let updater = () => this.forceUpdate();
 		for(let m of this.models) {
 			this.subManager.subscribe(m, updater);

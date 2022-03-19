@@ -1,10 +1,9 @@
-import Texture from "game/graphics/texture/Texture";
 import Matrix from "Matrix";
 import UpdateBroadcaster from "visual_model/UpdateBroadcaster";
 
 export type LevelEvents = "add" | "remove";
 
-export type Layer = Matrix<Texture>;
+export type Layer = Matrix<string | null>;
 
 export default class Level extends UpdateBroadcaster<LevelEvents> {
 
@@ -27,7 +26,7 @@ export default class Level extends UpdateBroadcaster<LevelEvents> {
 
 	addLayer(): Layer {
 		let id = this.nextID++;
-		let m = new Matrix<Texture>(this.width, this.height);
+		let m: Layer = new Matrix(this.width, this.height);
 		this.layers.set(id, m);
 		return m;
 	}

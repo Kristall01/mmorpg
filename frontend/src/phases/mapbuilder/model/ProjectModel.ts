@@ -24,8 +24,8 @@ export default class ProjectModel extends UpdateBroadcaster<ProjectEvents> {
 
 	}
 
-	getLevels(): Iterable<Level> {
-		return this.levels.values();
+	getLevels(): Iterable<[string, Level]> {
+		return this.levels.entries();
 	}
 
 	static newProject(): ProjectModel {

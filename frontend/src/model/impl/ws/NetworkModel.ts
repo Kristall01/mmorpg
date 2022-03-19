@@ -11,6 +11,7 @@ import SignalFocus from "model/signals/SignalFocus";
 import SignalJoinworld from "model/signals/SignalJoinworld";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
 import SignalRenameEntity from "model/signals/SignalRenameEntity";
+import Level from "visual_model/Level";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 
@@ -49,7 +50,16 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("despawnentity", ({id}) => new SignalEntityDespawn(id));
 		this.addPacketSignal("followentity", ({id}) => new SignalFocus(id));
 		this.addPacketSignal("entityspeed", ({id, speed}) => new SignalEntityspeed(id, speed));
-		this.addPacketSignal("joinworld", ({tileGrid, width, height, spawnX, spawnY}) => new SignalJoinworld(spawnX, spawnY, width, height, [Matrix.fromArray(width, height, tileGrid)]));
+		this.addPacketSignal("joinworld", ({layers, width, height, spawnX, spawnY}) => {
+
+			let l = new Level(width, height);
+			for(let i = 0; i < layers.length; ++i) {
+				let m: Matrix<string> = Matrix.fromArray(width, height, layers[i]);
+				l.addLayer().fill(a => m.elementAt(a))
+			}
+
+			return new SignalJoinworld(spawnX, spawnY, width, height, l)
+		});
 		this.addPacketSignal("leaveworld", () => new SignalLeaveworld());
 		this.addPacketSignal("entityrename", ({id, newname}) => new SignalRenameEntity(id, newname));
 		this.addPacketSignal("clothes", ({clothes, id}) => new SignalChangeClothes(id, clothes));

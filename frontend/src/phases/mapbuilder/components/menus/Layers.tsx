@@ -13,6 +13,9 @@ export default class Layers extends ConnectedComponent<LayerProps> {
 	}
 
 	render(): ReactNode {
+		for(let [levelName, level] of this.props.project.getLevels()) {
+			return <div>{levelName}</div>
+		}
 		return <div>asd</div>
 	}
 	
