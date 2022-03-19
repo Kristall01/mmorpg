@@ -3,9 +3,7 @@ package hu.kristall.rpg;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.World;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -39,6 +37,10 @@ public class WorldsManager {
 	
 	public Synchronizer<World> getDefaultWorld() {
 		return defaultWorld;
+	}
+	
+	public Collection<String> getWorldNames() {
+		return Collections.unmodifiableCollection(this.worlds.keySet());
 	}
 	
 	public void shutdown() {

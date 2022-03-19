@@ -19,7 +19,8 @@ public class CommandWorld extends SimpleCommand {
 			return;
 		}
 		if(args.length == 0) {
-			sender.sendMessage("§cHiba: §4Hibás parancs használat.");
+			sender.sendMessage("Ezekbe a világokba lehet csatlakozni:");
+			sender.sendMessage(String.join(", ",getServer().getWorldsManager().getWorldNames()));
 			return;
 		}
 		Player p = (Player) sender;
