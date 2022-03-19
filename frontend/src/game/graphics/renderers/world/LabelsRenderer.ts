@@ -1,19 +1,20 @@
+import { drawDamageLabel, drawHealLabel } from "game/graphics/GraphicsUtils";
+import WorldView from "game/graphics/world/WorldView";
 import { LabelType, WorldLabel } from "visual_model/Label";
 import { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";
-import { drawDamageLabel, drawHealLabel } from "../GraphicsUtils";
-import WorldView, { renderConfig } from "./WorldView";
+import WorldRenderer, { RenderConfig } from "./WorldRenderer";
 
 const animationTime = 750;
 
-export const renderLabels = (view: WorldView, world: World, config: renderConfig) => {
+export const renderLabels = (view: WorldRenderer, world: World, config: RenderConfig) => {
 	world.filterLabels(l => (l.startTime + animationTime > config.rendertime));
 	for(let label of world.labels()) {
 		renderLabel(view, label, config);
 	}
 }
 
-export const renderLabel = (view: WorldView, label: WorldLabel, config: renderConfig) => {
+export const renderLabel = (view: WorldRenderer, label: WorldLabel, config: RenderConfig) => {
 	let t = config.rendertime;
 	let pos = label.entity.cachedCanvasPosition;
 	let eHeight = label.entity.type.height*1.25 * config.tileSize;
