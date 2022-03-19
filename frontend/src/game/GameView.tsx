@@ -7,7 +7,6 @@ import Chat from "./ui/chat/Chat";
 
 import "./GameView.scss";
 import CozyPack from "./graphics/texture/CozyPack";
-import DeadLayer from "./ui/deadlayer/DeadLayer";
 import ImageStore from "./ImageStore";
 import TexturePack from "./graphics/texture/TexturePack";
 import WorldView from "./graphics/world/WorldView";
@@ -75,12 +74,13 @@ export default class GameView extends React.Component<props, {}> {
 				</ModelContext.Provider>
 			</div>
 		)
-		if(this.visualModel.dead) {
+		return content;
+/* 		if(this.visualModel.dead) {
 			return <DeadLayer>{content}</DeadLayer>
 		}
 		else {
 			return content;
 		}
-	}
+ */	}
 
 }

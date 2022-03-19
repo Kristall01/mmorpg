@@ -23,12 +23,13 @@ public class WorldsManager {
 		if(worlds.containsKey(name)) {
 			throw new IllegalStateException("there is a world with this name already");
 		}
-		World world = new World(server.getSynchronizer(), name, width, height);
+		boolean defaultWorld = this.defaultWorld == null;
+		World world = new World(server.getSynchronizer(), defaultWorld, name, width, height);
 		Synchronizer<World> worldSyncer = world.getSynchronizer();
-		if(defaultWorld == null) {
-			defaultWorld = worldSyncer;
-		}
 		this.worlds.put(name, worldSyncer);
+		if(defaultWorld) {
+			this.defaultWorld = worldSyncer;
+		}
 		return worldSyncer;
 	}
 	
@@ -46,7 +47,7 @@ public class WorldsManager {
 		for (Synchronizer<World> world : worlds.values()) {
 			shutdownTasks.add(world.syncCompute(w -> {
 				String name = w.getName();
-				w.shutdown();
+				w.shutdownWorld();
 				return name;
 			}));
 		}

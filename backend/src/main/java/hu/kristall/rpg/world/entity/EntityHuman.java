@@ -60,8 +60,13 @@ public class EntityHuman extends Entity {
 	
 	@Override
 	public void kill() {
+		worldPlayer.getAsyncPlayer().sync(p -> {
+			if(p != null) {
+				p.sendMessage("Meghaltál!");
+				p.scheduleWorldChange(p.getServer().getWorldsManager().getDefaultWorld());
+			}
+		});
 		super.kill();
-		getWorld().broadcastPacket(new PacketOutDied());
 	}
 	
 	@Override
@@ -74,14 +79,8 @@ public class EntityHuman extends Entity {
 		else {
 			type = LabelType.HEAL;
 		}
-		getWorldPlayer().getPlayer().getConnection().sendPacket(new PacketOutLabelFor(this.getID(), type, Integer.toString(fixedAmount)));
+		getWorldPlayer().getAsyncPlayer().connection.sendPacket(new PacketOutLabelFor(this.getID(), type, Integer.toString(fixedAmount)));
 	}
-	
-	/*public void kill() {
-		super.kill();
-		getWorld().broadcastPacket(new PacketOutEntityDeath(this));
-		this.remove();
-	}*/
 	
 	@Override
 	public void sendStatusFor(PlayerConnection conn) {
