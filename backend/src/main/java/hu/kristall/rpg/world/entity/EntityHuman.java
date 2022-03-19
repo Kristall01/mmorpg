@@ -3,6 +3,7 @@ package hu.kristall.rpg.world.entity;
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.LabelType;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.WorldPlayer;
@@ -60,12 +61,18 @@ public class EntityHuman extends Entity {
 	
 	@Override
 	public void kill() {
-		worldPlayer.getAsyncPlayer().sync(p -> {
-			if(p != null) {
-				p.sendMessage("Meghaltál!");
-				p.scheduleWorldChange(p.getServer().getWorldsManager().getDefaultWorld());
-			}
-		});
+		try {
+			worldPlayer.getAsyncPlayer().sync(p -> {
+				if(p != null) {
+					p.sendMessage("Meghaltál!");
+					p.scheduleWorldChange(p.getServer().getWorldsManager().getDefaultWorld());
+				}
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//server won't be shut down while players are playing
+			e.printStackTrace();
+		}
 		super.kill();
 	}
 	

@@ -16,6 +16,7 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 	private AsyncPlayer player;
 	private World world;
 	private Synchronizer<WorldPlayer> synchronizer = new Synchronizer<>(this);
+	private boolean changingWorld;
 	
 	public WorldPlayer(World world, AsyncPlayer player) {
 		this.world = world;
@@ -61,6 +62,44 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 			this.entity.setName(player.name);
 		}
 		return this.entity;
+	}
+	
+	private void stopChangingWorld() {
+		changingWorld = false;
+	}
+	
+	public void startChangingWorld(final String targetWorld) {
+		if(this.changingWorld) {
+			return;
+		}
+		this.changingWorld = true;
+		try {
+			player.sync(syncedPLayer -> {
+				Synchronizer<World> w = syncedPLayer.getServer().getWorldsManager().getWorld(targetWorld);
+				if(w == null) {
+					try {
+						syncedPLayer.getAsyncEntity().sync(me -> {
+							if(me == null) {
+								return;
+								//player already left this world. no need to do anything
+							}
+							me.stopChangingWorld();
+						});
+					}
+					catch (Synchronizer.TaskRejectedException e) {
+						//world wont be shut down while server is running
+						e.printStackTrace();
+					}
+				}
+				else {
+					syncedPLayer.scheduleWorldChange(w);
+				}
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//world won't be shutting down here
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean hasEntity() {

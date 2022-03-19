@@ -22,9 +22,15 @@ public class TerminalReader implements CommandSupplier {
 		Completer c = (reader, line, candidates) -> {
 			try {
 				String text = line.line();
-				Collection<String> l = asyncServer.syncCompute(srv -> srv.getCommandMap().complete(inputReader, text)).get();
-				for (String s : l) {
-					candidates.add(new Candidate(s));
+				Collection<String> l = null;
+				try {
+					l = asyncServer.syncCompute(srv -> srv.getCommandMap().complete(inputReader, text)).get();
+					for (String s : l) {
+						candidates.add(new Candidate(s));
+					}
+				}
+				catch (Synchronizer.TaskRejectedException e) {
+					//server was shut down meanwhile waiting
 				}
 			}
 			catch (InterruptedException | ExecutionException ignored) {}

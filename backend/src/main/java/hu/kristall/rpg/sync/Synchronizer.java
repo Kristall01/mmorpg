@@ -20,10 +20,10 @@ public class Synchronizer<T extends ISynchronized<T>> {
 		this.returnedObject = returnedObject;
 	}
 	
-	public Future<?> sync(Consumer<T> task) {
+	public Future<?> sync(Consumer<T> task) throws TaskRejectedException {
 		synchronized(syncLock) {
 			if(taskRunner.isShutdown()) {
-				return null;
+				throw new TaskRejectedException();
 			}
 		}
 		return taskRunner.runTask(() -> {
@@ -38,10 +38,10 @@ public class Synchronizer<T extends ISynchronized<T>> {
 		});
 	}
 	
-	public <U> Future<U> syncCompute(Function<T, U> task) {
+	public <U> Future<U> syncCompute(Function<T, U> task) throws TaskRejectedException {
 		synchronized(syncLock) {
 			if(taskRunner.isShutdown()) {
-				return null;
+				throw new TaskRejectedException();
 			}
 		}
 		return taskRunner.computeTask(() -> {
@@ -56,5 +56,7 @@ public class Synchronizer<T extends ISynchronized<T>> {
 			this.returnedObject = newObject;
 		}
 	}
+	
+	public static class TaskRejectedException extends Exception {}
 
 }

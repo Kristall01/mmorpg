@@ -8,7 +8,8 @@ public class SyncTimer extends Timer implements ISyncTimer {
 	
 	private final TaskRunner runner;
 	
-	public SyncTimer(TaskRunner runner) {
+	public SyncTimer(String threadName, TaskRunner runner) {
+		super(threadName);
 		this.runner = runner;
 	}
 	

@@ -24,7 +24,7 @@ public class CommandWorld extends SimpleCommand {
 		}
 		Player p = (Player) sender;
 		Synchronizer<World> w = getServer().getWorldsManager().getWorld(args[0]);
-		if(w == null) {
+		if(w == null && !args[0].contentEquals("null")) {
 			sender.sendMessage("§cHiba: §4Nincs ilyen világ");
 			return;
 		}

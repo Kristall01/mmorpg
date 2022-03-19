@@ -1,6 +1,7 @@
 package hu.kristall.rpg.network;
 
 import hu.kristall.rpg.Server;
+import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.Synchronizer;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
@@ -52,12 +53,23 @@ public class NetworkServer {
 		wsErrorContext.session.close();
 	}
 	
-	public void stop() {
+	public void stop(Runnable afterStop) {
 		stopping.set(true);
 		for (NetworkConnection value : connections.values()) {
 			value.close("server stopping");
 		}
-		javalinServer.stop();
+		AsyncExecutor.instance().runTask(() -> {
+			javalinServer.stop();
+			try {
+				asyncServer.sync(srv -> {
+					afterStop.run();
+				});
+			}
+			catch (Synchronizer.TaskRejectedException e) {
+				//lol
+				e.printStackTrace();
+			}
+		});
 	}
 	
 	public void startAcceptingConnections() {

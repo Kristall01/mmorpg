@@ -5,6 +5,7 @@ import TexturePack from "game/graphics/texture/TexturePack";
 import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
 import { DEFAULT_MAX_VERSION } from "tls";
+import Portal from "visual_model/Portal";
 import VisualModel, { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";
 import { renderEntity } from "./EntityRenderer";
@@ -30,9 +31,11 @@ class WorldRenderer extends StatelessRenderable {
 	private world: World
 	private model: VisualModel
 	private tileTextures: Matrix<Texture>;
+	private portalIcon: HTMLImageElement
 
 	constructor(world: World, visuals: VisualResources) {
 		super();
+		this.portalIcon = visuals.images.get("portal.png").img;
 		this.model = world.model;
 		this.world = world;
 		this.texturePack = visuals.textures;
@@ -248,11 +251,33 @@ class WorldRenderer extends StatelessRenderable {
 		}
 		//this.ctx.fillStyle = "yellow";
 
+		this.ctx.fillStyle = "blue";
+		//render portals
+
+		let whRation = this.portalIcon.width / this.portalIcon.height;
+
+
+		for(let p of this.world.getPortals()) {
+			let pWidth = tileSize*p.radius*3;
+			let pWidthHalf = pWidth/2;
+
+			let [pX, pY] = this.translateXY(...p.position);
+			this.ctx.drawImage(this.portalIcon, pX-pWidthHalf, pY-pWidthHalf, pWidth, pWidth);
+		}
+
+/* 		for(let p of this.world.getPortals()) {
+			let [pX, pY] = this.translateXY(...p.position);
+			this.ctx.beginPath();
+			this.ctx.arc(pX, pY, p.radius * tileSize, 0, Math.PI*2);
+			this.ctx.fill();
+		}
+ */
 		for(let entity of this.world.entities) {
 			renderEntity(this, entity, this.renderConfig);
 		}
 
 		renderLabels(this, this.world, this.renderConfig);
+
 		// for(let entity of this.model.world.entities) {
 		// for(let entity of this.world.entities) {
 		// 	entity.render(this.renderConfig, this, this.ctx);

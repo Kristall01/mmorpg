@@ -44,9 +44,21 @@ public class InputReader implements CommandSender {
 					e.printStackTrace();
 				}
 			}
+			catch (Synchronizer.TaskRejectedException e) {
+				//server is already shut down. let's stop this
+				stop();
+			}
 		};
 		
-		asyncServer.sync(srv -> srv.addShutdownListener(srvInstance -> this.stop()));
+		try {
+			asyncServer.sync(srv -> srv.addShutdownListener(srvInstance -> this.stop()));
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//server is already shut down, no need to add listener
+			e.printStackTrace();
+			stop();
+			return;
+		}
 		
 		t = new Thread(this::run, "InputReader thread");
 		t.start();
@@ -73,9 +85,14 @@ public class InputReader implements CommandSender {
 	}
 	
 	public void stop() {
+		if(stopping) {
+			return;
+		}
 		stopping = true;
 		supplier.close();
-		t.interrupt();
+		if(t != null) {
+			t.interrupt();
+		}
 	}
 	
 	@Override

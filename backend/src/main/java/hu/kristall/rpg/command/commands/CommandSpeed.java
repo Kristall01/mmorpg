@@ -5,6 +5,7 @@ import hu.kristall.rpg.command.CommandParent;
 import hu.kristall.rpg.command.impl.SimpleCommand;
 import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.command.senders.PlayerSender;
+import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.Entity;
 
 public class CommandSpeed extends SimpleCommand {
@@ -30,19 +31,25 @@ public class CommandSpeed extends SimpleCommand {
 			sender.sendMessage("§cHiba: §c'"+args[0]+"'§4 nem értelmezhető számként.");
 			return;
 		}
-		((Player)sender).getAsyncEntity().sync(wp -> {
-			if(wp == null) {
-				sender.sendMessage("§cHiba: §4Ezt a parancsot csak akkor lehet használni, ha egy világ része vagy.");
-				return;
-			}
-			Entity entity = wp.getEntity();
-			if(entity == null) {
-				sender.sendMessage("§cHiba: §4Nincs entitásod");
-				return;
-			}
-			entity.setSpeed(newSpeed);
-			sender.sendMessage("§abeállítva");
-		});
+		try {
+			((Player)sender).getAsyncEntity().sync(wp -> {
+				if(wp == null) {
+					sender.sendMessage("§cHiba: §4Ezt a parancsot csak akkor lehet használni, ha egy világ része vagy.");
+					return;
+				}
+				Entity entity = wp.getEntity();
+				if(entity == null) {
+					sender.sendMessage("§cHiba: §4Nincs entitásod");
+					return;
+				}
+				entity.setSpeed(newSpeed);
+				sender.sendMessage("§abeállítva");
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//world cannot be shut down while command is being processed
+			e.printStackTrace();
+		}
 	}
 	
 }
