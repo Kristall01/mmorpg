@@ -21,7 +21,7 @@ public class PacketInPlayChat extends PacketInPlay {
 				if(e == null) {
 					return;
 				}
-				e.getWorld().broadcastMessage("§a"+e.getPlayer().getName()+" §7»§r "+message);
+				e.getWorld().broadcastMessage("§a"+e.getAsyncPlayer().name+" §7»§r "+message);
 			});
 		}
 	}

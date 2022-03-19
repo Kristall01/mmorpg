@@ -60,7 +60,7 @@ export default class GameView extends React.Component<props, {}> {
 	}
 
 	render(): React.ReactNode {
-		return (
+		let content = (
 			<div
 				tabIndex={0}
 				ref={this.mainRef}
@@ -74,6 +74,13 @@ export default class GameView extends React.Component<props, {}> {
 				</ModelContext.Provider>
 			</div>
 		)
-	}
+		return content;
+/* 		if(this.visualModel.dead) {
+			return <DeadLayer>{content}</DeadLayer>
+		}
+		else {
+			return content;
+		}
+ */	}
 
 }

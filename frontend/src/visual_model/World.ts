@@ -7,6 +7,7 @@ import { EntityType } from "./EntityType";
 import UnknownEntity from "./entity/UnknownEntity";
 import HumanEntity from "./entity/HumanEntity";
 import { Direction } from "./Paths";
+import { WorldLabel } from "./Label";
 import Matrix from "Matrix";
 
 class World {
@@ -16,6 +17,7 @@ class World {
 	private _entities: Map<number, Entity> = new Map();
 	//private humanTextures: null = null;
 	camPositionFn: (rendertime: number) => Position;
+	private _labels: WorldLabel[] = [];
 	public readonly model: VisualModel
 	public readonly tileGrid: Matrix<string>
 
@@ -49,15 +51,29 @@ class World {
 		return this._entities.get(id);
 	}
 
-	spawnEntity(id: number, type: EntityType, pos: Position, speed: number, facing: Direction = Direction.enum.map.SOUTH) {
+	addLabel(l: WorldLabel) {
+		this._labels.push(l);
+	}
+
+	filterLabels(predicate: (value: WorldLabel, index: number) => boolean) {
+		if(this._labels.length !== 0) {
+			this._labels = this._labels.filter(predicate);
+		}
+	}
+
+	labels(): Iterable<WorldLabel> {
+		return this._labels;
+	}
+
+	spawnEntity(id: number, type: EntityType, pos: Position, speed: number, hp: number, maxHp: number, facing: Direction = Direction.enum.map.SOUTH) {
 		let e: Entity;
 		switch(type) {
  			case EntityType.enum.map.HUMAN: {
-				e = new HumanEntity(id, pos, speed, facing);
+				e = new HumanEntity(id, pos, speed, facing, hp, maxHp);
 				break
 			}
 			default: {
-				e = new UnknownEntity(id, pos, speed, facing);
+				e = new UnknownEntity(id, pos, speed, facing, hp, maxHp);
 			}
 		}
 		this._entities.set(id, e);
