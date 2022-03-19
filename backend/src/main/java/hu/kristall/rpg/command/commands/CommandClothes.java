@@ -17,6 +17,37 @@ public class CommandClothes extends SimpleCommand {
 	
 	@Override
 	protected void checkedExecute(CommandSender sender, String label, String[] args) {
+		if(args.length == 0) {
+			sender.sendMessage("§akomplett ruhák:");
+			for (Cloth value : Cloth.values()) {
+				if(value.isComplete()) {
+					sender.sendMessage(" -§7 §r"+value.name());
+				}
+			}
+			
+			sender.sendMessage("§afelsők:");
+			for (Cloth value : Cloth.values()) {
+				if(value.bitmap == 4) {
+					sender.sendMessage(" -§7 §r"+value.name());
+				}
+			}
+			
+			sender.sendMessage("§aalsók:");
+			for (Cloth value : Cloth.values()) {
+				if(value.bitmap == 2) {
+					sender.sendMessage(" -§7 §r"+value.name());
+				}
+			}
+			
+			sender.sendMessage("§acipők:");
+			for (Cloth value : Cloth.values()) {
+				if(value.bitmap == 1) {
+					sender.sendMessage(" -§7 §r"+value.name());
+				}
+			}
+			
+			return;
+		}
 		if(!(sender instanceof PlayerSender)) {
 			sender.sendMessage("§cHiba: §4Ezt a parancsot csak játékosok használhatják.");
 			return;

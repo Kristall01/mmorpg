@@ -1,3 +1,4 @@
+import { drawBar } from "game/graphics/GraphicsUtils";
 import CozyPack from "game/graphics/texture/CozyPack";
 import { enumValueOf } from "utils";
 import Entity from "visual_model/Entity";
@@ -5,10 +6,9 @@ import HumanEntity from "visual_model/entity/HumanEntity";
 import EntityType from "visual_model/EntityType";
 import { Activity, ClothColor } from "visual_model/human/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
-import { drawBar, drawDamageLabel } from "../GraphicsUtils";
-import WorldView, { renderConfig } from "./WorldView";
+import WorldRenderer, { RenderConfig } from "./WorldRenderer";
 
-type RendererFunction = (view: WorldView, e: Entity, renderConfig: renderConfig) => void;
+type RendererFunction = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => void;
 
 const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => {
 	let human = e as HumanEntity;
@@ -36,7 +36,7 @@ const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => {
 	}
 }
 
-const renderUnknown = (view: WorldView, e: Entity, renderConfig: renderConfig) => {
+const renderUnknown = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => {
 	let t = Math.round(renderConfig.rendertime/2) % 1536;
 	/* //0, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2304
 	if(t < 256) {
@@ -88,9 +88,7 @@ let renderers = new Array<RendererFunction>(EntityType.enum.values.length);
 renderers[EntityType.enum.map.HUMAN.ordinal] = renderHuman;
 renderers[EntityType.enum.map.UNKNOWN.ordinal] = renderUnknown;
 
-export const renderEntity = (view: WorldView, e: Entity, renderConfig: renderConfig) => {
-
-	//render base entity
+export const renderEntity = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => {
 	renderers[e.type.ordinal](view, e,renderConfig);
 
 

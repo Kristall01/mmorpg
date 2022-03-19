@@ -1,6 +1,5 @@
 import CozyPack from "game/graphics/texture/CozyPack";
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import WorldView, { renderConfig } from "game/graphics/worldview/WorldView";
 import Entity from "visual_model/Entity";
 import { EntityType } from "visual_model/EntityType";
 import { Activity, Cloth, Skintone } from "visual_model/human/HumanAssetConfig";

@@ -2,17 +2,22 @@ import LogicModel from "model/LogicModel";
 import React, { createContext, createRef } from "react";
 import VisualModel, {focus, Position} from "visual_model/VisualModel";
 import GraphicsComponent from "./graphics/component/GraphicsComponent";
-import WorldView from "./graphics/worldview/WorldView";
+import WorldRenderer from "./graphics/renderers/world/WorldRenderer";
 import Chat from "./ui/chat/Chat";
 
 import "./GameView.scss";
 import CozyPack from "./graphics/texture/CozyPack";
 import DeadLayer from "./ui/deadlayer/DeadLayer";
+import ImageStore from "./ImageStore";
+import TexturePack from "./graphics/texture/TexturePack";
+import WorldView from "./graphics/world/WorldView";
+import ConditionalWorldView from "./graphics/world/ConditionalWorldView";
+import VisualResources from "./VisualResources";
 
 export type props = {
 	logicModel: LogicModel
 	visualModel: VisualModel,
-	cozypack: CozyPack
+	visuals: VisualResources
 }
 
 export type Models = [LogicModel, VisualModel];
@@ -21,28 +26,20 @@ export const ModelContext = createContext<Models>(null!);
 
 export default class GameView extends React.Component<props, {}> {
 
-	private worldView: WorldView
-	private logicModel: LogicModel
-	private visualModel: VisualModel
 	private mainRef = createRef<HTMLDivElement>();
-	private intervalTask: number | undefined = undefined
-
-	private mousePositionX: number = 0;
-	private mousePositionY: number = 0;
+	private visualModel: VisualModel
+	private logicModel: LogicModel
+	private visuals: VisualResources
 
 	constructor(props: props) {
 		super(props);
 
-		this.logicModel = props.logicModel;
-		this.visualModel = props.visualModel;
-
-		this.visualModel.setUpdateCallback(() => this.handleModelUpdate());
-
-		this.worldView = new WorldView(this.visualModel, props.cozypack);
-	}
-
-	componentWillUnmount() {
-		clearInterval(this.intervalTask);
+		let {logicModel, visualModel, visuals} = props;
+		this.visualModel = visualModel;
+		this.logicModel = logicModel;
+		this.visualModel = visualModel;
+		this.visuals = visuals;
+		//this.worldView = new WorldView(this.visualModel.world, this.cozyPack, this.texturePack);
 	}
 
 	handleModelUpdate() {
@@ -59,57 +56,20 @@ export default class GameView extends React.Component<props, {}> {
 	}
 
 	componentDidMount() {
+		this.visualModel.addUpdateListener((type) => this.handleModelUpdate());
 		this.mainRef.current?.focus();
-	}
-
-	handleWheel(e: React.WheelEvent) {
-		if(e.target instanceof Element) {
-			if(e.target.matches(".nozoom") || e.target.matches(".nozoom *")) {
-				return;
-			}
-		}
-		this.visualModel.multiplyZoom(1 - (e.deltaY / 500));
-	}
-
-	handleMouseDown(e: React.MouseEvent) {
-		if(e.target !== this.mainRef.current) {
-			return;
-		}
-
-		const moveToOffset = (a: number, b: number) => {
-			let [logicX, logicY] = this.worldView.translateCanvasXY(a, b);
-			this.logicModel.moveMeTo(logicX, logicY);
-		}
-
-		moveToOffset(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-		let h: TimerHandler = () => moveToOffset(this.mousePositionX, this.mousePositionY);
-		this.intervalTask = setInterval(h, 250);
-	}
-
-	handleMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-		clearInterval(this.intervalTask);
-		this.intervalTask = undefined;
-	}
-
-	handleMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-		this.mousePositionX = e.nativeEvent.offsetX
-		this.mousePositionY = e.nativeEvent.offsetY;
 	}
 
 	render(): React.ReactNode {
 		let content = (
 			<div
-				onWheel={e => this.handleWheel(e)}
-				onMouseDown={e => this.handleMouseDown(e)}
 				tabIndex={0}
 				ref={this.mainRef}
 				className="gameview"
 				onKeyDown={e => this.handleKeydown(e)}
-				onMouseUp={e => this.handleMouseUp(e)}
-				onMouseMove={e => this.handleMouseMove(e)}
 			>
 				<ModelContext.Provider value={[this.logicModel, this.visualModel]}>
-					<GraphicsComponent model={this.visualModel} view={this.worldView} />
+					<ConditionalWorldView logicModel={this.logicModel} visualModel={this.visualModel} visuals={this.visuals} />
 					<Chat />
 					<button onClick={() => this.logicModel.disconnect()} className="dc-button">Disconnect</button>
 				</ModelContext.Provider>

@@ -45,7 +45,13 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 		return executor.submit(c);
 	}
 	
+	@Override
+	public boolean isShutdown() {
+		return executor.isShutdown();
+	}
+	
 	protected void shutdown() {
+		synchronizer.changeObject(null);
 		taskPoolLogger.info("shutting down...");
 		executor.shutdown();
 		timer.cancel();

@@ -4,8 +4,14 @@ import MenuContext from "MenuContext";
 import MenuScene from "phases/menu/MenuScene";
 import TexturePack from "game/graphics/texture/TexturePack";
 import CozyPack from "game/graphics/texture/CozyPack";
+import ImageStore from "game/ImageStore";
+import VisualResources from "game/VisualResources";
 
-const LoadingScene = () => {
+export type props = {
+	nextScene: (v: VisualResources) => React.SetStateAction<JSX.Element>
+}
+
+const LoadingScene = ({nextScene}: props) => {
 
 	let [text, setText] = useState("Betöltés...");
 	let [mounted, setMounted] = useState(true);
@@ -13,10 +19,9 @@ const LoadingScene = () => {
 
 	useEffect(() => {
 		(async () => {
-			let pack: CozyPack;
+			let visualResources: VisualResources;
 			try {
-				await TexturePack.loadAllTextures("/textures/texturepack.json");
-				pack = await CozyPack.createPack("/textures/cozy/");
+				visualResources = await VisualResources.load();
 			}
 			catch(err) {
 				console.error(err);
@@ -26,7 +31,7 @@ const LoadingScene = () => {
 				return;
 			}
 			if(mounted) {
-				setMenu(() => <MenuScene cozyPack={pack}/>);
+				setMenu(nextScene(visualResources));
 			}
 		})();
 		return () => {

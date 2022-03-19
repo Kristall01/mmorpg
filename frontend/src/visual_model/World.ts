@@ -8,28 +8,29 @@ import UnknownEntity from "./entity/UnknownEntity";
 import HumanEntity from "./entity/HumanEntity";
 import { Direction } from "./Paths";
 import { WorldLabel } from "./Label";
+import Matrix from "Matrix";
 
 class World {
 
 	public width: number
 	public height: number
-	private pack: TexturePack = null!
-	private textureMatrix: Array<Texture>
 	private _entities: Map<number, Entity> = new Map();
-	private humanTextures: null = null;
+	//private humanTextures: null = null;
 	camPositionFn: (rendertime: number) => Position;
 	private _labels: WorldLabel[] = [];
+	public readonly model: VisualModel
+	public readonly tileGrid: Matrix<string>
 
-	constructor(parent: VisualModel, width: number, height: number, tileGrid: string[], camStart: Position) {
+	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
+		this.tileGrid = tileGrid;
+		this.model = model;
 		this.width = width;
 		this.height = height;
-		this.textureMatrix = new Array(width*height);
-		this.pack = TexturePack.getInstance();
+		//this.textureMatrix = world
+//		this.pack = TexturePack.getInstance();
 		this.camPositionFn = () => camStart;
 
-		for(let i = 0; i < tileGrid.length; ++i) {
-			this.textureMatrix[i] = this.pack.getTexture(tileGrid[i]);
-		}
+		//this.tex
 	}
 
 	get entities(): IterableIterator<Entity> {
@@ -99,17 +100,6 @@ class World {
 
 	private indexToPos(i: number) {
 		return [i % this.width, Math.round(i / this.width)];
-	}
-
-	getTextureAt(x: number, y: number): Texture {
-		if(x < 0 || y < 0 || x >= this.width || y >= this.height) {
-			return this.pack.getDefaultTexture();
-		}
-		let a = this.textureMatrix[this.posToIndex([x,y])];
-		if(!a) {
-			console.log("err");
-		}
-		return a;
 	}
 
 }

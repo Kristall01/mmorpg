@@ -1,5 +1,4 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import WorldView, { renderConfig } from "game/graphics/worldview/WorldView";
 import Entity from "visual_model/Entity";
 import { EntityType } from "visual_model/EntityType";
 import { Direction } from "visual_model/Paths";

@@ -17,7 +17,7 @@ public class EntityHuman extends Entity {
 	
 	private WorldPlayer worldPlayer;
 	private Path lastPath;
-	private ClothPack clothes = new ClothPack(Cloth.NO_TOP, Cloth.NO_BOTTOM, Cloth.NO_SHOES);
+	private ClothPack clothes = new ClothPack(Cloth.SUIT, Cloth.PANTS_SUIT, Cloth.SHOES);
 	
 	public EntityHuman(World world, int entityID, Position startPosition) {
 		super(world, EntityType.HUMAN,  entityID);

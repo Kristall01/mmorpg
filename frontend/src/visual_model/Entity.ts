@@ -1,7 +1,7 @@
 import { RenderContext } from "game/graphics/GraphicsUtils"
-import WorldView, { renderConfig } from "game/graphics/worldview/WorldView"
 import { EntityType } from "./EntityType"
 import { ConstStatus, Direction, entityZigzagStatus, Status, StatusFn } from "./Paths"
+import UpdateBroadcaster from "./UpdateBroadcaster"
 import { Position } from "./VisualModel"
 
 export default abstract class Entity {

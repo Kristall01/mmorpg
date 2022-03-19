@@ -21,6 +21,11 @@ public class Synchronizer<T extends ISynchronized<T>> {
 	}
 	
 	public Future<?> sync(Consumer<T> task) {
+		synchronized(syncLock) {
+			if(taskRunner.isShutdown()) {
+				return null;
+			}
+		}
 		return taskRunner.runTask(() -> {
 			try {
 				synchronized(syncLock) {

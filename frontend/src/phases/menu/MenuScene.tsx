@@ -5,12 +5,14 @@ import GameScene from "phases/game/GameScene";
 import DModel from "model/impl/demo/DModel";
 import NetworkModel from "model/impl/ws/NetworkModel";
 import CozyPack from "game/graphics/texture/CozyPack";
+import ImageStore from "game/ImageStore";
+import VisualResources from "game/VisualResources";
 
 interface props {
-	cozyPack: CozyPack
+	visuals: VisualResources
 }
 
-const MenuScene = (props: props) => {
+const MenuScene = ({visuals}: props) => {
 
 	let setMenu = useContext(MenuContext);
 
@@ -23,7 +25,7 @@ const MenuScene = (props: props) => {
 			alert("A névnek legalább 3 karakternek kell lennie.");
 			return;
 		}
-		setMenu(() => <GameScene cozyPack={props.cozyPack} modelGenerator={(a) => new DModel(a, name!)} />)
+		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new DModel(a, name!)} />)
 	}
 
 	const startLocalhostModel = () => {
@@ -35,10 +37,7 @@ const MenuScene = (props: props) => {
 		if(address === null) {
 			return;
 		}
-		if(address.length === 0) {
-			address = "ws://localhost:8080/ws";
-		}
-		setMenu(() => <GameScene cozyPack={props.cozyPack} modelGenerator={(a) => new NetworkModel(a, address!, name!)} />)
+		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new NetworkModel(a, address!, name!)} />)
 	}
 
 	return (
