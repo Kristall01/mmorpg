@@ -63,24 +63,51 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	private void exclusiveWorldChange(Synchronizer<World> newAsyncWorld) {
 		final Player leaver = this;
 		final Synchronizer<Server> asyncServer = getServer().getSynchronizer();
-		asyncEntity.sync(e -> {
-			if(e != null) {
-				e.getWorld().leavePlayer(leaver.asyncPlayer);
-			}
-			if(newAsyncWorld == null) {
-				asyncServer.sync(srv -> {
-					repollWorldChange();
-				});
-			}
-			else {
-				newAsyncWorld.sync(newWorld -> {
-					leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer));
-					asyncServer.sync(srv -> {
-						repollWorldChange();
-					});
-				});
-			}
-		});
+		try {
+			asyncEntity.sync(e -> {
+				if(e != null) {
+					e.getWorld().leavePlayer(leaver.asyncPlayer);
+				}
+				if(newAsyncWorld == null) {
+					try {
+						asyncServer.sync(srv -> {
+							repollWorldChange();
+						});
+					}
+					catch (Synchronizer.TaskRejectedException ex) {
+						//server cannot be shut down here
+						ex.printStackTrace();
+						worldLock.unlock();
+					}
+				}
+				else {
+					try {
+						newAsyncWorld.sync(newWorld -> {
+							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer));
+							try {
+								asyncServer.sync(srv -> {
+									repollWorldChange();
+								});
+							}
+							catch (Synchronizer.TaskRejectedException ex) {
+								//server cannot be shut down here
+								ex.printStackTrace();
+								worldLock.unlock();
+							}
+						});
+					}
+					catch (Synchronizer.TaskRejectedException ex) {
+						//worlds cannot be shut down during server running
+						worldLock.unlock();
+						ex.printStackTrace();
+					}
+				}
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//worlds cannot be shut down during server running
+			e.printStackTrace();
+		}
 	}
 	
 	public void scheduleWorldChange(Synchronizer<World> newAsyncWorld) {

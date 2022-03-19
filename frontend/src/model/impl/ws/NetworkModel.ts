@@ -10,6 +10,7 @@ import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalEntityspeed from "model/signals/SignalEntityspeed";
 import SignalFocus from "model/signals/SignalFocus";
+import SignalInPortalspawn from "model/signals/SignalInPortalspawn";
 import SignalJoinworld from "model/signals/SignalJoinworld";
 import SignalLabelFor from "model/signals/SignalLabel";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
@@ -64,6 +65,7 @@ class NetworkModel extends LogicModel {
 		});
 		this.addPacketSignal("entityDeath", ({id}) => new SignalEntityDeath(id));
 		this.addPacketSignal("died", () => new SignalDied());
+		this.addPacketSignal("portal-spawn", ({X, Y, radius}) => new SignalInPortalspawn(X, Y, radius));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 

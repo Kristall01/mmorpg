@@ -17,14 +17,14 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 	private SyncTimer timer;
 
 	protected SynchronizedObject(String threadName, Synchronizer<T> syncer) {
+		this.taskPoolLogger = LoggerFactory.getLogger(threadName+"-task-pool");
 		this.executor = Executors.newSingleThreadExecutor(r -> new Thread(r, threadName));
 		executor.submit(Utils.emptyRunnable);
 		if(syncer == null) {
 			syncer = new Synchronizer<T>((T) this);
 		}
 		synchronizer = syncer;
-		this.taskPoolLogger = LoggerFactory.getLogger(threadName+"-task-pool");
-		this.timer = new SyncTimer(this);
+		this.timer = new SyncTimer(threadName+"-timer", this);
 	}
 	
 	protected void changeSyncer(Synchronizer<T> syncer) {
@@ -60,8 +60,8 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 	protected void shutdown() {
 		synchronizer.changeObject(null);
 		taskPoolLogger.info("shutting down...");
-		executor.shutdown();
 		timer.cancel();
+		executor.shutdown();
 		taskPoolLogger.info("shutdown done");
 	}
 	

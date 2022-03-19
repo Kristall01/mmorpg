@@ -9,6 +9,7 @@ import HumanEntity from "./entity/HumanEntity";
 import { Direction } from "./Paths";
 import { WorldLabel } from "./Label";
 import Matrix from "Matrix";
+import Portal from "./Portal";
 
 class World {
 
@@ -20,6 +21,7 @@ class World {
 	private _labels: WorldLabel[] = [];
 	public readonly model: VisualModel
 	public readonly tileGrid: Matrix<string>
+	private portals: Portal[] = []
 
 	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		this.tileGrid = tileGrid;
@@ -31,6 +33,14 @@ class World {
 		this.camPositionFn = () => camStart;
 
 		//this.tex
+	}
+
+	addPortal(p: Portal) {
+		this.portals.push(p);
+	}
+
+	getPortals(): Iterable<Portal> {
+		return this.portals;
 	}
 
 	get entities(): IterableIterator<Entity> {

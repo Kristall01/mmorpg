@@ -75,9 +75,15 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 		if(!authenticated()) {
 			return;
 		}
-		getAsyncServer().sync(srv -> {
-			getPlayer().handleQuit();
-		});
+		try {
+			getAsyncServer().sync(srv -> {
+				getPlayer().handleQuit();
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//server will be running while players are online
+			e.printStackTrace();
+		}
 	}
 	
 	//any thread

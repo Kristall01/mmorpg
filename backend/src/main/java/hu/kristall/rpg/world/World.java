@@ -13,6 +13,7 @@ import hu.kristall.rpg.world.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ public class World extends SynchronizedObject<World> {
 	protected Logger logger;
 	private boolean shuttingDown = false;
 	private boolean defaultWorld;
+	private List<Portal> portals = new ArrayList();
 	
 	public World(AsyncServer serverSynchronizer, boolean defaultWorld, String name, int width, int height) {
 		super("world-"+name);
@@ -51,6 +53,35 @@ public class World extends SynchronizedObject<World> {
 			s[i] = tileMap[i].name();
 		}
 		this.bakedMapSerialize = List.of(s);
+		if(name.contentEquals("w0")) {
+			addPortal(new Portal(new Position(1, 1), "w1"));
+		}
+		else if(name.contentEquals("w1")) {
+			addPortal(new Portal(new Position(1, 1), "w2"));
+		}
+		else if(name.contentEquals("w2")) {
+			addPortal(new Portal(new Position(1, 1), "w0"));
+		}
+		
+		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
+	}
+	
+	public void addPortal(Portal p) {
+		this.portals.add(p);
+		this.broadcastPacket(new PacketOutPortalSpawn(p));
+	}
+	
+	private void checkPortals() {
+		for (WorldPlayer worldPlayer : worldPlayers.values()) {
+			if(!worldPlayer.hasEntity()) {
+				continue;
+			}
+			for (Portal portal : portals) {
+				if(portal.checkCollision(worldPlayer.getEntity())) {
+					worldPlayer.startChangingWorld(portal.getTargetWorldName());
+				}
+			}
+		}
 	}
 	
 	public Tile getTileAt(int x, int y) {
@@ -111,6 +142,9 @@ public class World extends SynchronizedObject<World> {
 			for (Entity e : this.worldEntities.values()) {
 				e.sendStatusFor(connectingConnection);
 			}
+			for (Portal portal : portals) {
+				connectingConnection.sendPacket(new PacketOutPortalSpawn(portal));
+			}
 			
 			//sync done
 			
@@ -126,12 +160,15 @@ public class World extends SynchronizedObject<World> {
 			//send map packets
 			//list entities
 			//etc
+			
+			/*
 			getTimer().schedule(() -> {
 				WorldPlayer wp0 = worldPlayers.get(player);
 				if(wp0 != null && wp0.hasEntity()) {
 					wp0.getEntity().damage((20));
 				}
 			}, 2000 );
+			 */
 			
 			return wp.getSynchronizer();
 		}

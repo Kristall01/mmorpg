@@ -78,14 +78,26 @@ public class Server extends SynchronizedObject<Server> {
 			}
 			this.stopping = true;
 		}
-		logger.info("shutting down server");
-		networkServer.stop();
 		for (Consumer<Server> shutdownListener : shutdownListeners) {
 			shutdownListener.accept(this);
 		}
-		getSynchronizer().sync(srv -> {
-			this.worldsManager.shutdown();
-			getSynchronizer().sync(s -> super.shutdown());
+		logger.info("shutting down server");
+		networkServer.stop(() -> {
+			try {
+				getSynchronizer().sync(srv -> {
+					this.worldsManager.shutdown();
+					try {
+						getSynchronizer().sync(s -> super.shutdown());
+					}
+					catch (Synchronizer.TaskRejectedException e) {
+						//server wont be shut down until super.shutdown() is called
+					}
+				});
+			}
+			catch (Synchronizer.TaskRejectedException e) {
+				//server wont be shut down until super.shutdown() is called
+				e.printStackTrace();
+			}
 		});
 	}
 	
