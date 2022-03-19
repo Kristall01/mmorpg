@@ -48,6 +48,10 @@ class WorldView extends React.Component<props> {
 	}
 
 	handleMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+		this.clearIntervalTask();
+	}
+
+	clearIntervalTask() {
 		clearInterval(this.intervalTask);
 		this.intervalTask = undefined;
 	}
@@ -67,6 +71,8 @@ class WorldView extends React.Component<props> {
 	}
 
 	handleMouseDown(e: React.MouseEvent) {
+		this.clearIntervalTask();
+
 		if(e.target !== this.mainRef.current) {
 			return;
 		}
@@ -82,7 +88,7 @@ class WorldView extends React.Component<props> {
 	}
 
 	componentWillUnmount() {
-		clearInterval(this.intervalTask);
+		this.clearIntervalTask();
 	}
 
 	render() {
