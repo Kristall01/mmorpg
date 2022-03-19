@@ -252,4 +252,21 @@ public class World extends SynchronizedObject<World> {
 		return name;
 	}
 	
+	public Position fixValidate(Position to) {
+		double targetX = to.getX(), targetY = to.getY();
+		if(targetX < 0) {
+			targetX = 0;
+		}
+		else if(targetX > width) {
+			targetX = width;
+		}
+		if(targetY < 0) {
+			targetY = 0;
+		}
+		else if(targetY > height) {
+			targetY = height;
+		}
+		return new Position(targetX,targetY);
+	}
+	
 }

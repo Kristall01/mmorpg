@@ -54,6 +54,7 @@ public class EntityHuman extends Entity {
 	
 	@Override
 	public void move(Position to) {
+		to = getWorld().fixValidate(to);
 		long now = System.nanoTime();
 		this.lastPath = this.getWorld().interpolatePath(getPosition(), to, getSpeed(), now);
 		getWorld().broadcastPacket(new PacketOutMoveentity(this));
