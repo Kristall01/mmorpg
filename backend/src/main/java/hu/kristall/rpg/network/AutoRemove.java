@@ -18,7 +18,8 @@ public abstract class AutoRemove {
 	
 	public final void remove() {
 		removeTask.cancel();
-		this.remove();
+		this.removed = true;
+		this.remove0();
 	}
 	
 	protected abstract void remove0();
