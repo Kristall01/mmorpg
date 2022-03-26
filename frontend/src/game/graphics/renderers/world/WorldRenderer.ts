@@ -254,9 +254,6 @@ class WorldRenderer implements Renderable {
 				if(t === null) {
 					t = this.texturePack.getDefaultTexture();
 				}
-				if(t === undefined) {
-					console.error("error");
-				}
 				t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 			}
 		}
