@@ -55,7 +55,8 @@ class RenderScheduler extends EventTarget {
 			this._canvasElement.tabIndex = 0;
 			this._canvasElement.style.outline = "none";
 			this._canvasElement.focus();
-			this._ctx = this._canvasElement.getContext("2d", {alpha: false})!;
+			//disabling alpha channel have some bugs in  GPU rendering
+			this._ctx = this._canvasElement.getContext("2d"/* , {alpha: false} */)!;
 
 			this._fpsElement = document.createElement("div");
 			this._fpsElement.classList.add("fpscounter");
