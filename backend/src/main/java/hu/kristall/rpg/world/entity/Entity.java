@@ -163,6 +163,7 @@ public abstract class Entity {
 		Collection<FloatingItem> worldItems = world.getItems();
 		ArrayList<FloatingItem> pickupTargets = new ArrayList<>();
 		Position entityPosition = getPosition();
+		inventory.setBroadcastStopped(true);
 		for (FloatingItem floatingItem : worldItems) {
 			if(Position.distance(entityPosition, floatingItem.getPosition()) < radius) {
 				pickupTargets.add(floatingItem);
@@ -171,6 +172,10 @@ public abstract class Entity {
 		}
 		for (FloatingItem pickupTarget : pickupTargets) {
 			pickupTarget.remove();
+		}
+		inventory.setBroadcastStopped(false);
+		if(!pickupTargets.isEmpty()) {
+			inventory.broadcastUpdate();
 		}
 	}
 	

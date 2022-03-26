@@ -17,7 +17,7 @@ public class Inventory {
 		this.owner = owner;
 	}
 	
-	private void broadcastUpdate() {
+	public void broadcastUpdate() {
 		if(this.owner != null && !broadcastStopped) {
 			owner.setInventory(this);
 		}
@@ -49,6 +49,10 @@ public class Inventory {
 		items.put(item, i - amount);
 		broadcastUpdate();
 		return min;
+	}
+	
+	public void setBroadcastStopped(boolean broadcastStopped) {
+		this.broadcastStopped = broadcastStopped;
 	}
 	
 	public void addAll(Inventory other) {
