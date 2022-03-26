@@ -130,7 +130,7 @@ class WorldView extends React.Component<props> {
 				onMouseMove={e => this.handleMouseMove(e)}
 				onKeyDown={e => this.handleKeyDown(e)}
 			>
-				<GraphicsComponent maxFPS={this.visualModel.maxFPS} renderable={this.worldRenderer} />
+				<GraphicsComponent showFpsCounter={true} maxFPS={this.visualModel.maxFPS} renderable={this.worldRenderer} />
 			</div>
 		);
 	}
