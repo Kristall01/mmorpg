@@ -45,6 +45,7 @@ public class CommandMap implements CommandParent {
 		if(command.isEmpty()) {
 			return;
 		}
+		command = command.trim();
 		int firstSpace = command.indexOf(' ');
 		ICommand cmd;
 		String prefix;
