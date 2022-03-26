@@ -19,7 +19,7 @@ export function ofType(type: string, img: HTMLImageElement, others: any) {
 			return new AnimatedGlobalColumnTexture(img, others.sliceTime);
 		}
 		case "static_sprite": {
-			return new StaticSpriteTexture(img, others.cell_size, others.x, others.y);
+			return new StaticSpriteTexture(img, others.cell_size, others.x, others.y, others.translateX, others.translateY);
 		}
 		default: {
 			throw new Error("unknown texture type "+JSON.stringify(type));
