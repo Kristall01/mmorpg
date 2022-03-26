@@ -6,14 +6,14 @@ import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
-export type focus = "main" | "chat";
+export type focus = "main" | "chat" | "menu";
 
 export type Position = [number,number];
 
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open";
+export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -70,15 +70,26 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	}
 
 	setChatOpen(value: boolean) {
+		if(this.chatOpen === value) {
+			return;
+		}
 		this.chatOpen = value;
-		this.focus = value ? "chat" : "main";
-		
 		this.triggerUpdate("chat-open");
+		this.setFocus(value ? "chat" : "main");
+	}
+
+	private setFocus(focus: focus) {
+		this.focus = focus;
+		this.triggerUpdate("focus");
 	}
 
 	setMenuOpen(value: boolean) {
+		if(this.menuOpen === value) {
+			return;
+		}
 		this.menuOpen = value;
 		this.triggerUpdate("menu-open");
+		this.setFocus(value ? "menu" : "main");
 	}
 
 	handleSignal(signal: SignalIn) {
