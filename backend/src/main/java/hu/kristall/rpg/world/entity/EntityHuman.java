@@ -2,8 +2,12 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.PlayerConnection;
-import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
+import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
+import hu.kristall.rpg.network.packet.out.PacketOutMoveentity;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
 import hu.kristall.rpg.sync.Synchronizer;
+import hu.kristall.rpg.world.Inventory;
 import hu.kristall.rpg.world.LabelType;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.WorldPlayer;
@@ -31,6 +35,12 @@ public class EntityHuman extends Entity {
 	
 	public void setWorldPlayer(WorldPlayer worldPlayer) {
 		this.worldPlayer = worldPlayer;
+	}
+	
+	@Override
+	public void setInventory(Inventory inventory) {
+		super.setInventory(inventory);
+		this.worldPlayer.getAsyncPlayer().connection.sendPacket(new PacketOutSetInventory(inventory));
 	}
 	
 	@Override
