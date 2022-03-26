@@ -1,9 +1,15 @@
+import UpdateBroadcaster from "./UpdateBroadcaster";
+
+export type ItemEvent = "rename";
+
 export default class Item {
 
-	readonly name: string
+	readonly type: string
+	readonly name: string | null = null;
 
-	constructor(name: string) {
-		this.name = name;
+	constructor(type: string, name?: string) {
+		this.type = type;
+		this.name = name ?? null;
 	}
 
 }
