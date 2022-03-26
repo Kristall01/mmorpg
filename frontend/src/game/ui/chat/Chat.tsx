@@ -18,8 +18,6 @@ const Chat = (): JSX.Element | null => {
 	let [chatText, setChatText] = useState<string>("");
 	let [historyIndex, setHistoryIndex] = useState(-1)
 
-	console.log(historyIndex);
-
 	/*useEffect(() => {
 		if(model.chatContent !== null) {
 			inputRef.current?.focus();
