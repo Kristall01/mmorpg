@@ -151,6 +151,10 @@ public class World extends SynchronizedObject<World> {
 				connectingConnection.sendPacket(new PacketOutPortalSpawn(portal));
 			}
 			
+			for(FloatingItem item : this.floatingItems.values()) {
+				connectingConnection.sendPacket(new PacketOutSpawnItem(item));
+			}
+			
 			//sync done
 			
 			WorldPlayer wp = new WorldPlayer(this, player);
