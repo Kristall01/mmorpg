@@ -12,7 +12,7 @@ public class FloatingItem extends AutoRemove {
 	private GeneratedID<FloatingItem> id;
 	
 	public FloatingItem(World world, GeneratedID<FloatingItem> id, Position position, Item item) {
-		super(world.getTimer(), 5000);
+		super(world.getTimer(), 300000);
 		this.id = id;
 		this.world = world;
 		this.position = position;
