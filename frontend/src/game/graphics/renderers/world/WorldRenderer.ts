@@ -313,7 +313,7 @@ class WorldRenderer implements Renderable {
 
 		for(let item of this.floatingItems.values()) {
 			let pos = this.translateXY(...item.item.pos);
-			item.texture.drawTo(renderTime, this.ctx, pos, tile3)
+			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -1);
 			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 0.5)) {
 				showPickupMessage = true;
 			}

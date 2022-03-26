@@ -6,7 +6,7 @@ import StaticTexture from "./StaticTexture";
 
 export default interface Texture {
 
-	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number): void;
+	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number, otherSize?: number, translateX?: number, translateY?: number): void;
 
 }
 
@@ -19,7 +19,7 @@ export function ofType(type: string, img: HTMLImageElement, others: any) {
 			return new AnimatedGlobalColumnTexture(img, others.sliceTime);
 		}
 		case "static_sprite": {
-			return new StaticSpriteTexture(img, others.cell_size, others.x, others.y, others.translateX, others.translateY);
+			return new StaticSpriteTexture(img, others.cell_size, others.x, others.y);
 		}
 		default: {
 			throw new Error("unknown texture type "+JSON.stringify(type));
