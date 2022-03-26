@@ -2,18 +2,19 @@ import { convertToHtml } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
 import Entity from "./Entity";
+import ItemStack from "./ItemStack";
 import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
-export type focus = "main" | "chat" | "menu";
+export type focus = "main" | "chat" | "menu" | "inventory";
 
 export type Position = [number,number];
 
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world" | "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus";
+export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "inventory-update";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -30,6 +31,8 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private _dead: boolean = false;
 	private listeners = []
 	private chatHistory: string[] = [];
+	private _inventoryOpen: boolean = false;
+	private inventory: Array<ItemStack> = [];
 
 	constructor() {
 		super();
@@ -40,6 +43,28 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
 		this.triggerUpdate("world");
+	}
+
+	public setInventory(items: Array<ItemStack>) {
+		this.inventory = items;
+		this.triggerUpdate("inventory-update");
+	}
+
+	getItems(): Iterable<ItemStack> {
+		return this.inventory;
+	}
+
+	public get inventoryOpen() {
+		return this._inventoryOpen;
+	}
+
+	setInventoryOpen(value: boolean) {
+		if(this.inventoryOpen === value) {
+			return;
+		}
+		this._inventoryOpen = value;
+		this.triggerUpdate("inventory-open");
+		this.setFocus(value ? "inventory" : "main");
 	}
 
 	public pushHistoryEntry(msg: string) {

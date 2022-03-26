@@ -13,6 +13,7 @@ import WorldView from "./graphics/world/WorldView";
 import ConditionalWorldView from "./graphics/world/ConditionalWorldView";
 import VisualResources from "./VisualResources";
 import EscapeMenu from "./ui/escapemenu/EscapeMenu";
+import InventoryMenu from "./ui/inventory/InventoryMenu";
 
 export type props = {
 	logicModel: LogicModel
@@ -35,7 +36,6 @@ export default class GameView extends React.Component<props, {}> {
 		super(props);
 
 		let {logicModel, visualModel, visuals} = props;
-		this.visualModel = visualModel;
 		this.logicModel = logicModel;
 		this.visualModel = visualModel;
 		this.visuals = visuals;
@@ -62,6 +62,12 @@ export default class GameView extends React.Component<props, {}> {
 		}
 		if(e.key === "Enter") {
 			this.visualModel.setChatOpen(true);
+			return;
+		}
+		if(this.visualModel.focus === "main") {
+			if(e.key === "e" || e.key === "E") {
+				this.visualModel.setInventoryOpen(true);
+			}
 		}
 	}
 
@@ -75,6 +81,7 @@ export default class GameView extends React.Component<props, {}> {
 
 	render(): React.ReactNode {
 		let escapeMenu = this.visualModel.menuOpen ? <EscapeMenu /> : null;
+		let inventoryMenu = this.visualModel.inventoryOpen ? <InventoryMenu texturePack={this.props.visuals.textures} model={this.visualModel} /> : null;
 
 		let content = (
 			<div
@@ -87,6 +94,7 @@ export default class GameView extends React.Component<props, {}> {
 					<ConditionalWorldView logicModel={this.logicModel} visualModel={this.visualModel} visuals={this.visuals} />
 					<Chat />
 					{escapeMenu}
+					{inventoryMenu}
 				</ModelContext.Provider>
 			</div>
 		)
