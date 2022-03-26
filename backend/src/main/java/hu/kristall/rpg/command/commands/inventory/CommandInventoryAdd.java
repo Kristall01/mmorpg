@@ -5,6 +5,7 @@ import hu.kristall.rpg.command.CommandParent;
 import hu.kristall.rpg.command.impl.SimpleCommand;
 import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.world.Item;
+import hu.kristall.rpg.world.Material;
 
 public class CommandInventoryAdd extends SimpleCommand {
 	
@@ -17,8 +18,16 @@ public class CommandInventoryAdd extends SimpleCommand {
 		if(!CommandCheckers.checkArgCount(sender, args, 1)) {
 			return;
 		}
+		Material m;
+		try {
+			m = Material.valueOf(args[0]);
+		}
+		catch (IllegalArgumentException ex) {
+			sender.sendMessage("nincs ilyen item");
+			return;
+		}
 		CommandCheckers.checkWorldPlayerEntity(sender, e -> {
-			e.getInventory().addItem(new Item(args[0]), 1);
+			e.getInventory().addItem(new Item(m), 1);
 		});
 	}
 }
