@@ -161,6 +161,7 @@ class RenderScheduler extends EventTarget {
 			if(!hadScene) {
 				this._setLoopOp();
 				this._runLoop();
+				setTimeout(() => this._draw());
 			}
 		}
 		else {
