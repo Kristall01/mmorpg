@@ -69,7 +69,7 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("entityDeath", ({id}) => new SignalEntityDeath(id));
 		this.addPacketSignal("died", () => new SignalDied());
 		this.addPacketSignal("portal-spawn", ({X, Y, radius}) => new SignalInPortalspawn(X, Y, radius));
-		this.addPacketSignal("spawn-item", ({x,y,type,id}) => new SignalInSpawnItem(new FloatingItem(id, [x,y],new Item(type))));
+		this.addPacketSignal("spawn-item", ({x,y,type,id,name}) => new SignalInSpawnItem(new FloatingItem(id, [x,y],new Item(type, name ?? undefined))));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 

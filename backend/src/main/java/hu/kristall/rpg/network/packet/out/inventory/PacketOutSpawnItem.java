@@ -10,6 +10,7 @@ public class PacketOutSpawnItem extends PacketOut {
 	double x;
 	double y;
 	String type;
+	String name;
 	
 	private PacketOutSpawnItem() {
 		super("spawn-item");
@@ -21,8 +22,8 @@ public class PacketOutSpawnItem extends PacketOut {
 		Position pos = item.getPosition();
 		this.x = pos.getX();
 		this.y = pos.getY();
-		this.type = item.getItem().getType();
-		//TODO implement
+		this.type = item.getItem().getType().name();
+		this.name = item.getItem().getName();
 	}
 	
 }
