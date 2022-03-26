@@ -14,7 +14,7 @@ import Item from "./Item";
 import FloatingItem from "./FloatingItem";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 
-export type WorldEvent = "add-item";
+export type WorldEvent = "item";
 
 class World extends UpdateBroadcaster<WorldEvent> {
 
@@ -28,6 +28,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	public readonly tileGrid: Matrix<string>
 	private portals: Portal[] = []
 	private _items: Map<number, FloatingItem> = new Map();
+	public followedEntity: Entity | null = null;
 
 	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		super();
@@ -44,6 +45,15 @@ class World extends UpdateBroadcaster<WorldEvent> {
 
 	spawnItem(item: FloatingItem) {
 		this._items.set(item.id, item);
+		this.triggerUpdate("item");
+	}
+
+	despawnItem(id: number): boolean {
+		if(this._items.delete(id)) {
+			this.triggerUpdate("item");
+			return true;
+		}
+		return false;
 	}
 
 	get items(): Iterable<FloatingItem> {
@@ -105,12 +115,16 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	}
 
 	despawnEntiy(id: number) {
+		if(this.followedEntity?.id === id) {
+			this.followedEntity = null;
+		}
 		this._entities.delete(id);
 	}
 
 	followEntity(id: number) {
 		let e = this.getEntity(id);
 		if(e !== undefined) {
+			this.followedEntity = e;
 			let a = e;
 			this.camPositionFn = () => {
 				let pos = a.cachedStatus.position;

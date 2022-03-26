@@ -3,6 +3,7 @@ import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
 import SignalChangeHp from "model/signals/SignalChangeHp";
 import SignalChat from "model/signals/SignalChat";
+import SignalDespawnItem from "model/signals/SignalDespawnItem";
 import SignalDied from "model/signals/SignalDied";
 import SignalEntityDeath from "model/signals/SignalEntityDeath";
 import SignalEntityDespawn from "model/signals/SignalEntityDespawn";
@@ -70,6 +71,7 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("died", () => new SignalDied());
 		this.addPacketSignal("portal-spawn", ({X, Y, radius}) => new SignalInPortalspawn(X, Y, radius));
 		this.addPacketSignal("spawn-item", ({x,y,type,id,name}) => new SignalInSpawnItem(new FloatingItem(id, [x,y],new Item(type, name ?? undefined))));
+		this.addPacketSignal("despawn-item", ({id}) => new SignalDespawnItem(id));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
@@ -179,6 +181,10 @@ class NetworkModel extends LogicModel {
 
 	sendChatMessage(message: string): void {
 		this.sendPacket("chat", {message});
+	}
+
+	collectNearbyItems(): void {
+		this.sendPacket("collect-items", {});
 	}
 
 	private sendPacket(type: string, data: any) {

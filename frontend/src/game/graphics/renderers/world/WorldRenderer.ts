@@ -1,17 +1,19 @@
-import { drawText } from "game/graphics/GraphicsUtils";
+import { drawText, RenderContext } from "game/graphics/GraphicsUtils";
 import Renderable, { StatelessRenderable } from "game/graphics/Renderable";
 import CozyPack from "game/graphics/texture/CozyPack";
+import EmptyTexture from "game/graphics/texture/EmptyTexture";
 import Texture from "game/graphics/texture/Texture";
 import TexturePack from "game/graphics/texture/TexturePack";
 import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
+import SubManager from "SubManager";
 import { DEFAULT_MAX_VERSION } from "tls";
+import { radiusDistance } from "visual_model/Paths";
 import Portal from "visual_model/Portal";
 import VisualModel, { Position } from "visual_model/VisualModel";
-import World from "visual_model/World";
+import World, { WorldEvent } from "visual_model/World";
 import { renderEntity } from "./EntityRenderer";
 import FloatingItemResource from "./FloatingItemResource";
-import { renderItem } from "./ItemRenderer";
 import { renderLabel, renderLabels } from "./LabelsRenderer";
 
 export interface RenderConfig {
@@ -36,22 +38,41 @@ class WorldRenderer implements Renderable {
 	private tileTextures: Matrix<Texture>;
 	private portalIcon: HTMLImageElement
 	private floatingItems: Map<number, FloatingItemResource> = new Map();
-	private subs: SubManager = new SubMana
+	private subs: SubManager = new SubManager();
+	private visuals: VisualResources
+	public ctx: RenderContext = null!;
 
 	constructor(world: World, visuals: VisualResources) {
 		this.portalIcon = visuals.images.get("portal.png").img;
+		this.visuals = visuals;
 		this.model = world.model;
 		this.world = world;
 		this.texturePack = visuals.textures;
 		this.cozyPack = visuals.cozy;
 		this.tileTextures = world.tileGrid.map(t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture());
+		this.updateFloatingItemList();
 	}
 
 	unmount(): void {
-		throw new Error("Method not implemented.");
+		this.subs.removeAll();
 	}
+
 	mount(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D): void {
-		throw new Error("Method not implemented.");
+		this.ctx = ctx;
+		this.subs.subscribe(this.world, this.handleEvents.bind(this));
+	}
+
+	private updateFloatingItemList() {
+		this.floatingItems.clear();
+		for(let item of this.world.items) {
+			this.floatingItems.set(item.id, {item: item, texture: this.visuals.textures.getTexture(item.item.type, "item") || new EmptyTexture()});
+		}
+	}
+
+	private handleEvents(e: WorldEvent) {
+		if(e === "item") {
+			this.updateFloatingItemList();
+		}
 	}
 
 	translateXY(x: number, y: number): Position {
@@ -285,12 +306,23 @@ class WorldRenderer implements Renderable {
 		}
 
 		renderLabels(this, this.world, this.renderConfig);
+
+		let showPickupMessage = false;
+
 		for(let item of this.floatingItems.values()) {
 			let pos = this.translateXY(...item.item.pos);
-			drawText(this.ctx, pos, item.item.item.name);
-			item.texture.drawTo(renderTime, this.ctx, pos, tileSize/2)
+			item.texture.drawTo(renderTime, this.ctx, pos, tileSize/3)
+			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 0.5)) {
+				showPickupMessage = true;
+			}
+			if(item.item.item.name !== null) {
+				drawText(this.ctx, pos, item.item.item.name);
+			}
 		}
 
+		if(showPickupMessage) {
+			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
+		}
 
 		// for(let entity of this.model.world.entities) {
 		// for(let entity of this.world.entities) {
