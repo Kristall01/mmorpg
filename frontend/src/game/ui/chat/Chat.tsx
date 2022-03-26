@@ -16,6 +16,9 @@ const Chat = (): JSX.Element | null => {
 
 	let [logicModel, visualModel] = useContext(ModelContext);
 	let [chatText, setChatText] = useState<string>("");
+	let [historyIndex, setHistoryIndex] = useState(-1)
+
+	console.log(historyIndex);
 
 	/*useEffect(() => {
 		if(model.chatContent !== null) {
@@ -79,6 +82,7 @@ const Chat = (): JSX.Element | null => {
 			return;
 		}
 		if(e.key === "Enter") {
+			visualModel.pushHistoryEntry(chatText);
 			let chattext = e.currentTarget.value;
 			chattext = chattext.trim();
 			if(chattext.length !== 0) {
@@ -93,6 +97,17 @@ const Chat = (): JSX.Element | null => {
 			e.stopPropagation();
 			visualModel.setChatOpen(false);
 			e.preventDefault();
+			return;
+		}
+		if(e.key === "ArrowUp" || e.key === "ArrowDown") {
+			let index = e.key === "ArrowUp" ? 1 : -1;
+			let newIndex = historyIndex+index;
+			let prevEntry = visualModel.getHistoryEntry(newIndex);
+			if(prevEntry !== undefined) {
+				setChatText(prevEntry);
+				setHistoryIndex(newIndex);
+			}
+			return;
 		}
 	}
 
@@ -104,7 +119,11 @@ const Chat = (): JSX.Element | null => {
 /* 		if(visualModel.chatOpen === false) {
 			setChatText("");
 		}
+		
  */		dummyDiv.current?.scrollIntoView();
+		if(!visualModel.chatOpen) {
+			setHistoryIndex(-1);
+		}
 		window.scrollTo(0,document.body.scrollHeight);
 	}, [visualModel.focus, visualModel.chatlog, visualModel.chatOpen])
 

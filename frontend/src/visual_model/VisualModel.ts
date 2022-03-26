@@ -29,6 +29,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private _maxFPS: number | null = null;
 	private _dead: boolean = false;
 	private listeners = []
+	private chatHistory: string[] = [];
 
 	constructor() {
 		super();
@@ -39,6 +40,20 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
 		this.triggerUpdate("world");
+	}
+
+	public pushHistoryEntry(msg: string) {
+		if(this.getHistoryEntry(0) !== msg) {
+			this.chatHistory.push(msg);
+		}
+	}
+
+	public getHistoryEntry(index: number): string | undefined {
+		let finalIndex = this.chatHistory.length - index-1;
+		if(finalIndex === this.chatHistory.length) {
+			return "";
+		}
+		return this.chatHistory[finalIndex];
 	}
 
 	public leaveWorld() {
