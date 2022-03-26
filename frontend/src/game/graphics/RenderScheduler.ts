@@ -45,7 +45,7 @@ class RenderScheduler extends EventTarget {
 
 	_fpsCounter = new _fpsCounter()
 
-	constructor(baseElement: HTMLElement) {
+	constructor(baseElement: HTMLElement, showFpsCounter: boolean = true) {
 		super();
 		//setup canvas element
 			this._baseElement = baseElement;
@@ -59,6 +59,9 @@ class RenderScheduler extends EventTarget {
 
 			this._fpsElement = document.createElement("div");
 			this._fpsElement.classList.add("fpscounter");
+			if(!showFpsCounter) {
+				this.setFpsCounterVisible(false);
+			}
 			this._baseElement.appendChild(this._fpsElement);
 
 			this._pauseDelayCounter = 0;
@@ -78,6 +81,20 @@ class RenderScheduler extends EventTarget {
 		this.setMaxFps(null);
 		this._memoMaxFps = null;
 		this._oldNow = performance.now();
+	}
+
+	toggleFpsCounter() {
+		this._fpsElement.classList.toggle("hidden");
+	}
+
+	setFpsCounterVisible(visible: boolean) {
+		let classList = this._fpsElement.classList;
+		if(!visible) {
+			classList.add("hidden")
+		}
+		else {
+			classList.remove("hidden");
+		}
 	}
 
 	addListener(type: string, fn: EventListener) {
