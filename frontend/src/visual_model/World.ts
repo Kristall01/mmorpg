@@ -42,7 +42,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 		//this.tex
 	}
 
-	addItem(item: FloatingItem) {
+	spawnItem(item: FloatingItem) {
 		this._items.set(item.id, item);
 	}
 
