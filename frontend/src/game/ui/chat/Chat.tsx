@@ -15,7 +15,7 @@ let dummyDiv = createRef<HTMLDivElement>();
 const Chat = (): JSX.Element | null => {
 
 	let [logicModel, visualModel] = useContext(ModelContext);
-	let [chatText, setChatText] = useState<string>("nul");
+	let [chatText, setChatText] = useState<string>("");
 
 	/*useEffect(() => {
 		if(model.chatContent !== null) {
@@ -75,7 +75,7 @@ const Chat = (): JSX.Element | null => {
 		if(visualModel.focus === "chat" && e.key === "Escape") {
 			setChatText("");
 			visualModel.setChatOpen(false);
-			e.preventDefault();
+			e.stopPropagation();
 			return;
 		}
 		if(e.key === "Enter") {
@@ -90,23 +90,21 @@ const Chat = (): JSX.Element | null => {
 				}
 			}
 			setChatText("");
+			e.stopPropagation();
 			visualModel.setChatOpen(false);
 			e.preventDefault();
 		}
 	}
 
-	const focusChat = () => {
-		inputRef.current?.focus();
-	}
-
 	useEffect(() => {
 		if(visualModel.focus === "chat") {
-			focusChat();
+			inputRef.current?.focus();
+//			console.log("focused chat");
 		}
-		if(visualModel.chatOpen === false) {
+/* 		if(visualModel.chatOpen === false) {
 			setChatText("");
 		}
-		dummyDiv.current?.scrollIntoView();
+ */		dummyDiv.current?.scrollIntoView();
 		window.scrollTo(0,document.body.scrollHeight);
 	}, [visualModel.focus, visualModel.chatlog, visualModel.chatOpen])
 

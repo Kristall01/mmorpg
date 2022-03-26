@@ -1,6 +1,6 @@
 import LogicModel from "model/LogicModel";
 import React, { createContext, createRef } from "react";
-import VisualModel, {focus, Position} from "visual_model/VisualModel";
+import VisualModel, {focus, Position, UpdateTypes} from "visual_model/VisualModel";
 import GraphicsComponent from "./graphics/component/GraphicsComponent";
 import WorldRenderer from "./graphics/renderers/world/WorldRenderer";
 import Chat from "./ui/chat/Chat";
@@ -42,26 +42,35 @@ export default class GameView extends React.Component<props, {}> {
 		//this.worldView = new WorldView(this.visualModel.world, this.cozyPack, this.texturePack);
 	}
 
-	handleModelUpdate() {
+	handleModelUpdate(e: UpdateTypes) {
 		if(this.visualModel.focus === "main") {
+//			console.log("focused main");
 			this.mainRef.current?.focus();
 		}
 		this.forceUpdate();
 	}
 
 	handleKeydown(e: React.KeyboardEvent) {
-		if(e.key === "Escape" && this.visualModel.focus === "main") {
-			this.visualModel.setMenuOpen(!this.visualModel.menuOpen);
+		if(e.key === "Escape" && this.visualModel.focus === "chat") {
+			//chat lost input focus
+			this.visualModel.setChatOpen(false);
 			return;
 		}
-		if(e.key === "Enter" && e.target === this.mainRef.current && this.visualModel.chatOpen === false) {
+		if(e.key === "Escape" && this.visualModel.focus === "main") {
+			this.visualModel.setMenuOpen(true);
+			return;
+		}
+		if(e.key === "Enter") {
 			this.visualModel.setChatOpen(true);
 		}
 	}
 
 	componentDidMount() {
-		this.visualModel.addUpdateListener((type) => this.handleModelUpdate());
-		this.mainRef.current?.focus();
+		this.visualModel.addUpdateListener((type) => this.handleModelUpdate(type));
+		if(this.visualModel.focus === "main") {
+			this.mainRef.current?.focus();
+//			console.log("focused gameview");
+		}
 	}
 
 	render(): React.ReactNode {
