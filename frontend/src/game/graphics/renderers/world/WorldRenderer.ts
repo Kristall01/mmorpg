@@ -309,19 +309,23 @@ class WorldRenderer implements Renderable {
 
 		let showPickupMessage = false;
 
+		let tile3 = tileSize / 3;
+
 		for(let item of this.floatingItems.values()) {
 			let pos = this.translateXY(...item.item.pos);
-			item.texture.drawTo(renderTime, this.ctx, pos, tileSize/3)
+			item.texture.drawTo(renderTime, this.ctx, pos, tile3)
 			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 0.5)) {
 				showPickupMessage = true;
 			}
 			if(item.item.item.name !== null) {
-				drawText(this.ctx, pos, item.item.item.name);
+				drawText(this.ctx, [pos[0], pos[1] - tile3*1.1], item.item.item.name, "end", "middle");
 			}
 		}
 
 		if(showPickupMessage) {
-			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
+//			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
+			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
+			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle", "middle",)
 		}
 
 		// for(let entity of this.model.world.entities) {
