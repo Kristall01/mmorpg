@@ -1,0 +1,107 @@
+{
+	"type": "similar_list",
+	"similarity": {
+		"cell_size": 16,
+		"category": "item",
+		"texture_type": "static_sprite",
+		"path": "Sheet.png"
+	},
+	"entries": {
+		"APPLE": {
+			"x": 0,
+			"y": 8
+		},
+		"CHEESE": {
+			"x": 1,
+			"y": 8
+		},
+		"FRIED_EGGS": {
+			"x": 2,
+			"y": 8
+		},
+		"PIE": {
+			"x": 3,
+			"y": 8
+		},
+		"KEY_BRONZE": {
+			"x": 4,
+			"y": 8
+		},
+		"KEY_IRON": {
+			"x": 5,
+			"y": 8
+		},
+		"CANDLE": {
+			"x": 6,
+			"y": 8
+		},
+		"CUP": {
+			"x": 7,
+			"y": 8
+		},
+		"CHEST_PLATE": {
+			"x": 1,
+			"y": 7
+		},
+		"GAUNTLET_LEATHER": {
+			"x": 5,
+			"y": 7
+		},
+		"GAUNTLET_IRON": {
+			"x": 7,
+			"y": 7
+		},
+		"BOOTS_LEATHER": {
+			"x": 0,
+			"y": 6
+		},
+		"BOOTS_IRON": {
+			"x": 1,
+			"y": 6
+		},
+		"BOOTS_GOLD": {
+			"x": 2,
+			"y": 6
+		},
+		"SHOES": {
+			"x": 3,
+			"y": 6
+		},
+		"MAGIC_HAT_0": {
+			"x": 4,
+			"y": 6
+		},
+		"MAGIC_HAT_1": {
+			"x": 5,
+			"y": 6
+		},
+		"RING_0": {
+			"x": 0,
+			"y": 5
+		},
+		"RING_1": {
+			"x": 1,
+			"y": 5
+		},
+		"RING_2": {
+			"x": 2,
+			"y": 5
+		},
+		"RING_3": {
+			"x": 3,
+			"y": 5
+		},
+		"SWORD_0": {
+			"x": 7,
+			"y": 0
+		},
+		"SWORD_1": {
+			"x": 6,
+			"y": 0
+		},
+		"SWORD_2": {
+			"x": 5,
+			"y": 0
+		}
+	}
+}

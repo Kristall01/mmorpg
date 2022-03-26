@@ -17,9 +17,11 @@ export default class VisualResources {
 	public static async load(): Promise<VisualResources> {
 		let images = new ImageStore();
 		await images.loadZip("imagestore.zip");
+		await images.loadZip("items.zip");
 		let cozy = new CozyPack(images);
 		let textures = new TexturePack(images);
 		await textures.loadPack("texturepack.json");
+		await textures.loadPack("items.json");
 		return new VisualResources(images, cozy, textures);
 	}
 

@@ -10,8 +10,13 @@ import { Direction } from "./Paths";
 import { WorldLabel } from "./Label";
 import Matrix from "Matrix";
 import Portal from "./Portal";
+import Item from "./Item";
+import FloatingItem from "./FloatingItem";
+import UpdateBroadcaster from "./UpdateBroadcaster";
 
-class World {
+export type WorldEvent = "add-item";
+
+class World extends UpdateBroadcaster<WorldEvent> {
 
 	public width: number
 	public height: number
@@ -22,8 +27,10 @@ class World {
 	public readonly model: VisualModel
 	public readonly tileGrid: Matrix<string>
 	private portals: Portal[] = []
+	private _items: Map<number, FloatingItem> = new Map();
 
 	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
+		super();
 		this.tileGrid = tileGrid;
 		this.model = model;
 		this.width = width;
@@ -33,6 +40,14 @@ class World {
 		this.camPositionFn = () => camStart;
 
 		//this.tex
+	}
+
+	addItem(item: FloatingItem) {
+		this._items.set(item.id, item);
+	}
+
+	get items(): Iterable<FloatingItem> {
+		return this._items.values();
 	}
 
 	addPortal(p: Portal) {

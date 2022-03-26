@@ -11,10 +11,13 @@ import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalEntityspeed from "model/signals/SignalEntityspeed";
 import SignalFocus from "model/signals/SignalFocus";
 import SignalInPortalspawn from "model/signals/SignalInPortalspawn";
+import SignalInSpawnItem from "model/signals/SignalInSpawnItem";
 import SignalJoinworld from "model/signals/SignalJoinworld";
 import SignalLabelFor from "model/signals/SignalLabel";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
 import SignalRenameEntity from "model/signals/SignalRenameEntity";
+import FloatingItem from "visual_model/FloatingItem";
+import Item from "visual_model/Item";
 import { LabelType } from "visual_model/Label";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
@@ -66,6 +69,7 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("entityDeath", ({id}) => new SignalEntityDeath(id));
 		this.addPacketSignal("died", () => new SignalDied());
 		this.addPacketSignal("portal-spawn", ({X, Y, radius}) => new SignalInPortalspawn(X, Y, radius));
+		this.addPacketSignal("spawn-item", ({x,y,type,id}) => new SignalInSpawnItem(new FloatingItem(id, [x,y],new Item(type))));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 

@@ -78,4 +78,23 @@ export const drawHealLabel = (ctx: RenderContext, drawPosition: Position, progre
 	ctx.fillText(text, drawPosition[0] - width/2, drawPosition[1] - progress*50);
 }
 
+export const drawText = (ctx: RenderContext, canvasPosition: Position, text: string) => {
+	ctx.font = '30px Roboto';
+
+	let metrics = ctx.measureText(text);
+	let actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+	let boxHeight = actualHeight+10;
+
+	let textWidth = metrics.width;
+	let xy = [canvasPosition[0]-textWidth/2, canvasPosition[1]];
+	ctx.textBaseline = "top";
+
+	ctx.fillStyle = "rgba(0,0,0,0.3)";
+	ctx.fillRect(xy[0]-5, xy[1]-5-boxHeight, textWidth+10, boxHeight);
+
+	ctx.fillStyle = "#fff";
+	ctx.fillText(text, xy[0], xy[1] - boxHeight);
+}
+
 export type RenderContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;

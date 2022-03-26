@@ -1,4 +1,5 @@
-import { StatelessRenderable } from "game/graphics/Renderable";
+import { drawText } from "game/graphics/GraphicsUtils";
+import Renderable, { StatelessRenderable } from "game/graphics/Renderable";
 import CozyPack from "game/graphics/texture/CozyPack";
 import Texture from "game/graphics/texture/Texture";
 import TexturePack from "game/graphics/texture/TexturePack";
@@ -9,6 +10,8 @@ import Portal from "visual_model/Portal";
 import VisualModel, { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";
 import { renderEntity } from "./EntityRenderer";
+import FloatingItemResource from "./FloatingItemResource";
+import { renderItem } from "./ItemRenderer";
 import { renderLabel, renderLabels } from "./LabelsRenderer";
 
 export interface RenderConfig {
@@ -22,7 +25,7 @@ export interface RenderConfig {
 	rendertime: number
 }
 
-class WorldRenderer extends StatelessRenderable {
+class WorldRenderer implements Renderable {
 
 	//private camPosition: CameraPositionFn = (rendertime: number) => center;
 	private texturePack: TexturePack
@@ -32,15 +35,23 @@ class WorldRenderer extends StatelessRenderable {
 	private model: VisualModel
 	private tileTextures: Matrix<Texture>;
 	private portalIcon: HTMLImageElement
+	private floatingItems: Map<number, FloatingItemResource> = new Map();
+	private subs: SubManager = new SubMana
 
 	constructor(world: World, visuals: VisualResources) {
-		super();
 		this.portalIcon = visuals.images.get("portal.png").img;
 		this.model = world.model;
 		this.world = world;
 		this.texturePack = visuals.textures;
 		this.cozyPack = visuals.cozy;
-		this.tileTextures = world.tileGrid.map(t => visuals.textures.getTexture(t));
+		this.tileTextures = world.tileGrid.map(t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture());
+	}
+
+	unmount(): void {
+		throw new Error("Method not implemented.");
+	}
+	mount(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D): void {
+		throw new Error("Method not implemented.");
 	}
 
 	translateXY(x: number, y: number): Position {
@@ -277,6 +288,12 @@ class WorldRenderer extends StatelessRenderable {
 		}
 
 		renderLabels(this, this.world, this.renderConfig);
+		for(let item of this.floatingItems.values()) {
+			let pos = this.translateXY(...item.item.pos);
+			drawText(this.ctx, pos, item.item.item.name);
+			item.texture.drawTo(renderTime, this.ctx, pos, tileSize/2)
+		}
+
 
 		// for(let entity of this.model.world.entities) {
 		// for(let entity of this.world.entities) {

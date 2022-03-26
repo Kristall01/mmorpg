@@ -1,0 +1,32 @@
+package hu.kristall.rpg.world;
+
+public enum Material {
+
+	APPLE,
+	CHEESE,
+	FRIED_EGGS,
+	PIE,
+	KEY_BRONZE,
+	KEY_IRON,
+	CANDLE,
+	CUP,
+	CHEST_PLATE,
+	GAUNTLET_LEATHER,
+	GAUNTLET_IRON,
+	BOOTS_LEATHER,
+	BOOTS_IRON,
+	BOOTS_GOLD,
+	SHOES,
+	MAGIC_HAT_0,
+	MAGIC_HAT_1,
+	RING_0,
+	RING_1,
+	RING_2,
+	RING_3,
+	SWORD_0,
+	SWORD_1,
+	SWORD_2
+	
+	
+	
+}
