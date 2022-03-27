@@ -62,10 +62,7 @@ class InventoryMenu extends ConnectedComponent<InventoryMenuProps> {
 		let i = 0;
 		for(let item of this.props.model.getItems()) {
 			let itemName = item.item.name
-			let titleElement = itemName === null ? null : (
-				<span className="title" dangerouslySetInnerHTML={{__html: convertToHtml(itemName)}} >
-				</span>
-				)
+			let titleElement = <span className="title" dangerouslySetInnerHTML={{__html: convertToHtml(itemName ?? item.item.type).innerHTML}} />
 			items.push((
 			<div key={i++} className='cell'>
 				<GraphicsComponent

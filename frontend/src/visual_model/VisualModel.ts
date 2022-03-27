@@ -1,4 +1,4 @@
-import { convertToHtml } from "game/ui/chat/textconverter";
+import { convertToHtmlText } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
 import Entity from "./Entity";
@@ -100,7 +100,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	}
 
 	addChatEntry(text: string) {
-		this.chatlog = [...this.chatlog, convertToHtml(text)];
+		this.chatlog = [...this.chatlog, convertToHtmlText(text)];
 		this.triggerUpdate("chatlog");
 	}
 
