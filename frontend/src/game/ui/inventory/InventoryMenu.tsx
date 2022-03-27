@@ -4,22 +4,30 @@ import TextureRenderer from 'game/graphics/renderers/world/TextureRenderer';
 import EmptyTexture from 'game/graphics/texture/EmptyTexture';
 import TexturePack from 'game/graphics/texture/TexturePack';
 import React, {createRef } from 'react';
-import VisualModel from 'visual_model/VisualModel';
-import { convertToHtml } from '../chat/textconverter';
+import VisualModel, {UpdateTypes} from 'visual_model/VisualModel';
+import World, { WorldEvent } from 'visual_model/World';
+import { convertToHtml, convertToHtmlText } from '../chat/textconverter';
 import './InventoryMenu.scss';
 
 export type InventoryMenuProps = {
 	texturePack: TexturePack
 	model: VisualModel
+	world: World
 }
 
-class InventoryMenu extends ConnectedComponent<InventoryMenuProps> {
+class InventoryMenu extends ConnectedComponent<UpdateTypes | WorldEvent, InventoryMenuProps> {
 
 	private mainRef;
 
 	constructor(props: InventoryMenuProps) {
-		super(props, [props.model]);
+		super(props, [props.model, props.world]);
 		this.mainRef = createRef<HTMLDivElement>();
+	}
+
+	handleEvent(t: UpdateTypes | WorldEvent) {
+		if(t === "chat-open" || t === "inventory-open" || t === "item" || t === "inventory-update") {
+			this.forceUpdate();
+		}
 	}
 
 	private handleKeyDown(e: React.KeyboardEvent) {
@@ -40,7 +48,7 @@ class InventoryMenu extends ConnectedComponent<InventoryMenuProps> {
 		if(this.props.model.focus === "inventory") {
 			this.mainRef.current?.focus();
 		}
-		return true;
+		return false;
 	}
 
 /* 
@@ -60,7 +68,7 @@ class InventoryMenu extends ConnectedComponent<InventoryMenuProps> {
 	render() {
 		let items = [];
 		let i = 0;
-		for(let item of this.props.model.getItems()) {
+		for(let item of this.props.world.getItems()) {
 			let itemName = item.item.name
 			let titleElement = <span className="title" dangerouslySetInnerHTML={{__html: convertToHtml(itemName ?? item.item.type).innerHTML}} />
 			items.push((

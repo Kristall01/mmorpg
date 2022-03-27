@@ -11,7 +11,7 @@ export default class SignalSetinventory implements SignalIn {
 	}
 
 	execute(model: VisualModel) {
-		model.setInventory(this.items);
+		model.world?.setInventory(this.items);
 	}
 
 

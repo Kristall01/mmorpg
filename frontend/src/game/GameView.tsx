@@ -81,7 +81,6 @@ export default class GameView extends React.Component<props, {}> {
 
 	render(): React.ReactNode {
 		let escapeMenu = this.visualModel.menuOpen ? <EscapeMenu /> : null;
-		let inventoryMenu = this.visualModel.inventoryOpen ? <InventoryMenu texturePack={this.props.visuals.textures} model={this.visualModel} /> : null;
 
 		let content = (
 			<div
@@ -94,7 +93,6 @@ export default class GameView extends React.Component<props, {}> {
 					<ConditionalWorldView logicModel={this.logicModel} visualModel={this.visualModel} visuals={this.visuals} />
 					<Chat />
 					{escapeMenu}
-					{inventoryMenu}
 				</ModelContext.Provider>
 			</div>
 		)

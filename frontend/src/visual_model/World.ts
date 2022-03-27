@@ -13,8 +13,9 @@ import Portal from "./Portal";
 import Item from "./Item";
 import FloatingItem from "./FloatingItem";
 import UpdateBroadcaster from "./UpdateBroadcaster";
+import ItemStack from "./ItemStack";
 
-export type WorldEvent = "item";
+export type WorldEvent = "item" | "inventory-update";
 
 class World extends UpdateBroadcaster<WorldEvent> {
 
@@ -29,6 +30,8 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	private portals: Portal[] = []
 	private _items: Map<number, FloatingItem> = new Map();
 	public followedEntity: Entity | null = null;
+	private inventory: Array<ItemStack> = [];
+
 
 	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		super();
@@ -41,6 +44,15 @@ class World extends UpdateBroadcaster<WorldEvent> {
 		this.camPositionFn = () => camStart;
 
 		//this.tex
+	}
+
+	public setInventory(items: Array<ItemStack>) {
+		this.inventory = items;
+		this.triggerUpdate("inventory-update");
+	}
+
+	getItems(): Iterable<ItemStack> {
+		return this.inventory;
 	}
 
 	spawnItem(item: FloatingItem) {

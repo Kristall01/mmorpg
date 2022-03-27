@@ -14,7 +14,7 @@ export type Position = [number,number];
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "inventory-update";
+export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -32,7 +32,6 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private listeners = []
 	private chatHistory: string[] = [];
 	private _inventoryOpen: boolean = false;
-	private inventory: Array<ItemStack> = [];
 
 	constructor() {
 		super();
@@ -43,15 +42,6 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
 		this.triggerUpdate("world");
-	}
-
-	public setInventory(items: Array<ItemStack>) {
-		this.inventory = items;
-		this.triggerUpdate("inventory-update");
-	}
-
-	getItems(): Iterable<ItemStack> {
-		return this.inventory;
 	}
 
 	public get inventoryOpen() {

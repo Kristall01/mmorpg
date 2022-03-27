@@ -1,3 +1,4 @@
+import InventoryMenu from "game/ui/inventory/InventoryMenu";
 import VisualResources from "game/VisualResources";
 import LogicModel from "model/LogicModel";
 import React, { Component, createRef } from "react";
@@ -62,7 +63,7 @@ class WorldView extends React.Component<props> {
 			this.mainRef.current?.focus();
 			//console.log("focused worldview");
 		}
-		return false;
+		return true;
 	}
 
 	handleKeyDown(e: React.KeyboardEvent) {
@@ -120,6 +121,7 @@ class WorldView extends React.Component<props> {
 	}
 
 	render() {
+		let inventoryMenu = this.visualModel.inventoryOpen ? <InventoryMenu world={this.props.world} texturePack={this.props.visuals.textures} model={this.visualModel} /> : null;
 		return (
 			<div tabIndex={-1}
 				ref={this.mainRef}
@@ -130,6 +132,7 @@ class WorldView extends React.Component<props> {
 				onMouseMove={e => this.handleMouseMove(e)}
 				onKeyDown={e => this.handleKeyDown(e)}
 			>
+				{inventoryMenu}
 				<GraphicsComponent showFpsCounter={true} maxFPS={this.visualModel.maxFPS} renderable={this.worldRenderer} />
 			</div>
 		);

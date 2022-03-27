@@ -2,21 +2,24 @@ import React from "react";
 import SubManager from "SubManager";
 import UpdateBroadcaster from "visual_model/UpdateBroadcaster";
 
-export default abstract class ConnectedComponent<props = {},S = {}, SS = {}> extends React.Component<props, S, SS> {
+export default abstract class ConnectedComponent<T = any, props = {},S = {}, SS = {}> extends React.Component<props, S, SS> {
 
 	private subManager: SubManager = new SubManager();
-	private models: Array<UpdateBroadcaster<any>>
+	private models: Array<UpdateBroadcaster<T>>
 
-	constructor(props: props, models: Array<UpdateBroadcaster<any>>) {
+	constructor(props: props, models: Array<UpdateBroadcaster<T>>) {
 		super(props);
 		this.models = models;
 	}
 
 	componentDidMount() {
-		let updater = () => this.forceUpdate();
 		for(let m of this.models) {
-			this.subManager.subscribe(m, updater);
+			this.subManager.subscribe(m, (t) => this.handleEvent(t));
 		}
+	}
+
+	protected handleEvent(event: T) {
+		this.forceUpdate();		
 	}
 
 	componentWillUnmount() {
