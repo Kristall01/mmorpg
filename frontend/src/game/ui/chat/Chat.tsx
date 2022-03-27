@@ -98,11 +98,13 @@ const Chat = (): JSX.Element | null => {
 			return;
 		}
 		if(e.key === "ArrowUp" || e.key === "ArrowDown") {
+			e.preventDefault();
 			let index = e.key === "ArrowUp" ? 1 : -1;
 			let newIndex = historyIndex+index;
 			let prevEntry = visualModel.getHistoryEntry(newIndex);
 			if(prevEntry !== undefined) {
 				setChatText(prevEntry);
+				inputRef.current?.setSelectionRange(prevEntry.length, prevEntry.length);
 				setHistoryIndex(newIndex);
 			}
 			return;
