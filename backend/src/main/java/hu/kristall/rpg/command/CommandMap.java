@@ -30,6 +30,13 @@ public class CommandMap implements CommandParent {
 		commandMap.put(command.getName(), command);
 	}
 	
+	@Override
+	public CommandHandler registerSubHandler(String name, String description) {
+		CommandHandler h = new CommandHandler(this, name, description);
+		registerCommand(h);
+		return h;
+	}
+	
 	public ICommand getCommand(String prefix) {
 		return commandMap.get(prefix.toLowerCase());
 	}
@@ -38,6 +45,7 @@ public class CommandMap implements CommandParent {
 		if(command.isEmpty()) {
 			return;
 		}
+		command = command.trim();
 		int firstSpace = command.indexOf(' ');
 		ICommand cmd;
 		String prefix;

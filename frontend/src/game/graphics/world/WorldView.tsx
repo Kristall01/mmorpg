@@ -1,3 +1,4 @@
+import InventoryMenu from "game/ui/inventory/InventoryMenu";
 import VisualResources from "game/VisualResources";
 import LogicModel from "model/LogicModel";
 import React, { Component, createRef } from "react";
@@ -47,6 +48,34 @@ class WorldView extends React.Component<props> {
 		})
 	}
 
+	shouldComponentUpdate(nextProps: props, nextState: {}) {
+/* 		if(visualModel.focus === "chat") {
+			focusChat();
+		}
+		if(visualModel.chatOpen === false) {
+			setChatText("");
+		}
+		dummyDiv.current?.scrollIntoView();
+		window.scrollTo(0,document.body.scrollHeight);
+	}, [visualModel.focus, visualModel.chatlog, visualModel.chatOpen]);
+ */
+		if(this.visualModel.focus === "main") {
+			this.mainRef.current?.focus();
+			//console.log("focused worldview");
+		}
+		return true;
+	}
+
+	handleKeyDown(e: React.KeyboardEvent) {
+		let lowercase = e.key.toLowerCase();
+		//console.log("handled keydown");
+		if(lowercase === "a") {
+			//console.log("spell casted!");
+			this.logicModel.collectNearbyItems();
+			e.stopPropagation();
+		}
+	}
+
 	handleMouseUp(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
 		this.clearIntervalTask();
 	}
@@ -92,16 +121,19 @@ class WorldView extends React.Component<props> {
 	}
 
 	render() {
+		let inventoryMenu = this.visualModel.inventoryOpen ? <InventoryMenu world={this.props.world} texturePack={this.props.visuals.textures} model={this.visualModel} /> : null;
 		return (
-			<div
+			<div tabIndex={-1}
 				ref={this.mainRef}
 				className="world-view"
 				onWheel={e => this.handleWheel(e)}
 				onMouseDown={e => this.handleMouseDown(e)}
 				onMouseUp={e => this.handleMouseUp(e)}
 				onMouseMove={e => this.handleMouseMove(e)}
+				onKeyDown={e => this.handleKeyDown(e)}
 			>
-				<GraphicsComponent maxFPS={this.visualModel.maxFPS} renderable={this.worldRenderer} />
+				{inventoryMenu}
+				<GraphicsComponent showFpsCounter={true} maxFPS={this.visualModel.maxFPS} renderable={this.worldRenderer} />
 			</div>
 		);
 	}

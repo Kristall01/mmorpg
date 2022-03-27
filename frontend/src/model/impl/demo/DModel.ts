@@ -118,6 +118,10 @@ class DModel extends LogicModel {
 		}
 	}
 
+	collectNearbyItems(): void {
+		//noting :/
+	}
+
 	moveMeTo(x: number, y: number): void {
 		setTimeout(() => {
 			if(x > map.width-1) {

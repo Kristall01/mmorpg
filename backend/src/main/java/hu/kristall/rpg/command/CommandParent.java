@@ -48,4 +48,8 @@ public interface CommandParent extends Executable {
 		}
 		return cmd.tabComplete(sender, args, argsIndex+1);
 	}
+	
+	void registerCommand(ICommand cmd);
+	CommandHandler registerSubHandler(String name, String description);
+	
 }

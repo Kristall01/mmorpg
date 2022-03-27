@@ -1,11 +1,12 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
 import { Position } from "visual_model/VisualModel";
 import AnimatedGlobalColumnTexture from "./AnimatedGlobalColumnTexture";
+import StaticSpriteTexture from "./StaticSpriteTexture";
 import StaticTexture from "./StaticTexture";
 
 export default interface Texture {
 
-	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number): void;
+	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number, otherSize?: number, translateX?: number, translateY?: number): void;
 
 }
 
@@ -16,6 +17,9 @@ export function ofType(type: string, img: HTMLImageElement, others: any) {
 		}
 		case "animated_global_column": {
 			return new AnimatedGlobalColumnTexture(img, others.sliceTime);
+		}
+		case "static_sprite": {
+			return new StaticSpriteTexture(img, others.cell_size, others.x, others.y);
 		}
 		default: {
 			throw new Error("unknown texture type "+JSON.stringify(type));

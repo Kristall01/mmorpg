@@ -109,6 +109,10 @@ const calculatedDirection = (x: number, y: number): Direction => {
 	return x >= 0 ? enumMap.EAST : enumMap.WEST;
 }
 
+export const radiusDistance = (p0: Position, p1: Position) => {
+	return Math.sqrt(Math.pow(p0[0] - p1[0], 2) + Math.pow(p0[1] - p1[1], 2));
+}
+
 export const zigzagStatus = (startTimeMs: number, points: Position[], cellsPerSec: number): StatusFn => {
 	let timePoints: number[] = [];
 	let totalDist = 0;

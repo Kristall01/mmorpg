@@ -3,6 +3,9 @@ package hu.kristall.rpg.world;
 import hu.kristall.rpg.*;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutDespawnItem;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutSpawnItem;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.Entity;
@@ -13,10 +16,7 @@ import hu.kristall.rpg.world.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class World extends SynchronizedObject<World> {
 	
@@ -28,11 +28,13 @@ public class World extends SynchronizedObject<World> {
 	protected String name;
 	protected AsyncServer asyncServer;
 	protected int nextEntityID = 0;
+	private IdGenerator<FloatingItem> nextItemID = new IdGenerator<>();
 	protected List<String> bakedMapSerialize;
 	protected Logger logger;
 	private boolean shuttingDown = false;
 	private boolean defaultWorld;
-	private List<Portal> portals = new ArrayList();
+	private List<Portal> portals = new ArrayList<>();
+	private Map<GeneratedID<FloatingItem>, FloatingItem> floatingItems = new HashMap<>();
 	
 	public World(AsyncServer serverSynchronizer, boolean defaultWorld, String name, int width, int height) {
 		super("world-"+name);
@@ -64,6 +66,10 @@ public class World extends SynchronizedObject<World> {
 		}
 		
 		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
+	}
+	
+	public Collection<FloatingItem> getItems() {
+		return Collections.unmodifiableCollection(this.floatingItems.values());
 	}
 	
 	public void addPortal(Portal p) {
@@ -146,12 +152,17 @@ public class World extends SynchronizedObject<World> {
 				connectingConnection.sendPacket(new PacketOutPortalSpawn(portal));
 			}
 			
+			for(FloatingItem item : this.floatingItems.values()) {
+				connectingConnection.sendPacket(new PacketOutSpawnItem(item));
+			}
+			
 			//sync done
 			
 			WorldPlayer wp = new WorldPlayer(this, player);
 			worldPlayers.put(player, wp);
 			EntityHuman h = wp.spawnTo(pos);
 			connectingConnection.sendPacket(new PacketOutFollowEntity(h));
+			connectingConnection.sendPacket(new PacketOutSetInventory(h.getInventory()));
 			broadcastMessage("§e" + player.name + " csatlakozott");
 			
 			//player.followEntity(p.getID());
@@ -180,6 +191,21 @@ public class World extends SynchronizedObject<World> {
 	
 	public List<String> serializeTileGrid() {
 		return bakedMapSerialize;
+	}
+	
+	public void cleanRemovedItem(FloatingItem item) {
+		if(item.isRemoved()) {
+			floatingItems.remove(item.getID());
+			broadcastPacket(new PacketOutDespawnItem(item));
+		}
+	}
+	
+	public FloatingItem spawnItem(Item item, Position pos) {
+		GeneratedID<FloatingItem> itemID = nextItemID.get();
+		FloatingItem floatingItem = new FloatingItem(this, itemID, pos, item);
+		floatingItems.put(itemID, floatingItem);
+		broadcastPacket(new PacketOutSpawnItem(floatingItem));
+		return floatingItem;
 	}
 	
 	public void cleanRemovedEntity(Entity e) {

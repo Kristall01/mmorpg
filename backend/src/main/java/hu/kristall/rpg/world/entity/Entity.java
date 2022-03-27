@@ -3,8 +3,13 @@ package hu.kristall.rpg.world.entity;
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.world.FloatingItem;
+import hu.kristall.rpg.world.Inventory;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.path.Path;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public abstract class Entity {
 	
@@ -17,6 +22,7 @@ public abstract class Entity {
 	private double hp;
 	private double maxHp;
 	private boolean alive = true;
+	private Inventory inventory;
 	
 	public Entity(World world, EntityType type, int entityID, double speed, double HP, double maxHp) {
 		this.type = type;
@@ -26,6 +32,16 @@ public abstract class Entity {
 		this.hp = HP;
 		this.maxHp = maxHp;
 		this.hp = maxHp;
+		
+		this.inventory = new Inventory(this);
+	}
+	
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
+	}
+	
+	public Inventory getInventory() {
+		return inventory;
 	}
 	
 	public Entity(World world, EntityType type, int entityID) {
@@ -140,6 +156,26 @@ public abstract class Entity {
 		conn.sendPacket(new PacketOutHpChange(this));
 		if(getName() != null) {
 			conn.sendPacket(new PacketOutEntityRename(this));
+		}
+	}
+	
+	public void pickupNearbyItems(double radius) {
+		Collection<FloatingItem> worldItems = world.getItems();
+		ArrayList<FloatingItem> pickupTargets = new ArrayList<>();
+		Position entityPosition = getPosition();
+		inventory.setBroadcastStopped(true);
+		for (FloatingItem floatingItem : worldItems) {
+			if(Position.distance(entityPosition, floatingItem.getPosition()) < radius) {
+				pickupTargets.add(floatingItem);
+				inventory.addItem(floatingItem.getItem(), 1);
+			}
+		}
+		for (FloatingItem pickupTarget : pickupTargets) {
+			pickupTarget.remove();
+		}
+		inventory.setBroadcastStopped(false);
+		if(!pickupTargets.isEmpty()) {
+			inventory.broadcastUpdate();
 		}
 	}
 	

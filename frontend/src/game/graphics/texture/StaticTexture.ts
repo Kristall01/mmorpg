@@ -14,8 +14,8 @@ export default class StaticTexture implements Texture {
 		this.height = img.height;
 	}
 
-	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number): void {
-		ctx.drawImage(this.img, 0, 0, this.width, this.height, position[0], position[1], size, size);
+	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number, otherSize?: number): void {
+		ctx.drawImage(this.img, 0, 0, this.width, this.height, position[0], position[1], size, otherSize ?? size);
 	}
 
 }

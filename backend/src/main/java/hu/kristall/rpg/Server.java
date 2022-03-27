@@ -60,6 +60,10 @@ public class Server extends SynchronizedObject<Server> {
 		return logger;
 	}
 	
+	public Player getPlayer(String name) {
+		return players.get(name);
+	}
+	
 	public void addShutdownListener(Consumer<Server> r) {
 		shutdownListeners.add(r);
 	}
