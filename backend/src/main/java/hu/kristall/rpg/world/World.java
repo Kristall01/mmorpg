@@ -4,6 +4,7 @@ import hu.kristall.rpg.*;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutDespawnItem;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSpawnItem;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
@@ -161,6 +162,7 @@ public class World extends SynchronizedObject<World> {
 			worldPlayers.put(player, wp);
 			EntityHuman h = wp.spawnTo(pos);
 			connectingConnection.sendPacket(new PacketOutFollowEntity(h));
+			connectingConnection.sendPacket(new PacketOutSetInventory(h.getInventory()));
 			broadcastMessage("§e" + player.name + " csatlakozott");
 			
 			//player.followEntity(p.getID());
