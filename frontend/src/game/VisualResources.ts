@@ -6,19 +6,23 @@ export default class VisualResources {
 
 	public readonly cozy: CozyPack
 	public readonly textures: TexturePack
+	public readonly images: ImageStore
 
-	private constructor(cozy: CozyPack, texture: TexturePack) {
+	private constructor(images: ImageStore, cozy: CozyPack, texture: TexturePack) {
 		this.cozy = cozy;
 		this.textures = texture;
+		this.images = images;
 	}
 
 	public static async load(): Promise<VisualResources> {
 		let images = new ImageStore();
 		await images.loadZip("imagestore.zip");
+		await images.loadZip("items.zip");
 		let cozy = new CozyPack(images);
 		let textures = new TexturePack(images);
 		await textures.loadPack("texturepack.json");
-		return new VisualResources(cozy, textures);
+		await textures.loadPack("items.json");
+		return new VisualResources(images, cozy, textures);
 	}
 
 }

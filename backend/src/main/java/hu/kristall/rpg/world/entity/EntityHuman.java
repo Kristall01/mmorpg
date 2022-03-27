@@ -2,7 +2,12 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.PlayerConnection;
-import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
+import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
+import hu.kristall.rpg.network.packet.out.PacketOutMoveentity;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
+import hu.kristall.rpg.sync.Synchronizer;
+import hu.kristall.rpg.world.Inventory;
 import hu.kristall.rpg.world.LabelType;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.WorldPlayer;
@@ -33,6 +38,12 @@ public class EntityHuman extends Entity {
 	}
 	
 	@Override
+	public void setInventory(Inventory inventory) {
+		super.setInventory(inventory);
+		this.worldPlayer.getAsyncPlayer().connection.sendPacket(new PacketOutSetInventory(inventory));
+	}
+	
+	@Override
 	public Position getPosition() {
 		return lastPath.getPosiFn().getCurrentLocation();
 	}
@@ -53,6 +64,7 @@ public class EntityHuman extends Entity {
 	
 	@Override
 	public void move(Position to) {
+		to = getWorld().fixValidate(to);
 		long now = System.nanoTime();
 		this.lastPath = this.getWorld().interpolatePath(getPosition(), to, getSpeed(), now);
 		getWorld().broadcastPacket(new PacketOutMoveentity(this));
@@ -60,12 +72,18 @@ public class EntityHuman extends Entity {
 	
 	@Override
 	public void kill() {
-		worldPlayer.getAsyncPlayer().sync(p -> {
-			if(p != null) {
-				p.sendMessage("Meghaltál!");
-				p.scheduleWorldChange(p.getServer().getWorldsManager().getDefaultWorld());
-			}
-		});
+		try {
+			worldPlayer.getAsyncPlayer().sync(p -> {
+				if(p != null) {
+					p.sendMessage("Meghaltál!");
+					p.scheduleWorldChange(p.getServer().getWorldsManager().getDefaultWorld());
+				}
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//server won't be shut down while players are playing
+			e.printStackTrace();
+		}
 		super.kill();
 	}
 	

@@ -3,9 +3,7 @@ package hu.kristall.rpg;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.World;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -41,15 +39,25 @@ public class WorldsManager {
 		return defaultWorld;
 	}
 	
+	public Collection<String> getWorldNames() {
+		return Collections.unmodifiableCollection(this.worlds.keySet());
+	}
+	
 	public void shutdown() {
 		server.getLogger().info("Shutting down worlds");
 		List<Future<String>> shutdownTasks = new ArrayList<>();
 		for (Synchronizer<World> world : worlds.values()) {
-			shutdownTasks.add(world.syncCompute(w -> {
-				String name = w.getName();
-				w.shutdownWorld();
-				return name;
-			}));
+			try {
+				shutdownTasks.add(world.syncCompute(w -> {
+					String name = w.getName();
+					w.shutdownWorld();
+					return name;
+				}));
+			}
+			catch (Synchronizer.TaskRejectedException e) {
+				//world wont be shut down before this operation
+				e.printStackTrace();
+			}
 		}
 		for (Future<?> shutdownTask : shutdownTasks) {
 			try {

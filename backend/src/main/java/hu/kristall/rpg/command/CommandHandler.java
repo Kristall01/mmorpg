@@ -49,10 +49,12 @@ public class CommandHandler implements ICommand, CommandParent {
 		this.requiredPermission = requiredPermission;
 	}
 	
+	@Override
 	public void registerCommand(ICommand command) {
 		commandMap.put(command.getName().toLowerCase(), command);
 	}
 	
+	@Override
 	public CommandHandler registerSubHandler(String name, String description) {
 		CommandHandler h = new CommandHandler(this, name, description);
 		registerCommand(h);

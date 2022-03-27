@@ -9,8 +9,15 @@ import HumanEntity from "./entity/HumanEntity";
 import { Direction } from "./Paths";
 import { WorldLabel } from "./Label";
 import Matrix from "Matrix";
+import Portal from "./Portal";
+import Item from "./Item";
+import FloatingItem from "./FloatingItem";
+import UpdateBroadcaster from "./UpdateBroadcaster";
+import ItemStack from "./ItemStack";
 
-class World {
+export type WorldEvent = "item" | "inventory-update";
+
+class World extends UpdateBroadcaster<WorldEvent> {
 
 	public width: number
 	public height: number
@@ -20,8 +27,14 @@ class World {
 	private _labels: WorldLabel[] = [];
 	public readonly model: VisualModel
 	public readonly tileGrid: Matrix<string>
+	private portals: Portal[] = []
+	private _items: Map<number, FloatingItem> = new Map();
+	public followedEntity: Entity | null = null;
+	private inventory: Array<ItemStack> = [];
+
 
 	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
+		super();
 		this.tileGrid = tileGrid;
 		this.model = model;
 		this.width = width;
@@ -31,6 +44,40 @@ class World {
 		this.camPositionFn = () => camStart;
 
 		//this.tex
+	}
+
+	public setInventory(items: Array<ItemStack>) {
+		this.inventory = items;
+		this.triggerUpdate("inventory-update");
+	}
+
+	getItems(): Iterable<ItemStack> {
+		return this.inventory;
+	}
+
+	spawnItem(item: FloatingItem) {
+		this._items.set(item.id, item);
+		this.triggerUpdate("item");
+	}
+
+	despawnItem(id: number): boolean {
+		if(this._items.delete(id)) {
+			this.triggerUpdate("item");
+			return true;
+		}
+		return false;
+	}
+
+	get items(): Iterable<FloatingItem> {
+		return this._items.values();
+	}
+
+	addPortal(p: Portal) {
+		this.portals.push(p);
+	}
+
+	getPortals(): Iterable<Portal> {
+		return this.portals;
 	}
 
 	get entities(): IterableIterator<Entity> {
@@ -80,12 +127,16 @@ class World {
 	}
 
 	despawnEntiy(id: number) {
+		if(this.followedEntity?.id === id) {
+			this.followedEntity = null;
+		}
 		this._entities.delete(id);
 	}
 
 	followEntity(id: number) {
 		let e = this.getEntity(id);
 		if(e !== undefined) {
+			this.followedEntity = e;
 			let a = e;
 			this.camPositionFn = () => {
 				let pos = a.cachedStatus.position;

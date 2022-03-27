@@ -3,6 +3,9 @@ package hu.kristall.rpg.world;
 import hu.kristall.rpg.*;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutDespawnItem;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
+import hu.kristall.rpg.network.packet.out.inventory.PacketOutSpawnItem;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.Entity;
@@ -13,9 +16,7 @@ import hu.kristall.rpg.world.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class World extends SynchronizedObject<World> {
 	
@@ -27,10 +28,13 @@ public class World extends SynchronizedObject<World> {
 	protected String name;
 	protected AsyncServer asyncServer;
 	protected int nextEntityID = 0;
+	private IdGenerator<FloatingItem> nextItemID = new IdGenerator<>();
 	protected List<String> bakedMapSerialize;
 	protected Logger logger;
 	private boolean shuttingDown = false;
 	private boolean defaultWorld;
+	private List<Portal> portals = new ArrayList<>();
+	private Map<GeneratedID<FloatingItem>, FloatingItem> floatingItems = new HashMap<>();
 	
 	public World(AsyncServer serverSynchronizer, boolean defaultWorld, String name, int width, int height) {
 		super("world-"+name);
@@ -51,6 +55,39 @@ public class World extends SynchronizedObject<World> {
 			s[i] = tileMap[i].name();
 		}
 		this.bakedMapSerialize = List.of(s);
+		if(name.contentEquals("w0")) {
+			addPortal(new Portal(new Position(1, 1), "w1"));
+		}
+		else if(name.contentEquals("w1")) {
+			addPortal(new Portal(new Position(1, 1), "w2"));
+		}
+		else if(name.contentEquals("w2")) {
+			addPortal(new Portal(new Position(1, 1), "w0"));
+		}
+		
+		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
+	}
+	
+	public Collection<FloatingItem> getItems() {
+		return Collections.unmodifiableCollection(this.floatingItems.values());
+	}
+	
+	public void addPortal(Portal p) {
+		this.portals.add(p);
+		this.broadcastPacket(new PacketOutPortalSpawn(p));
+	}
+	
+	private void checkPortals() {
+		for (WorldPlayer worldPlayer : worldPlayers.values()) {
+			if(!worldPlayer.hasEntity()) {
+				continue;
+			}
+			for (Portal portal : portals) {
+				if(portal.checkCollision(worldPlayer.getEntity())) {
+					worldPlayer.startChangingWorld(portal.getTargetWorldName());
+				}
+			}
+		}
 	}
 	
 	public Tile getTileAt(int x, int y) {
@@ -111,6 +148,13 @@ public class World extends SynchronizedObject<World> {
 			for (Entity e : this.worldEntities.values()) {
 				e.sendStatusFor(connectingConnection);
 			}
+			for (Portal portal : portals) {
+				connectingConnection.sendPacket(new PacketOutPortalSpawn(portal));
+			}
+			
+			for(FloatingItem item : this.floatingItems.values()) {
+				connectingConnection.sendPacket(new PacketOutSpawnItem(item));
+			}
 			
 			//sync done
 			
@@ -118,6 +162,7 @@ public class World extends SynchronizedObject<World> {
 			worldPlayers.put(player, wp);
 			EntityHuman h = wp.spawnTo(pos);
 			connectingConnection.sendPacket(new PacketOutFollowEntity(h));
+			connectingConnection.sendPacket(new PacketOutSetInventory(h.getInventory()));
 			broadcastMessage("§e" + player.name + " csatlakozott");
 			
 			//player.followEntity(p.getID());
@@ -126,12 +171,15 @@ public class World extends SynchronizedObject<World> {
 			//send map packets
 			//list entities
 			//etc
+			
+			/*
 			getTimer().schedule(() -> {
 				WorldPlayer wp0 = worldPlayers.get(player);
 				if(wp0 != null && wp0.hasEntity()) {
 					wp0.getEntity().damage((20));
 				}
 			}, 2000 );
+			 */
 			
 			return wp.getSynchronizer();
 		}
@@ -143,6 +191,21 @@ public class World extends SynchronizedObject<World> {
 	
 	public List<String> serializeTileGrid() {
 		return bakedMapSerialize;
+	}
+	
+	public void cleanRemovedItem(FloatingItem item) {
+		if(item.isRemoved()) {
+			floatingItems.remove(item.getID());
+			broadcastPacket(new PacketOutDespawnItem(item));
+		}
+	}
+	
+	public FloatingItem spawnItem(Item item, Position pos) {
+		GeneratedID<FloatingItem> itemID = nextItemID.get();
+		FloatingItem floatingItem = new FloatingItem(this, itemID, pos, item);
+		floatingItems.put(itemID, floatingItem);
+		broadcastPacket(new PacketOutSpawnItem(floatingItem));
+		return floatingItem;
 	}
 	
 	public void cleanRemovedEntity(Entity e) {
@@ -213,6 +276,23 @@ public class World extends SynchronizedObject<World> {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public Position fixValidate(Position to) {
+		double targetX = to.getX(), targetY = to.getY();
+		if(targetX < 0) {
+			targetX = 0;
+		}
+		else if(targetX > width) {
+			targetX = width;
+		}
+		if(targetY < 0) {
+			targetY = 0;
+		}
+		else if(targetY > height) {
+			targetY = height;
+		}
+		return new Position(targetX,targetY);
 	}
 	
 }

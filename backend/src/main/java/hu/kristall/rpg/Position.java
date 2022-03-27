@@ -35,4 +35,8 @@ public class Position {
 	public int hashCode() {
 		return Objects.hash(x, y);
 	}
+	
+	public static double distance(Position p0, Position p1) {
+		return Math.sqrt(Math.pow(p0.getX() - p1.getX(), 2) + Math.pow(p0.getY() - p1.getY(), 2));
+	}
 }

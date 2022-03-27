@@ -1,11 +1,16 @@
 {
-	"WATER": {
-		"path": "water_output.png",
-		"type": "animated_global_column",
-		"sliceTime": 125
-	},
-	"GRASS": {
-		"path":"grass.png",
-		"type": "static_global"
+	"type": "regular_list",
+	"entries": {
+		"WATER": {
+			"path": "water_output.png",
+			"texture_type": "animated_global_column",
+			"sliceTime": 125,
+			"category": "tile"
+		},
+		"GRASS": {
+			"path":"grass.png",
+			"texture_type": "static_global",
+			"category": "tile"
+		}
 	}
 }

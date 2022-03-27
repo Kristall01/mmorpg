@@ -15,7 +15,8 @@ let dummyDiv = createRef<HTMLDivElement>();
 const Chat = (): JSX.Element | null => {
 
 	let [logicModel, visualModel] = useContext(ModelContext);
-	let [chatText, setChatText] = useState<string>("nul");
+	let [chatText, setChatText] = useState<string>("");
+	let [historyIndex, setHistoryIndex] = useState(-1)
 
 	/*useEffect(() => {
 		if(model.chatContent !== null) {
@@ -72,13 +73,14 @@ const Chat = (): JSX.Element | null => {
 	}
 
 	const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
-		if(e.key === "Escape") {
+		if(visualModel.focus === "chat" && e.key === "Escape") {
 			setChatText("");
 			visualModel.setChatOpen(false);
-			e.preventDefault();
+			e.stopPropagation();
 			return;
 		}
 		if(e.key === "Enter") {
+			visualModel.pushHistoryEntry(chatText);
 			let chattext = e.currentTarget.value;
 			chattext = chattext.trim();
 			if(chattext.length !== 0) {
@@ -90,23 +92,38 @@ const Chat = (): JSX.Element | null => {
 				}
 			}
 			setChatText("");
+			e.stopPropagation();
 			visualModel.setChatOpen(false);
 			e.preventDefault();
+			return;
 		}
-	}
-
-	const focusChat = () => {
-		inputRef.current?.focus();
+		if(e.key === "ArrowUp" || e.key === "ArrowDown") {
+			e.preventDefault();
+			let index = e.key === "ArrowUp" ? 1 : -1;
+			let newIndex = historyIndex+index;
+			let prevEntry = visualModel.getHistoryEntry(newIndex);
+			if(prevEntry !== undefined) {
+				setChatText(prevEntry);
+				inputRef.current?.setSelectionRange(prevEntry.length, prevEntry.length);
+				setHistoryIndex(newIndex);
+			}
+			return;
+		}
 	}
 
 	useEffect(() => {
-		if(visualModel.focus === focus.chat) {
-			focusChat();
+		if(visualModel.focus === "chat") {
+			inputRef.current?.focus();
+//			console.log("focused chat");
 		}
-		if(visualModel.chatOpen === false) {
+/* 		if(visualModel.chatOpen === false) {
 			setChatText("");
 		}
-		dummyDiv.current?.scrollIntoView();
+		
+ */		dummyDiv.current?.scrollIntoView();
+		if(!visualModel.chatOpen) {
+			setHistoryIndex(-1);
+		}
 		window.scrollTo(0,document.body.scrollHeight);
 	}, [visualModel.focus, visualModel.chatlog, visualModel.chatOpen])
 
