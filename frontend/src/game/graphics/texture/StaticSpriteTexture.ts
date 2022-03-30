@@ -9,7 +9,10 @@ export default class StaticSpriteTexture implements Texture {
 	private startY: number
 	private size: number
 
-	constructor(img: HTMLImageElement, scale: number, x: number, y: number) {
+	readonly id: string;
+
+	constructor(id: string, img: HTMLImageElement, scale: number, x: number, y: number) {
+		this.id = id;
 		this.img = img;
 		this.startX = x*scale;
 		this.startY = y*scale;

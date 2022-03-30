@@ -55,7 +55,7 @@ const ProjectBrowser = ({}) => {
 	return (
 		<>
 			<button onClick={() => setMenu(() => <MapBuilder poject={ProjectModel.newProject()} />)}>új projekt készítése</button>
-			<button>projekt betöltése</button>
+			{/** <button>projekt betöltése</button> */}
 		</>
 	)
 

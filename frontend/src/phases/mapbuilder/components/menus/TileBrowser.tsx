@@ -8,27 +8,31 @@ const TileBrowser = ({}) => {
 
 	let tiles: Array<JSX.Element> = [];
 
-	for(let tile of model.getProject().getTexturePack().getTextures()) {
-		let className = ["tileline"];
-		if(model.getActiveTexture()?.id === tile.id) {
-			className.push("active");
-		}
+	let tilesRaw = model.getProject().getTexturePack().getTextures("tile");
 
-		//preview image disabled
-//		let imgTag = tile.img ? <img src={tile.img} /> : null
-		let imgTag = null;
-		tiles.push(<div onClick={() => {
-			model.setActiveTile(tile);
-		}} key={tile.id} className={className.join(" ")}>
-			<div className="text">
-				{tile.id}
-			</div>
-			<div className="right">
-				{/*
-					<img src={visuals.images.get(tile.img).src} />
-				*/}
-			</div>
-		</div>);
+	if(tilesRaw !== undefined) {
+		for(let tile of tilesRaw) {
+			let className = ["tileline"];
+			if(model.getActiveTexture()?.id === tile.id) {
+				className.push("active");
+			}
+
+			//preview image disabled
+	//		let imgTag = tile.img ? <img src={tile.img} /> : null
+			let imgTag = null;
+			tiles.push(<div onClick={() => {
+				model.setActiveTile(tile);
+			}} key={tile.id} className={className.join(" ")}>
+				<div className="text">
+					{tile.id}
+				</div>
+				<div className="right">
+					{/*
+						<img src={visuals.images.get(tile.img).src} />
+					*/}
+				</div>
+			</div>);
+		}
 	}
 
 	return (

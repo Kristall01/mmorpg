@@ -20,8 +20,7 @@ const startPos: Position = [0,0];
 
 
 let level = new Level(50, 8);
-level.addLayer()
-let m = new Matrix<string>(50, 8);
+let m = level.addLayer();
 m.fill(([x,y]) => {
 	if(x == 0 || x == level.width-1 || y == 0 || y == level.height-1) {
 		return "WATER";
@@ -31,26 +30,16 @@ m.fill(([x,y]) => {
 	}
 });
 
-export interface DModelConfig {
-	tilegrid?: Matrix<string>
-	speed?: number
-}
-
-let defaultConfig: DModelConfig = {
-	tilegrid: m,
-	speed: 2
-}
-
 class DModel extends LogicModel {
 
 	private name: string;
 	private statusFn: StatusFn
-	private tiles: Matrix<string>
+	private tiles: Matrix<string | null>
 	private entitySpeed: number = 2;
 
-	constructor(callback: IEventReciever, username: string, options?: DModelConfig) {
+	constructor(callback: IEventReciever, username: string) {
 		super(callback);
-		let {speed, tilegrid} = (options === undefined) ? defaultConfig : Object.assign({}, defaultConfig, options);
+		let {speed, tilegrid} = {speed: 5, tilegrid: m};
 		this.tiles = tilegrid!
 		this.name = username;
 		this.entitySpeed = speed!;

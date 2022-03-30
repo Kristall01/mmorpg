@@ -1,18 +1,18 @@
 import ConnectedComponent from "ConnectedComponent"
 import { ReactNode } from "react";
-import ProjectModel from "../model/ProjectModel";
+import ProjectModel, { ProjectEvents } from "../model/ProjectModel";
 
 export interface Props {
 	project: ProjectModel
 }
 
-export default class WorldManager extends ConnectedComponent<Props, {}> {
+export default class WorldManager extends ConnectedComponent<ProjectEvents, Props, {}> {
 
 	constructor(props: Props) {
 		super(props, [props.project]);
 	}
 
-	render(): JSX.Element {
+	render(): React.ReactNode {
 		return <div></div>
 	}
 

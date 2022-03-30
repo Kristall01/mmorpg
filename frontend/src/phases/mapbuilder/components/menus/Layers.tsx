@@ -1,4 +1,4 @@
-import ProjectModel from "phases/mapbuilder/model/ProjectModel";
+import ProjectModel, { ProjectEvents } from "phases/mapbuilder/model/ProjectModel";
 import { ReactNode } from "react";
 import ConnectedComponent from "../../../../ConnectedComponent";
 
@@ -6,7 +6,7 @@ export type LayerProps = {
 	project: ProjectModel
 }
 
-export default class Layers extends ConnectedComponent<LayerProps> {
+export default class Layers extends ConnectedComponent<ProjectEvents, LayerProps> {
 
 	constructor(props: LayerProps) {
 		super(props, [props.project]);

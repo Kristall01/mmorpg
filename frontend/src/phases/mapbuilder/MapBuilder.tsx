@@ -74,7 +74,7 @@ class MapBuilder extends React.Component<props, {}, typeof MenuContext> {
 		nav.createMenuOption("fa-solid fa-ellipsis", "options", () => <Buttons />);
 		nav.createMenuOption("fa-solid fa-crop", "edit grid", () => <GridEditor />);
 		nav.createMenuOption("fa-solid fa-layer-group", "manage layers", () => <Layers project={this.props.poject} />);
-		nav.createMenuOption("fa-regular fa-map", "select world", () => <WorldManager project={this.props.poject}/>)
+		nav.createMenuOption("fa-regular fa-map", "worlds", () => <WorldManager project={this.props.poject}/>)
 		this.gameNavOpt = nav.createCustomOption("fa-solid fa-play", "start testing", () => {model.toggleGame()});
 		//this.gridNavOpt = 
 		this.model = model;

@@ -4,6 +4,7 @@ import { SignalIn } from "model/Definitions";
 import Entity from "./Entity";
 import ItemStack from "./ItemStack";
 import { LabelType, WorldLabel } from "./Label";
+import Level from "./Level";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import MapbuildModel from "../model/MapbuildModel";
+import MapbuildModel, { EventTypes } from "../model/MapbuildModel";
 import ConnectedComponent from "../../../ConnectedComponent";
 import TextureGrid from "./TextureGrid";
 
@@ -7,7 +7,7 @@ type props = {
 	model: MapbuildModel
 }
 
-export default class MainScreen extends ConnectedComponent<props, {}> {
+export default class MainScreen extends ConnectedComponent<EventTypes, props, {}> {
 
 	constructor(props: props) {
 		super(props, [props.model]);
