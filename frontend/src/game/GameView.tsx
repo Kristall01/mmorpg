@@ -1,6 +1,6 @@
 import LogicModel from "model/LogicModel";
 import React, { createContext, createRef } from "react";
-import VisualModel, {focus, Position} from "visual_model/VisualModel";
+import VisualModel, {focus, Position, UpdateTypes} from "visual_model/VisualModel";
 import GraphicsComponent from "./graphics/component/GraphicsComponent";
 import WorldRenderer from "./graphics/renderers/world/WorldRenderer";
 import Chat from "./ui/chat/Chat";
@@ -12,6 +12,8 @@ import TexturePack from "./graphics/texture/TexturePack";
 import WorldView from "./graphics/world/WorldView";
 import ConditionalWorldView from "./graphics/world/ConditionalWorldView";
 import VisualResources from "./VisualResources";
+import EscapeMenu from "./ui/escapemenu/EscapeMenu";
+import InventoryMenu from "./ui/inventory/InventoryMenu";
 
 export type props = {
 	logicModel: LogicModel
@@ -34,33 +36,53 @@ export default class GameView extends React.Component<props, {}> {
 		super(props);
 
 		let {logicModel, visualModel, visuals} = props;
-		this.visualModel = visualModel;
 		this.logicModel = logicModel;
 		this.visualModel = visualModel;
 		this.visuals = visuals;
 		//this.worldView = new WorldView(this.visualModel.world, this.cozyPack, this.texturePack);
 	}
 
-	handleModelUpdate() {
-		if(this.visualModel.focus === focus.main) {
+	handleModelUpdate(e: UpdateTypes) {
+		if(this.visualModel.focus === "main") {
+//			console.log("focused main");
 			this.mainRef.current?.focus();
 		}
 		this.forceUpdate();
 	}
 
 	handleKeydown(e: React.KeyboardEvent) {
-		if(e.key === "Enter" && e.target === this.mainRef.current && this.visualModel.chatOpen === false) {
+		if(e.key === "Escape" && this.visualModel.focus === "chat") {
+			//chat lost input focus
+			this.visualModel.setChatOpen(false);
+			return;
+		}
+		if(e.key === "Escape" && this.visualModel.focus === "main") {
+			this.visualModel.setMenuOpen(true);
+			return;
+		}
+		if(e.key === "Enter") {
 			this.visualModel.setChatOpen(true);
+			return;
+		}
+		if(this.visualModel.focus === "main") {
+			if(e.key === "e" || e.key === "E") {
+				this.visualModel.setInventoryOpen(true);
+			}
 		}
 	}
 
 	componentDidMount() {
-		this.visualModel.addUpdateListener((type) => this.handleModelUpdate());
-		this.mainRef.current?.focus();
+		this.visualModel.addUpdateListener((type) => this.handleModelUpdate(type));
+		if(this.visualModel.focus === "main") {
+			this.mainRef.current?.focus();
+//			console.log("focused gameview");
+		}
 	}
 
 	render(): React.ReactNode {
-		return (
+		let escapeMenu = this.visualModel.menuOpen ? <EscapeMenu /> : null;
+
+		let content = (
 			<div
 				tabIndex={0}
 				ref={this.mainRef}
@@ -70,10 +92,17 @@ export default class GameView extends React.Component<props, {}> {
 				<ModelContext.Provider value={[this.logicModel, this.visualModel]}>
 					<ConditionalWorldView logicModel={this.logicModel} visualModel={this.visualModel} visuals={this.visuals} />
 					<Chat />
-					<button onClick={() => this.logicModel.disconnect()} className="dc-button">Disconnect</button>
+					{escapeMenu}
 				</ModelContext.Provider>
 			</div>
 		)
-	}
+		return content;
+/* 		if(this.visualModel.dead) {
+			return <DeadLayer>{content}</DeadLayer>
+		}
+		else {
+			return content;
+		}
+ */	}
 
 }

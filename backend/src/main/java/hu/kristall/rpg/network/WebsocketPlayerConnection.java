@@ -2,15 +2,12 @@ package hu.kristall.rpg.network;
 
 import hu.kristall.rpg.Player;
 import hu.kristall.rpg.Server;
+import hu.kristall.rpg.network.packet.in.play.*;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.network.packet.in.PacketIn;
 import hu.kristall.rpg.network.packet.in.handshake.PacketInHandshake;
 import hu.kristall.rpg.network.packet.in.handshake.PacketInHandshakeAuth;
-import hu.kristall.rpg.network.packet.in.play.PacketInPlay;
-import hu.kristall.rpg.network.packet.in.play.PacketInPlayChat;
-import hu.kristall.rpg.network.packet.in.play.PacketInPlayMove;
-import hu.kristall.rpg.network.packet.in.play.PacketInPlayPing;
 import hu.kristall.rpg.network.packet.out.PacketOut;
 import hu.kristall.rpg.network.packet.out.PacketOutDisconnect;
 import io.javalin.websocket.WsContext;
@@ -75,9 +72,15 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 		if(!authenticated()) {
 			return;
 		}
-		getAsyncServer().sync(srv -> {
-			getPlayer().handleQuit();
-		});
+		try {
+			getAsyncServer().sync(srv -> {
+				getPlayer().handleQuit();
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//server will be running while players are online
+			e.printStackTrace();
+		}
 	}
 	
 	//any thread
@@ -110,6 +113,7 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 		playPacketMapBuilder.register("chat", PacketInPlayChat.class);
 		playPacketMapBuilder.register("ping", PacketInPlayPing.class);
 		playPacketMapBuilder.register("move", PacketInPlayMove.class);
+		playPacketMapBuilder.register("collect-items", PacketInPlayCollectitems.class);
 		playPacketMap = playPacketMapBuilder.build();
 		
 		PacketMap.Builder<PacketInHandshake> handshakePacketMapBuilder = new PacketMap.Builder<PacketInHandshake>();

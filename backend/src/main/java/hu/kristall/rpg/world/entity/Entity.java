@@ -2,12 +2,14 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.PlayerConnection;
-import hu.kristall.rpg.network.packet.out.PacketOutEntityRename;
-import hu.kristall.rpg.network.packet.out.PacketOutEntityspeed;
-import hu.kristall.rpg.network.packet.out.PacketOutMoveentity;
-import hu.kristall.rpg.network.packet.out.PacketOutSpawnEntity;
+import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.world.FloatingItem;
+import hu.kristall.rpg.world.Inventory;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.path.Path;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public abstract class Entity {
 	
@@ -17,18 +19,95 @@ public abstract class Entity {
 	private double speed;
 	private boolean removed = false;
 	private String name;
+	private double hp;
+	private double maxHp;
+	private boolean alive = true;
+	private Inventory inventory;
 	
-	public Entity(World world, EntityType type, int entityID, double speed) {
+	public Entity(World world, EntityType type, int entityID, double speed, double HP, double maxHp) {
 		this.type = type;
 		this.world = world;
 		this.entityID = entityID;
 		this.speed = speed;
+		this.hp = HP;
+		this.maxHp = maxHp;
+		this.hp = maxHp;
+		
+		this.inventory = new Inventory(this);
+	}
+	
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
+	}
+	
+	public Inventory getInventory() {
+		return inventory;
+	}
+	
+	public Entity(World world, EntityType type, int entityID) {
+		this(world, type, entityID, type.speed, type.maxHP, type.maxHP);
 	}
 	
 	public abstract Position getPosition();
 	
 	public String getName() {
 		return name;
+	}
+	
+	public double getHp() {
+		return hp;
+	}
+	
+	public boolean heal(double amount) {
+		if(amount <= 0) {
+			world.getLogger().error("heal amount must be positive");
+			return false;
+		}
+		return setHp(getHp()+amount);
+	}
+	
+	public double getMaxHp() {
+		return maxHp;
+	}
+	
+	private boolean setHp(final double baseAmount) {
+		double amount = baseAmount;
+		if(amount > getMaxHp()) {
+			amount = getMaxHp();
+		}
+		if(amount <= 0) {
+			amount = 0;
+		}
+		if(this.hp == amount) {
+			return false;
+		}
+		handleHpChange(baseAmount - this.hp);
+		this.hp = amount;
+		world.broadcastPacket(new PacketOutHpChange(this.getID(), this.getHp()));
+		if(amount == 0) {
+			this.kill();
+		}
+		return true;
+	}
+	
+	public void kill() {
+		this.alive = false;
+		this.remove();
+	}
+	
+	public boolean isAlive() {
+		return alive;
+	}
+	
+	protected void handleHpChange(double amount) {}
+	
+	public boolean damage(double amount) {
+		if(amount <= 0) {
+			world.getLogger().error("Entity::damage() got negative amount of damage");
+			return false;
+		}
+		setHp(getHp() - amount);
+		return true;
 	}
 	
 	public void setName(String name) {
@@ -74,8 +153,29 @@ public abstract class Entity {
 	public void sendStatusFor(PlayerConnection conn) {
 		conn.sendPacket(new PacketOutSpawnEntity(this));
 		conn.sendPacket(new PacketOutMoveentity(this));
+		conn.sendPacket(new PacketOutHpChange(this));
 		if(getName() != null) {
 			conn.sendPacket(new PacketOutEntityRename(this));
+		}
+	}
+	
+	public void pickupNearbyItems(double radius) {
+		Collection<FloatingItem> worldItems = world.getItems();
+		ArrayList<FloatingItem> pickupTargets = new ArrayList<>();
+		Position entityPosition = getPosition();
+		inventory.setBroadcastStopped(true);
+		for (FloatingItem floatingItem : worldItems) {
+			if(Position.distance(entityPosition, floatingItem.getPosition()) < radius) {
+				pickupTargets.add(floatingItem);
+				inventory.addItem(floatingItem.getItem(), 1);
+			}
+		}
+		for (FloatingItem pickupTarget : pickupTargets) {
+			pickupTarget.remove();
+		}
+		inventory.setBroadcastStopped(false);
+		if(!pickupTargets.isEmpty()) {
+			inventory.broadcastUpdate();
 		}
 	}
 	

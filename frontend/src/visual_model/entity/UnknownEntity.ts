@@ -10,8 +10,8 @@ const rgb = (r: number,g: number,b: number) => {
 
 export default class UnknownEntity extends Entity {
 
-	constructor(id: number, loc: Position, speed: number, facing: Direction) {
-		super(id, EntityType.enum.map.UNKNOWN, loc, speed, facing);
+	constructor(id: number, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number) {
+		super(id, EntityType.enum.map.UNKNOWN, loc, speed, facing, hp, maxHp);
 	}
 
 }

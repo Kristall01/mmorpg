@@ -7,8 +7,14 @@ import Renderable from "../Renderable";
 
 type props = {
 	renderable: Renderable,
-	maxFPS?: number | null
+	maxFPS?: number | null,
+	showFpsCounter?: boolean
 }
+
+const fillFpsCounterValue = (a: boolean | undefined) => {
+	return a ?? false;
+}
+
 
 class GraphicsComponent extends Component<props> {
 
@@ -20,7 +26,7 @@ class GraphicsComponent extends Component<props> {
 
 	constructor(props: props) {
 		super(props);
-		let {maxFPS = null, renderable} = props;
+		let {maxFPS = null, renderable, showFpsCounter} = props;
 		this.renderable = renderable;
 		this.maxFPS = maxFPS;
 
@@ -44,6 +50,9 @@ class GraphicsComponent extends Component<props> {
 			this.renderable = nextProps.renderable;
 			this.scheduler?.setScene(this.renderable);
 		}
+		if(nextProps.showFpsCounter !== this.props.showFpsCounter) {
+			this.scheduler?.setFpsCounterVisible(fillFpsCounterValue(nextProps.showFpsCounter));
+		}
 		return false;
 	}
 
@@ -56,6 +65,7 @@ class GraphicsComponent extends Component<props> {
 			this.scheduler = new RenderScheduler(parent);
 			this.scheduler.setScene(this.renderable);
 			this.scheduler.setMaxFps(this.maxFPS);
+			this.scheduler.setFpsCounterVisible(fillFpsCounterValue(this.props.showFpsCounter));
 		}
 	}
 

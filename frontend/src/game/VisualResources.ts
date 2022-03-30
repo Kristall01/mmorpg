@@ -10,7 +10,7 @@ export default class VisualResources {
 	public readonly textures: TexturePack
 	public readonly images: ImageStore
 
-	private constructor(cozy: CozyPack, texture: TexturePack, images: ImageStore) {
+	private constructor(images: ImageStore, cozy: CozyPack, texture: TexturePack) {
 		this.cozy = cozy;
 		this.textures = texture;
 		this.images = images;
@@ -23,12 +23,12 @@ export default class VisualResources {
 		}
 		let images = new ImageStore();
 		await images.loadZip("imagestore.zip");
+		await images.loadZip("items.zip");
 		let cozy = new CozyPack(images);
 		let textures = new TexturePack(images);
 		await textures.loadPack("texturepack.json");
-		let instance = new VisualResources(cozy, textures, images);
-		VisualResources.instance = instance;
-		return instance;
+		await textures.loadPack("items.json");
+		return new VisualResources(images, cozy, textures);
 	}
 
 }

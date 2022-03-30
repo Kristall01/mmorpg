@@ -36,6 +36,8 @@ export interface Status {
 
 export type StatusFn = (rendertime: number) => Status
 
+export type PositionFn = (rendertime: number) => Position
+
 const pointDistance = (pos0: Position, pos1: Position): number => {
 	return Math.sqrt(Math.pow(pos0[0] - pos1[0], 2) + Math.pow(pos0[1] - pos1[1], 2));
 }
@@ -105,6 +107,10 @@ const calculatedDirection = (x: number, y: number): Direction => {
 		return y >= 0 ? enumMap.SOUTH : enumMap.NORTH;
 	}
 	return x >= 0 ? enumMap.EAST : enumMap.WEST;
+}
+
+export const radiusDistance = (p0: Position, p1: Position) => {
+	return Math.sqrt(Math.pow(p0[0] - p1[0], 2) + Math.pow(p0[1] - p1[1], 2));
 }
 
 export const zigzagStatus = (startTimeMs: number, points: Position[], cellsPerSec: number): StatusFn => {

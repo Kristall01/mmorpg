@@ -9,12 +9,16 @@ export default class SignalEntityspawn implements SignalIn {
 	private type: string
 	private pos: Position
 	private speed: number
+	private hp: number
+	private maxHp: number
 
-	constructor(id: number, type: string, pos: Position, speed: number) {
+	constructor(id: number, type: string, pos: Position, speed: number, hp: number, maxHp: number) {
 		this.id = id;
 		this.type = type;
 		this.speed = speed;
 		this.pos = pos;
+		this.hp = hp;
+		this.maxHp = maxHp;
 	}
 
 	execute(model: VisualModel) {
@@ -22,7 +26,7 @@ export default class SignalEntityspawn implements SignalIn {
 		if(t === null) {
 			t = EntityType.enum.map.UNKNOWN;
 		}
-		model.world?.spawnEntity(this.id, t, this.pos, this.speed);
+		model.world?.spawnEntity(this.id, t, this.pos, this.speed, this.hp, this.maxHp);
 	}
 
 }

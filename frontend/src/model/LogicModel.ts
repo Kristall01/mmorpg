@@ -26,4 +26,6 @@ export default abstract class LogicModel {
 
 	abstract sendChatMessage(message: string): void;
 
+	abstract collectNearbyItems(): void;
+
 }

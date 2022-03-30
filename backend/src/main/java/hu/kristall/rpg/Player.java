@@ -4,16 +4,19 @@ import hu.kristall.rpg.command.senders.PlayerSender;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutChat;
 import hu.kristall.rpg.sync.AsyncExecutor;
+import hu.kristall.rpg.sync.ISynchronized;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.WorldPlayer;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Player implements PlayerSender {
+public class Player implements PlayerSender, ISynchronized<Player> {
 	
 	private String name;
 	private final PlayerConnection connection;
@@ -22,6 +25,7 @@ public class Player implements PlayerSender {
 	private final Queue<Synchronizer<World>> worldChangeQueue = new LinkedList<>();
 	private final Server server;
 	private Runnable quitHandler;
+	private final AsyncPlayer asyncPlayer;
 	
 	public Player(Server server, Runnable quitHandler, PlayerConnection connection, String name) {
 		this.server = server;
@@ -29,6 +33,7 @@ public class Player implements PlayerSender {
 		this.connection = connection;
 		this.quitHandler = quitHandler;
 		this.worldLock = new ReentrantLock();
+		this.asyncPlayer = new AsyncPlayer(this);
 	}
 	
 	public void handleQuit() {
@@ -58,24 +63,51 @@ public class Player implements PlayerSender {
 	private void exclusiveWorldChange(Synchronizer<World> newAsyncWorld) {
 		final Player leaver = this;
 		final Synchronizer<Server> asyncServer = getServer().getSynchronizer();
-		asyncEntity.sync(e -> {
-			if(e != null) {
-				e.getWorld().leavePlayer(leaver);
-			}
-			if(newAsyncWorld == null) {
-				asyncServer.sync(srv -> {
-					repollWorldChange();
-				});
-			}
-			else {
-				newAsyncWorld.sync(newWorld -> {
-					leaver.setAsyncEntity(newWorld.joinPlayer(leaver));
-					asyncServer.sync(srv -> {
-						repollWorldChange();
-					});
-				});
-			}
-		});
+		try {
+			asyncEntity.sync(e -> {
+				if(e != null) {
+					e.getWorld().leavePlayer(leaver.asyncPlayer);
+				}
+				if(newAsyncWorld == null) {
+					try {
+						asyncServer.sync(srv -> {
+							repollWorldChange();
+						});
+					}
+					catch (Synchronizer.TaskRejectedException ex) {
+						//server cannot be shut down here
+						ex.printStackTrace();
+						worldLock.unlock();
+					}
+				}
+				else {
+					try {
+						newAsyncWorld.sync(newWorld -> {
+							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer));
+							try {
+								asyncServer.sync(srv -> {
+									repollWorldChange();
+								});
+							}
+							catch (Synchronizer.TaskRejectedException ex) {
+								//server cannot be shut down here
+								ex.printStackTrace();
+								worldLock.unlock();
+							}
+						});
+					}
+					catch (Synchronizer.TaskRejectedException ex) {
+						//worlds cannot be shut down during server running
+						worldLock.unlock();
+						ex.printStackTrace();
+					}
+				}
+			});
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//worlds cannot be shut down during server running
+			e.printStackTrace();
+		}
 	}
 	
 	public void scheduleWorldChange(Synchronizer<World> newAsyncWorld) {
@@ -134,6 +166,26 @@ public class Player implements PlayerSender {
 	
 	public void kick(String reason) {
 		connection.close(reason);
+		this.asyncPlayer.changeObject(null);
 	}
 	
+	@Override
+	public Synchronizer<Player> getSynchronizer() {
+		return this.asyncPlayer;
+	}
+	
+	@Override
+	public Future<?> runTask(Runnable task) {
+		return server.runTask(task);
+	}
+	
+	@Override
+	public <T> Future<T> computeTask(Callable<T> c) {
+		return server.computeTask(c);
+	}
+	
+	@Override
+	public boolean isShutdown() {
+		return server.isShutdown();
+	}
 }

@@ -45,7 +45,7 @@ class RenderScheduler extends EventTarget {
 
 	_fpsCounter = new _fpsCounter()
 
-	constructor(baseElement: HTMLElement) {
+	constructor(baseElement: HTMLElement, showFpsCounter: boolean = true) {
 		super();
 		//setup canvas element
 			this._baseElement = baseElement;
@@ -55,10 +55,14 @@ class RenderScheduler extends EventTarget {
 			this._canvasElement.tabIndex = 0;
 			this._canvasElement.style.outline = "none";
 			this._canvasElement.focus();
-			this._ctx = this._canvasElement.getContext("2d", {alpha: false})!;
+			//disabling alpha channel have some bugs in  GPU rendering
+			this._ctx = this._canvasElement.getContext("2d"/* , {alpha: false} */)!;
 
 			this._fpsElement = document.createElement("div");
 			this._fpsElement.classList.add("fpscounter");
+			if(!showFpsCounter) {
+				this.setFpsCounterVisible(false);
+			}
 			this._baseElement.appendChild(this._fpsElement);
 
 			this._pauseDelayCounter = 0;
@@ -78,6 +82,20 @@ class RenderScheduler extends EventTarget {
 		this.setMaxFps(null);
 		this._memoMaxFps = null;
 		this._oldNow = performance.now();
+	}
+
+	toggleFpsCounter() {
+		this._fpsElement.classList.toggle("hidden");
+	}
+
+	setFpsCounterVisible(visible: boolean) {
+		let classList = this._fpsElement.classList;
+		if(!visible) {
+			classList.add("hidden")
+		}
+		else {
+			classList.remove("hidden");
+		}
 	}
 
 	addListener(type: string, fn: EventListener) {
@@ -144,6 +162,7 @@ class RenderScheduler extends EventTarget {
 			if(!hadScene) {
 				this._setLoopOp();
 				this._runLoop();
+				setTimeout(() => this._draw());
 			}
 		}
 		else {

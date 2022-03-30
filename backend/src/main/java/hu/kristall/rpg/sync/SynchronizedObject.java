@@ -12,29 +12,36 @@ import java.util.concurrent.Future;
 public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISynchronized<T> {
 	
 	private final ExecutorService executor;
-	private final Synchronizer<T> synchronizer;
+	private Synchronizer<T> synchronizer;
 	private Logger taskPoolLogger;
 	private SyncTimer timer;
+
+	protected SynchronizedObject(String threadName, Synchronizer<T> syncer) {
+		this.taskPoolLogger = LoggerFactory.getLogger(threadName+"-task-pool");
+		this.executor = Executors.newSingleThreadExecutor(r -> new Thread(r, threadName));
+		executor.submit(Utils.emptyRunnable);
+		if(syncer == null) {
+			syncer = new Synchronizer<T>((T) this);
+		}
+		synchronizer = syncer;
+		this.timer = new SyncTimer(threadName+"-timer", this);
+	}
+	
+	protected void changeSyncer(Synchronizer<T> syncer) {
+		this.synchronizer = syncer;
+	}
 	
 	protected SynchronizedObject(String threadName) {
-		this(Executors.newSingleThreadExecutor(r -> new Thread(r, threadName)));
-		this.taskPoolLogger = LoggerFactory.getLogger(threadName+"-task-pool");
-		this.timer = new SyncTimer(this);
+		this(threadName, null);
 	}
+	
+	/*	protected SynchronizedObject() {
+		this(Executors.newSingleThreadExecutor());
+		this.taskPoolLogger = LoggerFactory.getLogger("unnamed-task-pool");
+	}*/
 	
 	public ISyncTimer getTimer() {
 		return timer;
-	}
-	
-	protected SynchronizedObject() {
-		this(Executors.newSingleThreadExecutor());
-		this.taskPoolLogger = LoggerFactory.getLogger("unnamed-task-pool");
-	}
-	
-	private SynchronizedObject(ExecutorService executor) {
-		this.executor = executor;
-		executor.submit(Utils.emptyRunnable);
-		synchronizer = new Synchronizer<T>((T) this);
 	}
 	
 	public Future<?> runTask(Runnable r) {
@@ -53,8 +60,8 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 	protected void shutdown() {
 		synchronizer.changeObject(null);
 		taskPoolLogger.info("shutting down...");
-		executor.shutdown();
 		timer.cancel();
+		executor.shutdown();
 		taskPoolLogger.info("shutdown done");
 	}
 	

@@ -2,6 +2,9 @@ package hu.kristall.rpg.command;
 
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.command.commands.*;
+import hu.kristall.rpg.command.commands.inventory.CommandInventoryAdd;
+import hu.kristall.rpg.command.commands.inventory.CommandInventoryListitems;
+import hu.kristall.rpg.command.commands.world.CommandWorldSpawnitem;
 
 public class CommandCollections {
 	
@@ -13,6 +16,15 @@ public class CommandCollections {
 		map.registerCommand(new CommandSpeed(map));
 		map.registerCommand(new CommandWorld(map));
 		map.registerCommand(new CommandClothes(map));
+		map.registerCommand(new CommandDmg(map));
+		
+		CommandHandler inventory = map.registerSubHandler( "inventory", "inventory commands");
+			inventory.registerCommand(new CommandInventoryListitems(inventory));
+			inventory.registerCommand(new CommandInventoryAdd(inventory));
+			
+		CommandHandler world = map.registerSubHandler("world", "world commands");
+			world.registerCommand(new CommandWorldSpawnitem(world));
+		
 		return map;
 	}
 	

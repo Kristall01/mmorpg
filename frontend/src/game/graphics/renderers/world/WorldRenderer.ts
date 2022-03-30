@@ -1,13 +1,20 @@
-import { StatelessRenderable } from "game/graphics/Renderable";
+import { drawText, RenderContext } from "game/graphics/GraphicsUtils";
+import Renderable, { StatelessRenderable } from "game/graphics/Renderable";
 import CozyPack from "game/graphics/texture/CozyPack";
+import EmptyTexture from "game/graphics/texture/EmptyTexture";
 import Texture from "game/graphics/texture/Texture";
 import TexturePack from "game/graphics/texture/TexturePack";
 import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
+import SubManager from "SubManager";
 import { DEFAULT_MAX_VERSION } from "tls";
+import { radiusDistance } from "visual_model/Paths";
+import Portal from "visual_model/Portal";
 import VisualModel, { Position } from "visual_model/VisualModel";
-import World from "visual_model/World";
+import World, { WorldEvent } from "visual_model/World";
 import { renderEntity } from "./EntityRenderer";
+import FloatingItemResource from "./FloatingItemResource";
+import { renderLabel, renderLabels } from "./LabelsRenderer";
 
 export interface RenderConfig {
 	camX: number
@@ -20,7 +27,7 @@ export interface RenderConfig {
 	rendertime: number
 }
 
-class WorldRenderer extends StatelessRenderable {
+class WorldRenderer implements Renderable {
 
 	//private camPosition: CameraPositionFn = (rendertime: number) => center;
 	private texturePack: TexturePack
@@ -29,9 +36,15 @@ class WorldRenderer extends StatelessRenderable {
 	private world: World
 	private model: VisualModel
 	private tileTextureLayers: Array<Matrix<Texture>>;
+	private portalIcon: HTMLImageElement
+	private floatingItems: Map<number, FloatingItemResource> = new Map();
+	private subs: SubManager = new SubManager();
+	private visuals: VisualResources
+	public ctx: RenderContext = null!;
 
 	constructor(world: World, visuals: VisualResources) {
-		super();
+		this.portalIcon = visuals.images.get("portal.png").img;
+		this.visuals = visuals;
 		this.model = world.model;
 		this.world = world;
 		this.texturePack = visuals.textures;
@@ -40,12 +53,36 @@ class WorldRenderer extends StatelessRenderable {
 			if(e === null) {
 				return this.texturePack.getDefaultTexture();
 			}
-			let t: Texture | undefined = this.texturePack.getTexture(e);
+			let t: Texture | undefined = this.texturePack.getTexture(e, "tile");
 			if(t === undefined) {
 				return this.texturePack.getDefaultTexture();
 			}
 			return t;
 		}));
+		//this.tileTextures = world.tileGrid.map(t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture());
+		this.updateFloatingItemList();
+	}
+
+	unmount(): void {
+		this.subs.removeAll();
+	}
+
+	mount(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D): void {
+		this.ctx = ctx;
+		this.subs.subscribe(this.world, this.handleEvents.bind(this));
+	}
+
+	private updateFloatingItemList() {
+		this.floatingItems.clear();
+		for(let item of this.world.items) {
+			this.floatingItems.set(item.id, {item: item, texture: this.visuals.textures.getTexture(item.item.type, "item") || new EmptyTexture()});
+		}
+	}
+
+	private handleEvents(e: WorldEvent) {
+		if(e === "item") {
+			this.updateFloatingItemList();
+		}
 	}
 
 	translateXY(x: number, y: number): Position {
@@ -255,10 +292,55 @@ class WorldRenderer extends StatelessRenderable {
 		}
 		//this.ctx.fillStyle = "yellow";
 
+		this.ctx.fillStyle = "blue";
+		//render portals
+
+		let whRation = this.portalIcon.width / this.portalIcon.height;
+
+
+		for(let p of this.world.getPortals()) {
+			let pWidth = tileSize*p.radius*3;
+			let pWidthHalf = pWidth/2;
+
+			let [pX, pY] = this.translateXY(...p.position);
+			this.ctx.drawImage(this.portalIcon, pX-pWidthHalf, pY-pWidthHalf, pWidth, pWidth);
+		}
+
+/* 		for(let p of this.world.getPortals()) {
+			let [pX, pY] = this.translateXY(...p.position);
+			this.ctx.beginPath();
+			this.ctx.arc(pX, pY, p.radius * tileSize, 0, Math.PI*2);
+			this.ctx.fill();
+		}
+ */
 		for(let entity of this.world.entities) {
 			renderEntity(this, entity, this.renderConfig);
 		}
 
+		renderLabels(this, this.world, this.renderConfig);
+
+		let showPickupMessage = false;
+
+		let tile3 = tileSize / 3;
+
+		for(let item of this.floatingItems.values()) {
+			let pos = this.translateXY(...item.item.pos);
+			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -1);
+			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 0.5)) {
+				showPickupMessage = true;
+			}
+			if(item.item.item.name !== null) {
+				drawText(this.ctx, [pos[0], pos[1] - tile3*1.1], item.item.item.name, "end", "middle");
+			}
+		}
+
+		if(showPickupMessage) {
+//			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
+			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
+			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle", "middle",)
+		}
+
+		// for(let entity of this.model.world.entities) {
 		// for(let entity of this.world.entities) {
 		// 	entity.render(this.renderConfig, this, this.ctx);
 		// }
@@ -279,7 +361,8 @@ class WorldRenderer extends StatelessRenderable {
 				this.ctx.fillText(name, entity.cachedCanvasPosition[0]-textWidth/2, entity.cachedCanvasPosition[1]);
 			}
 		}
- */	}
+	 	*/	
+	}
 	
 
 }

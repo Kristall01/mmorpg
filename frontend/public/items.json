@@ -1,0 +1,270 @@
+{
+	"type": "similar_list",
+	"similarity": {
+		"cell_size": 16,
+		"category": "item",
+		"texture_type": "static_sprite",
+		"path": "Sheet.png",
+		"translateX": -0.5,
+		"translateY": -1
+	},
+	"entries": {
+		"APPLE": {
+			"x": 0,
+			"y": 8
+		},
+		"CHEESE": {
+			"x": 1,
+			"y": 8
+		},
+		"FRIED_EGGS": {
+			"x": 2,
+			"y": 8
+		},
+		"PIE": {
+			"x": 3,
+			"y": 8
+		},
+		"KEY_BRONZE": {
+			"x": 4,
+			"y": 8
+		},
+		"KEY_IRON": {
+			"x": 5,
+			"y": 8
+		},
+		"CANDLE": {
+			"x": 6,
+			"y": 8
+		},
+		"CUP": {
+			"x": 7,
+			"y": 8
+		},
+		"CHEST_PLATE": {
+			"x": 1,
+			"y": 7
+		},
+		"GAUNTLET_LEATHER": {
+			"x": 5,
+			"y": 7
+		},
+		"GAUNTLET_IRON": {
+			"x": 7,
+			"y": 7
+		},
+		"BOOTS_LEATHER": {
+			"x": 0,
+			"y": 6
+		},
+		"BOOTS_IRON": {
+			"x": 1,
+			"y": 6
+		},
+		"BOOTS_GOLD": {
+			"x": 2,
+			"y": 6
+		},
+		"SHOES": {
+			"x": 3,
+			"y": 6
+		},
+		"MAGIC_HAT_0": {
+			"x": 4,
+			"y": 6
+		},
+		"MAGIC_HAT_1": {
+			"x": 5,
+			"y": 6
+		},
+		"RING_0": {
+			"x": 0,
+			"y": 5
+		},
+		"RING_1": {
+			"x": 1,
+			"y": 5
+		},
+		"RING_2": {
+			"x": 2,
+			"y": 5
+		},
+		"RING_3": {
+			"x": 3,
+			"y": 5
+		},
+		"SWORD_0": {
+			"x": 0,
+			"y": 0
+		},
+		"SWORD_1": {
+			"x": 1,
+			"y": 0
+		},
+		"SWORD_2": {
+			"x": 2,
+			"y": 0
+		},
+		"SWORD_3": {
+			"x": 3,
+			"y": 0
+		},
+		"SWORD_4": {
+			"x": 4,
+			"y": 0
+		},
+		"SWORD_5": {
+			"x": 5,
+			"y": 0
+		},
+		"SWORD_6": {
+			"x": 6,
+			"y": 0
+		},
+		"SWORD_7": {
+			"x": 7,
+			"y": 0
+		},
+
+		"HELMET_0": {
+			"x": 4,
+			"y": 5
+		},
+		"HELMET_1": {
+			"x": 5,
+			"y": 5
+		},
+		"HELMET_2": {
+			"x": 6,
+			"y": 5
+		},
+		"HELMET_3": {
+			"x": 7,
+			"y": 5
+		},
+		"NECKLACE": {
+			"x": 0,
+			"y": 4
+		},
+		"NECKLACE_START": {
+			"x": 1,
+			"y": 4
+		},
+		"NECKLACE_FANG": {
+			"x": 2,
+			"y": 4
+		},
+		"NECKLACE_SKULL": {
+			"x": 3,
+			"y": 4
+		},
+		"SCROLL_BLUE": {
+			"x": 4,
+			"y": 4
+		},
+		"SCROLL_RED": {
+			"x": 5,
+			"y": 4
+		},
+		"SCROLL_OPENED": {
+			"x": 6,
+			"y": 4
+		},
+		"STONE_TABLET": {
+			"x": 7,
+			"y": 4
+		},
+		"SHIELD_WOOD": {
+			"x": 0,
+			"y": 3
+		},
+		"SHIELD_IRON": {
+			"x": 1,
+			"y": 3
+		},
+		"SHIELD_BRONZE": {
+			"x": 2,
+			"y": 3
+		},
+		"SHIELD_GOLD": {
+			"x": 3,
+			"y": 3
+		},
+		"POTION_RED_SMALL": {
+			"x": 4,
+			"y": 3
+		},
+		"POTION_RED_MEDIUM": {
+			"x": 5,
+			"y": 3
+		},
+		"POTION_BLUE_SMALL": {
+			"x": 6,
+			"y": 3
+		},
+		"POTION_BLUE_BIG": {
+			"x": 7,
+			"y": 3
+		},
+		"BOW_0": {
+			"x": 0,
+			"y": 2
+		},
+		"BOW_1": {
+			"x": 1,
+			"y": 2
+		},
+		"BOW_2": {
+			"x": 2,
+			"y": 2
+		},
+		"BOW_3": {
+			"x": 3,
+			"y": 2
+		},
+		"WAND_0": {
+			"x": 4,
+			"y": 2
+		},
+		"WAND_1": {
+			"x": 5,
+			"y": 2
+		},
+		"WAND_2": {
+			"x": 6,
+			"y": 2
+		},
+		"WAND_3": {
+			"x": 7,
+			"y": 2
+		},
+		"SPEAR": {
+			"x": 0,
+			"y": 1
+		},
+		"SPEAR_RIBBON": {
+			"x": 1,
+			"y": 1
+		},
+		"SPEAR_SPIKE": {
+			"x": 2,
+			"y": 1
+		},
+		"AXE_0": {
+			"x": 4,
+			"y": 1
+		},
+		"AXE_1": {
+			"x": 5,
+			"y": 1
+		},
+		"AXE_2": {
+			"x": 6,
+			"y": 1
+		},
+		"AXE_3": {
+			"x": 7,
+			"y": 1
+		}
+	}	
+}

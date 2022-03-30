@@ -2,16 +2,28 @@ import Matrix from "Matrix";
 import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
+import SignalChangeHp from "model/signals/SignalChangeHp";
 import SignalChat from "model/signals/SignalChat";
+import SignalDespawnItem from "model/signals/SignalDespawnItem";
+import SignalDied from "model/signals/SignalDied";
+import SignalEntityDeath from "model/signals/SignalEntityDeath";
 import SignalEntityDespawn from "model/signals/SignalEntityDespawn";
 import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalEntityspeed from "model/signals/SignalEntityspeed";
 import SignalFocus from "model/signals/SignalFocus";
+import SignalInPortalspawn from "model/signals/SignalInPortalspawn";
+import SignalInSpawnItem from "model/signals/SignalInSpawnItem";
 import SignalJoinworld from "model/signals/SignalJoinworld";
+import SignalLabelFor from "model/signals/SignalLabel";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
 import SignalRenameEntity from "model/signals/SignalRenameEntity";
 import Level from "visual_model/Level";
+import SignalSetinventory from "model/signals/SignalSetinventory";
+import FloatingItem from "visual_model/FloatingItem";
+import Item from "visual_model/Item";
+import ItemStack from "visual_model/ItemStack";
+import { LabelType } from "visual_model/Label";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 
@@ -46,7 +58,7 @@ class NetworkModel extends LogicModel {
 			}
  			return new SignalEntitypath(id, this.convertServerNanos(startNanos), points);
 		})
-		this.addPacketSignal("spawnentity", ({x, y, ID, speed, type}) => new SignalEntityspawn(ID, type, [x,y], speed));
+		this.addPacketSignal("spawnentity", ({x, y, ID, speed, type, hp, maxHp}) => new SignalEntityspawn(ID, type, [x,y], speed, hp, maxHp));
 		this.addPacketSignal("despawnentity", ({id}) => new SignalEntityDespawn(id));
 		this.addPacketSignal("followentity", ({id}) => new SignalFocus(id));
 		this.addPacketSignal("entityspeed", ({id, speed}) => new SignalEntityspeed(id, speed));
@@ -63,6 +75,25 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("leaveworld", () => new SignalLeaveworld());
 		this.addPacketSignal("entityrename", ({id, newname}) => new SignalRenameEntity(id, newname));
 		this.addPacketSignal("clothes", ({clothes, id}) => new SignalChangeClothes(id, clothes));
+		this.addPacketSignal("hpchange", ({id, newHp}) => new SignalChangeHp(id, newHp));
+		this.addPacketSignal("labelFor", ({text, labelType, entityID}) => {
+			let type = LabelType.enum.values[labelType];
+			return new SignalLabelFor(text, type, entityID);
+		});
+		this.addPacketSignal("entityDeath", ({id}) => new SignalEntityDeath(id));
+		this.addPacketSignal("died", () => new SignalDied());
+		this.addPacketSignal("portal-spawn", ({X, Y, radius}) => new SignalInPortalspawn(X, Y, radius));
+		this.addPacketSignal("spawn-item", ({x,y,type,id,name}) => new SignalInSpawnItem(new FloatingItem(id, [x,y],new Item(type, name ?? undefined))));
+		this.addPacketSignal("despawn-item", ({id}) => new SignalDespawnItem(id));
+		this.addPacketSignal("setinventory", ({items}) => {
+			let itemStacks: Array<ItemStack> = [];
+			for(let {amount, item} of items) {
+				let {type, name} = item;
+				itemStacks.push({amount, item: new Item(type, name ?? undefined)})
+			}
+
+			return new SignalSetinventory(itemStacks);
+		});
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
@@ -172,6 +203,10 @@ class NetworkModel extends LogicModel {
 
 	sendChatMessage(message: string): void {
 		this.sendPacket("chat", {message});
+	}
+
+	collectNearbyItems(): void {
+		this.sendPacket("collect-items", {});
 	}
 
 	private sendPacket(type: string, data: any) {

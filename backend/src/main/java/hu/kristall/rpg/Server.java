@@ -25,10 +25,12 @@ public class Server extends SynchronizedObject<Server> {
 	private Map<String, Player> players = new HashMap<>();
 	private LinkedList<Consumer<Server>> shutdownListeners = new LinkedList<>();
 	private boolean stopping = false;
+	private final Object stoppingLock = new Object();
 	private Logger logger = LoggerFactory.getLogger("server");
 	
 	private Server(String servePath) {
 		super("server");
+		changeSyncer(new AsyncServer(this));
 		try {
 			this.networkServer = new NetworkServer(this, servePath);
 			lang = new Lang();
@@ -49,8 +51,17 @@ public class Server extends SynchronizedObject<Server> {
 		}
 	}
 	
+	@Override
+	public AsyncServer getSynchronizer() {
+		return (AsyncServer) super.getSynchronizer();
+	}
+	
 	public Logger getLogger() {
 		return logger;
+	}
+	
+	public Player getPlayer(String name) {
+		return players.get(name);
 	}
 	
 	public void addShutdownListener(Consumer<Server> r) {
@@ -58,23 +69,39 @@ public class Server extends SynchronizedObject<Server> {
 	}
 	
 	public boolean isStopping() {
-		return stopping;
+		synchronized(stoppingLock) {
+			return stopping;
+		}
 	}
 	
 	@Override
 	public void shutdown() {
-		if(stopping) {
-			return;
+		synchronized(stoppingLock) {
+			if(stopping) {
+				return;
+			}
+			this.stopping = true;
 		}
-		this.stopping = true;
-		logger.info("shutting down server");
-		networkServer.stop();
 		for (Consumer<Server> shutdownListener : shutdownListeners) {
 			shutdownListener.accept(this);
 		}
-		getSynchronizer().sync(srv -> {
-			this.worldsManager.shutdown();
-			getSynchronizer().sync(s -> super.shutdown());
+		logger.info("shutting down server");
+		networkServer.stop(() -> {
+			try {
+				getSynchronizer().sync(srv -> {
+					this.worldsManager.shutdown();
+					try {
+						getSynchronizer().sync(s -> super.shutdown());
+					}
+					catch (Synchronizer.TaskRejectedException e) {
+						//server wont be shut down until super.shutdown() is called
+					}
+				});
+			}
+			catch (Synchronizer.TaskRejectedException e) {
+				//server wont be shut down until super.shutdown() is called
+				e.printStackTrace();
+			}
 		});
 	}
 	

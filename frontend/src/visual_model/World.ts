@@ -7,21 +7,39 @@ import { EntityType } from "./EntityType";
 import UnknownEntity from "./entity/UnknownEntity";
 import HumanEntity from "./entity/HumanEntity";
 import { Direction } from "./Paths";
+import { WorldLabel } from "./Label";
 import Matrix from "Matrix";
 import Level from "./Level";
+import Portal from "./Portal";
+import Item from "./Item";
+import FloatingItem from "./FloatingItem";
+import UpdateBroadcaster from "./UpdateBroadcaster";
+import ItemStack from "./ItemStack";
 
-class World {
+export type WorldEvent = "item" | "inventory-update";
+
+class World extends UpdateBroadcaster<WorldEvent> {
 
 	public width: number
 	public height: number
 	private _entities: Map<number, Entity> = new Map();
 	//private humanTextures: null = null;
 	camPositionFn: (rendertime: number) => Position;
+	private _labels: WorldLabel[] = [];
 	public readonly model: VisualModel
 	public readonly level: Level
 
+	
+	//public readonly tileGrid: Matrix<string> //GIT MERGECONFLICT
+	private portals: Portal[] = []
+	private _items: Map<number, FloatingItem> = new Map();
+	public followedEntity: Entity | null = null;
+	private inventory: Array<ItemStack> = [];
+
 	constructor(model: VisualModel, width: number, height: number, level: Level, camStart: Position) {
+		super();
 		this.level = level;
+		//this.tileGrid = tileGrid; //GIT MERGECONFLICT
 		this.model = model;
 		this.width = width;
 		this.height = height;
@@ -30,6 +48,40 @@ class World {
 		this.camPositionFn = () => camStart;
 
 		//this.tex
+	}
+
+	public setInventory(items: Array<ItemStack>) {
+		this.inventory = items;
+		this.triggerUpdate("inventory-update");
+	}
+
+	getItems(): Iterable<ItemStack> {
+		return this.inventory;
+	}
+
+	spawnItem(item: FloatingItem) {
+		this._items.set(item.id, item);
+		this.triggerUpdate("item");
+	}
+
+	despawnItem(id: number): boolean {
+		if(this._items.delete(id)) {
+			this.triggerUpdate("item");
+			return true;
+		}
+		return false;
+	}
+
+	get items(): Iterable<FloatingItem> {
+		return this._items.values();
+	}
+
+	addPortal(p: Portal) {
+		this.portals.push(p);
+	}
+
+	getPortals(): Iterable<Portal> {
+		return this.portals;
 	}
 
 	get entities(): IterableIterator<Entity> {
@@ -50,27 +102,45 @@ class World {
 		return this._entities.get(id);
 	}
 
-	spawnEntity(id: number, type: EntityType, pos: Position, speed: number, facing: Direction = Direction.enum.map.SOUTH) {
+	addLabel(l: WorldLabel) {
+		this._labels.push(l);
+	}
+
+	filterLabels(predicate: (value: WorldLabel, index: number) => boolean) {
+		if(this._labels.length !== 0) {
+			this._labels = this._labels.filter(predicate);
+		}
+	}
+
+	labels(): Iterable<WorldLabel> {
+		return this._labels;
+	}
+
+	spawnEntity(id: number, type: EntityType, pos: Position, speed: number, hp: number, maxHp: number, facing: Direction = Direction.enum.map.SOUTH) {
 		let e: Entity;
 		switch(type) {
  			case EntityType.enum.map.HUMAN: {
-				e = new HumanEntity(id, pos, speed, facing);
+				e = new HumanEntity(id, pos, speed, facing, hp, maxHp);
 				break
 			}
 			default: {
-				e = new UnknownEntity(id, pos, speed, facing);
+				e = new UnknownEntity(id, pos, speed, facing, hp, maxHp);
 			}
 		}
 		this._entities.set(id, e);
 	}
 
 	despawnEntiy(id: number) {
+		if(this.followedEntity?.id === id) {
+			this.followedEntity = null;
+		}
 		this._entities.delete(id);
 	}
 
 	followEntity(id: number) {
 		let e = this.getEntity(id);
 		if(e !== undefined) {
+			this.followedEntity = e;
 			let a = e;
 			this.camPositionFn = () => {
 				let pos = a.cachedStatus.position;
