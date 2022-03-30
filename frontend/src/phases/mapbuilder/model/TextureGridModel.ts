@@ -19,7 +19,7 @@ export default class TextureGridModel extends Matrix<Texture | null> {
 				t.setElementAt([x+xShift,y+yShift], this.elementAt([x,y]));
 			}
 		}
-		this.model.setGrid(t);
+		//this.model.setGrid(t);
 	}
 
 	expandRight(amount: number): void {

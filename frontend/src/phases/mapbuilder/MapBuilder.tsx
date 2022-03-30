@@ -3,7 +3,7 @@ import DModel from 'model/impl/demo/DModel';
 import GameScene from 'phases/game/GameScene';
 import React, { createContext } from 'react';
 import './MapBuilder.scss';
-import MapbuildModel, {EventTypes} from './model/MapbuildModel';
+import MapbuildModel, {MapbuildEvents} from './model/MapbuildModel';
 import Buttons from './components/menus/Buttons';
 import GridEditor from './components/menus/GridEditor';
 import TileBrowser from './components/menus/TileBrowser';
@@ -13,7 +13,7 @@ import GameView from 'game/GameView';
 import SubManager from 'SubManager';
 import { NavigationOption } from './model/navoptions/NavigationOption';
 import Persistence from './components/menus/Persistence';
-import Layers from './components/menus/Layers';
+import LayerManager from './components/menus/LayerManager';
 import MenuContext from 'MenuContext';
 import { LandingPhase } from "phases/landing/LandingPhase"
 import { Events } from './model/NavigatorModel';
@@ -73,8 +73,8 @@ class MapBuilder extends React.Component<props, {}, typeof MenuContext> {
 		nav.createMenuOption("fa-solid fa-block-brick", "tiles", () => <TileBrowser />);
 		nav.createMenuOption("fa-solid fa-ellipsis", "options", () => <Buttons />);
 		nav.createMenuOption("fa-solid fa-crop", "edit grid", () => <GridEditor />);
-		nav.createMenuOption("fa-solid fa-layer-group", "manage layers", () => <Layers project={this.props.poject} />);
-		nav.createMenuOption("fa-regular fa-map", "worlds", () => <WorldManager project={this.props.poject}/>)
+		nav.createMenuOption("fa-solid fa-layer-group", "manage layers", () => <LayerManager model={this.model} project={this.props.poject} />);
+		nav.createMenuOption("fa-regular fa-map", "worlds", () => <WorldManager model={this.model} project={this.props.poject}/>)
 		this.gameNavOpt = nav.createCustomOption("fa-solid fa-play", "start testing", () => {model.toggleGame()});
 		//this.gridNavOpt = 
 		this.model = model;
@@ -96,7 +96,7 @@ class MapBuilder extends React.Component<props, {}, typeof MenuContext> {
 		}
 	}
 
-	private handleUpdateEvent(type: EventTypes) {
+	private handleUpdateEvent(type: MapbuildEvents) {
 		if(type === "game") {
 			if(this.model.isGameShown()) {
 				this.gameNavOpt.setConfig({icon: "fa-solid fa-pause", "label": "stop testing"});

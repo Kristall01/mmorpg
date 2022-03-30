@@ -6,7 +6,8 @@ const GridEditor = ({}) => {
 
 	let model = useContext(MapbuildModelContext);
 
-	let grid0 = model.getGrid()
+//	let grid0 = model.getGrid()
+let grid0 = null;
 
 	if(grid0 === null) {
 		return <div>no grid to edit :/</div>;

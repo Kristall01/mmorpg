@@ -12,7 +12,7 @@ export default class AnimatedGlobalColumnTexture extends Texture {
 	private sliceTime: number
 
 	constructor(id: string, img: HTMLImageElement, sliceTime: number, slices?: number) {
-		super(id);
+		super(id, img.width, slices === undefined ? img.height/img.width : img.height/slices);
 		this.img = img;
 		this.height = img.height;
 		this.width = img.width;

@@ -49,7 +49,7 @@ class WorldRenderer implements Renderable {
 		this.world = world;
 		this.texturePack = visuals.textures;
 		this.cozyPack = visuals.cozy;
-		this.tileTextureLayers = Array.from(world.level.getLayers()).map(a => a.map(e => {
+		this.tileTextureLayers = Array.from(world.level.getLayers()).map(a => a[1].map(e => {
 			if(e === null) {
 				return this.texturePack.getDefaultTexture();
 			}

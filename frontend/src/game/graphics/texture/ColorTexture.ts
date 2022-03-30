@@ -7,7 +7,7 @@ export default class ColorTexture extends Texture {
 	private rgb: string
 
 	constructor(id: string, rgb: string) {
-		super(id);
+		super(id, 1, 1);
 		this.rgb = rgb;
 	}
 

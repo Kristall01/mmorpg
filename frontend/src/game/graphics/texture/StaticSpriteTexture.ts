@@ -2,7 +2,7 @@ import { Position } from "visual_model/VisualModel";
 import { RenderContext } from "../GraphicsUtils";
 import Texture from "./Texture";
 
-export default class StaticSpriteTexture implements Texture {
+export default class StaticSpriteTexture extends Texture {
 
 	private img: HTMLImageElement
 	private startX: number
@@ -12,6 +12,7 @@ export default class StaticSpriteTexture implements Texture {
 	readonly id: string;
 
 	constructor(id: string, img: HTMLImageElement, scale: number, x: number, y: number) {
+		super(id, scale, scale);
 		this.id = id;
 		this.img = img;
 		this.startX = x*scale;

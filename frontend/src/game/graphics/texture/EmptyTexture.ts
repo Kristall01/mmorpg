@@ -5,7 +5,7 @@ import Texture from "./Texture";
 export default class EmptyTexture extends Texture {
 
 	constructor() {
-		super("empty");
+		super("empty", 1, 1);
 	}
 
 	drawTo(rendertime: number, ctx: RenderContext, position: Position, size: number): void {

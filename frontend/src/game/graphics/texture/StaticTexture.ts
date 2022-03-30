@@ -9,7 +9,7 @@ export default class StaticTexture extends Texture {
 	private height: number
 
 	constructor(id: string, img: HTMLImageElement) {
-		super(id);
+		super(id, img.width, img.height);
 		this.img = img;
 		this.width = img.width;
 		this.height = img.height;

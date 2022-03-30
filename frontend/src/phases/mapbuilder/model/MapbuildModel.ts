@@ -14,24 +14,26 @@ import React from "react";
 import NetworkModel from "model/impl/ws/NetworkModel";
 import ProjectModel from "./ProjectModel";
 import Texture from "game/graphics/texture/Texture";
+import Level from "visual_model/Level";
 
-export type EventTypes = "grid" | "game" | "project";
+export type MapbuildEvents = "grid" | "game" | "project" | "world-select";
 
 interface GameViewConfig {
 	tab: TabModel
 	game: GameScene
 }
 
-class MapbuildModel extends UpdateBroadcaster<EventTypes> {
+class MapbuildModel extends UpdateBroadcaster<MapbuildEvents> {
 
 	private wheel: number
-	private grid: TextureGridModel | null = null
-	private tiles: Texture[] = []
+	//private grid: TextureGridModel | null = null
+	//private tiles: Texture[] = []
 	private activeTexture: Texture | null = null
 	private tabManager: TabManager
 	public readonly navigator: NavigatorModel = new NavigatorModel();
 	private game: TabModel | null = null;
 	private project: ProjectModel
+	private activeLevel: Level | null = null
 
 	visuals: VisualResources = null!;
 
@@ -41,14 +43,31 @@ class MapbuildModel extends UpdateBroadcaster<EventTypes> {
 		this.wheel = 50;
 		this.tabManager = new TabManager(this);
 
-		this.setGrid(new TextureGridModel(this, 3,3));
+		//his.setGrid(new TextureGridModel(this, 3,3));
 		//this.addTile(new Tile("grass.png", "GRASS"));
 		//this.addTile(new Tile("water0.png", "WATER"));
 	}
 
-	setGrid(grid: TextureGridModel) {
+/* 	setGrid(grid: TextureGridModel) {
 		this.grid = grid;
 		this.triggerUpdate("grid");
+	} */
+
+	getActiveLevel(): Level | null {
+		return this.activeLevel;
+	}
+
+	activateLevel(name: string) {
+		let l = this.project.getLevel(name);
+		if(l === undefined) {
+			return false;
+		}
+		this.activeLevel = l;
+		this.triggerUpdate("world-select");
+	}
+
+	getSelectedLevel(): Level | null {
+		return this.activeLevel;
 	}
 
 	getProject() {
@@ -99,9 +118,9 @@ class MapbuildModel extends UpdateBroadcaster<EventTypes> {
 		//this.update();
 	}
 
- 	getGrid(): TextureGridModel | null {
+/*  getGrid(): TextureGridModel | null {
 		return this.grid;
-	}
+	} */
 
 	getTabManager(): TabManager {
 		return this.tabManager;
