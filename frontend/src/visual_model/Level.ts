@@ -1,7 +1,7 @@
 import Matrix from "Matrix";
 import UpdateBroadcaster from "visual_model/UpdateBroadcaster";
 
-export type LevelEvents = "add" | "remove";
+export type LevelEvents = "layer-added";
 
 export type Layer = Matrix<string | null>;
 
@@ -28,6 +28,7 @@ export default class Level extends UpdateBroadcaster<LevelEvents> {
 		let id = this.nextID++;
 		let m: Layer = new Matrix(this.width, this.height);
 		this.layers.set(id, m);
+		this.triggerUpdate("layer-added");
 		return m;
 	}
 
@@ -35,8 +36,8 @@ export default class Level extends UpdateBroadcaster<LevelEvents> {
 		return this.layers.delete(ID);
 	}
 
-	getLayers(): Iterable<Layer> {
-		return this.layers.values();
+	getLayers(): Iterable<[number,Layer]> {
+		return this.layers.entries();
 	}
 
 }
