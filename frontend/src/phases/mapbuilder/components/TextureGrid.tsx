@@ -1,37 +1,47 @@
-import { useContext } from "react";
-import { VisualResourcesContext } from "../MapBuilder";
-import TextureGridModel from "../model/TextureGridModel";
+import ConnectedComponent from "ConnectedComponent";
+import { ReactNode } from "react";
+import Level, { LevelEvents } from "visual_model/Level";
+import ResizableLevel, { ResizableLevelEvents } from "../model/ResizableLevel";
+import TextureGridModel, { TextureGridModelEvent } from "../model/TextureGridModel";
 
-export type props = {
-	grid: TextureGridModel
-	cellSize: number
+export type TexturGridProps = {
+	cellsize: number,
+	level: ResizableLevel
 }
 
-const TextureGrid = ({grid, cellSize}: props) => {
+class TextureGrid extends ConnectedComponent<ResizableLevelEvents, TexturGridProps> {
 
-	let rows = [];
-	let visuals = useContext(VisualResourcesContext);
-
-	for(let i = 0; i < grid.height; ++i) {
-		let cols = [];
-		for(let j = 0; j < grid.width; ++j) {
-			let src = /* grid.elementAt([j, i])?.img */"";
-			let content = src ? <img src={visuals.images.get(src).src} /> : null
-			cols.push(<div onClick={() => grid.setElementAt([j,i], grid.model.getActiveTexture())} className="cell" style={{width: cellSize, height: cellSize}} key={j}>
-				{content}
-			</div>)
-		}
-		rows.push(<div className="row" style={{height: cellSize}} key={i}>{cols}</div>)
+	constructor(props: TexturGridProps) {
+		super(props, [props.level])
 	}
 
-	return (
-		<div className="tilegrid-parent">
-			<div className="tilegrid">
-				{rows}
+	render(): ReactNode {
+		let rows = [];
+		const cellsize = this.props.cellsize;
+		const {width, height} = this.props.level.getLevel();
+		for(let i = 0; i < height; ++i) {
+			let cols: Array<ReactNode> = [];
+			for(let j = 0; j < width; ++j) {
+	//			let src = /* grid.elementAt([j, i])?.img */"";
+	/* 			let content = src ? <img src={visuals.images.get(src).src} /> : null
+				cols.push(<div onClick={() => grid.setElementAt([j,i], grid.model.getActiveTexture())} className="cell" style={{width: cellSize, height: cellSize}} key={j}>
+					{content}
+				</div>)*/
+				cols.push(<div className="cell" style={{width: this.props.cellsize, height: "100%"}} key={`${i},${j}`} />);
+			}
+			rows.push(<div className="row" style={{height: cellsize}} key={i}>{cols}</div>)
+		}
+		return (
+			<div className="tilegrid-parent">
+				<div className="tilegrid">
+					{rows}
+				</div>
 			</div>
-		</div>
-	)
+		)
 
-};
+	}
+
+
+}
 
 export default TextureGrid;

@@ -12,12 +12,14 @@ export default class Level extends UpdateBroadcaster<LevelEvents> {
 	public readonly width: number
 	private nextID: number = 0;
 
-	constructor(width: number, height: number) {
+	constructor(width: number, height: number, addFirstLayer: boolean = true) {
 		super();
 		this.width = width;
 		this.height = height;
 
-		this.addLayer();
+		if(addFirstLayer) {
+			this.addLayer();
+		}
 	}
 
 	getLayer(ID: number): Layer | undefined {

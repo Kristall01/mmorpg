@@ -15,6 +15,7 @@ import NetworkModel from "model/impl/ws/NetworkModel";
 import ProjectModel from "./ProjectModel";
 import Texture from "game/graphics/texture/Texture";
 import Level from "visual_model/Level";
+import ResizableLevel from "./ResizableLevel";
 
 export type MapbuildEvents = "grid" | "game" | "project" | "world-select";
 
@@ -33,7 +34,7 @@ class MapbuildModel extends UpdateBroadcaster<MapbuildEvents> {
 	public readonly navigator: NavigatorModel = new NavigatorModel();
 	private game: TabModel | null = null;
 	private project: ProjectModel
-	private activeLevel: Level | null = null
+	private activeLevel: ResizableLevel | null = null
 
 	visuals: VisualResources = null!;
 
@@ -53,7 +54,7 @@ class MapbuildModel extends UpdateBroadcaster<MapbuildEvents> {
 		this.triggerUpdate("grid");
 	} */
 
-	getActiveLevel(): Level | null {
+	getActiveLevel(): ResizableLevel | null {
 		return this.activeLevel;
 	}
 
@@ -62,11 +63,11 @@ class MapbuildModel extends UpdateBroadcaster<MapbuildEvents> {
 		if(l === undefined) {
 			return false;
 		}
-		this.activeLevel = l;
+		this.activeLevel = new ResizableLevel(l);
 		this.triggerUpdate("world-select");
 	}
 
-	getSelectedLevel(): Level | null {
+	getSelectedLevel(): ResizableLevel | null {
 		return this.activeLevel;
 	}
 
