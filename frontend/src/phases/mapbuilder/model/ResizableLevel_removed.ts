@@ -5,7 +5,7 @@ import TextureGridModel from "./TextureGridModel";
 
 export type ResizableLevelEvents = "resized" | LevelEvents;
 
-export default class ResizableLevel extends UpdateBroadcaster<ResizableLevelEvents>{
+export default class ResizableLevel_removed extends UpdateBroadcaster<ResizableLevelEvents>{
 
 	private level: Level
 	private subs = new SubManager();

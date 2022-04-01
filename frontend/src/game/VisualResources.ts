@@ -16,6 +16,11 @@ export default class VisualResources {
 		this.images = images;
 	}
 
+	public static empty():VisualResources {
+		let images = new ImageStore();
+		return new VisualResources(images,null!, new TexturePack(images));
+	}
+
 	public static async load(): Promise<VisualResources> {
 		let baseInstance = VisualResources.instance;
 		if(baseInstance !== null) {

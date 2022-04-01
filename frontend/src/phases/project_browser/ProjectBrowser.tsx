@@ -1,3 +1,4 @@
+import VisualResources from "game/VisualResources";
 import MenuContext from "MenuContext";
 import MapBuilder from "phases/mapbuilder/MapBuilder";
 import MapbuildModel from "phases/mapbuilder/model/MapbuildModel";
@@ -52,9 +53,15 @@ const ProjectBrowser = ({}) => {
 		let f: File = files[0];
 	}
 
+	const startedLoading = () => {
+		VisualResources.load().then(visuals => {
+			setMenu(() => <MapBuilder poject={ProjectModel.newProjectWithVisuals(visuals)} />)
+		})
+	}
+
 	return (
 		<>
-			<button onClick={() => setMenu(() => <MapBuilder poject={ProjectModel.newProject()} />)}>új projekt készítése</button>
+			<button onClick={startedLoading}>új projekt készítése</button>
 			{/** <button>projekt betöltése</button> */}
 		</>
 	)

@@ -1,15 +1,14 @@
 import ConnectedComponent from "ConnectedComponent";
 import { ReactNode } from "react";
 import Level, { LevelEvents } from "visual_model/Level";
-import ResizableLevel, { ResizableLevelEvents } from "../model/ResizableLevel";
 import TextureGridModel, { TextureGridModelEvent } from "../model/TextureGridModel";
 
 export type TexturGridProps = {
 	cellsize: number,
-	level: ResizableLevel
+	level: Level
 }
 
-class TextureGrid extends ConnectedComponent<ResizableLevelEvents, TexturGridProps> {
+class TextureGrid extends ConnectedComponent<LevelEvents, TexturGridProps> {
 
 	constructor(props: TexturGridProps) {
 		super(props, [props.level])
@@ -18,7 +17,7 @@ class TextureGrid extends ConnectedComponent<ResizableLevelEvents, TexturGridPro
 	render(): ReactNode {
 		let rows = [];
 		const cellsize = this.props.cellsize;
-		const {width, height} = this.props.level.getLevel();
+		const {width, height} = this.props.level;
 		for(let i = 0; i < height; ++i) {
 			let cols: Array<ReactNode> = [];
 			for(let j = 0; j < width; ++j) {

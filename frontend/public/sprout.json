@@ -1,0 +1,21 @@
+[
+	{
+		"type": "similar_list",
+		"similarity": {
+			"cell_size": 16,
+			"category": "item",
+			"texture_type": "static_sprite",
+			"path": "Grass.png"
+		},
+		"entries": {
+			"GRASS_0000": {
+				"x": 1,
+				"y": 2
+			},
+			"GRASS_000": {
+				"x": 1,
+				"y": 2
+			},
+		}
+	}
+]

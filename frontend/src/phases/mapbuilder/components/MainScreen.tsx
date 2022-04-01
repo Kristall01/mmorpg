@@ -27,7 +27,7 @@ export default class MainScreen extends ConnectedComponent<MapbuildEvents, props
 		}
 //		return <div></div>
 		return (
-			<TextureGrid level={level} cellsize={50} />
+			<TextureGrid level={level.level} cellsize={50} />
 		)
 	}
 

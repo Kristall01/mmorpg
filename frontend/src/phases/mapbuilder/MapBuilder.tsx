@@ -72,7 +72,7 @@ class MapBuilder extends React.Component<props, {}, typeof MenuContext> {
 		let nav = model.navigator;
 		nav.createMenuOption("fa-solid fa-block-brick", "tiles", () => <TileBrowser />);
 		nav.createMenuOption("fa-solid fa-ellipsis", "options", () => <Buttons />);
-		nav.createMenuOption("fa-solid fa-crop", "edit grid", () => <GridEditor />);
+		nav.createMenuOption("fa-solid fa-crop", "edit grid", () => <GridEditor model={this.model} />);
 		nav.createMenuOption("fa-solid fa-layer-group", "manage layers", () => <LayerManager model={this.model} project={this.props.poject} />);
 		nav.createMenuOption("fa-regular fa-map", "worlds", () => <WorldManager model={this.model} project={this.props.poject}/>)
 		this.gameNavOpt = nav.createCustomOption("fa-solid fa-play", "start testing", () => {model.toggleGame()});
@@ -118,7 +118,7 @@ class MapBuilder extends React.Component<props, {}, typeof MenuContext> {
 	render() {
 		return (
 			<MapbuildModelContext.Provider value={this.model}>
-				<VisualResourcesContext.Provider value={/* this.props.visuals */null!}>
+				<VisualResourcesContext.Provider value={this.props.poject.getVisuals()}>
 					<div className="map-builder-component">
 						<div className="side">
 							<Navigation nav={this.model.navigator} />

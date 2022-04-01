@@ -36,8 +36,8 @@ export default class WorldManager extends ConnectedComponent<ProjectEvents, Prop
 						worlds.map((a, i) => {
 							return (
 								<li key={i} className="world-label">
-									{a[0]}
-									<button onClick={() => this.props.model.activateLevel(a[0])}>activate</button>
+									{a.name}
+									<button onClick={() => this.props.model.activateLevel(a.name)}>activate</button>
 								</li>
 							)
 						})

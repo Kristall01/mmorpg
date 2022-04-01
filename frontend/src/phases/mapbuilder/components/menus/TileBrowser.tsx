@@ -4,11 +4,11 @@ import { MapbuildModelContext, VisualResourcesContext } from "../../MapBuilder";
 const TileBrowser = ({}) => {
 
 	let model = useContext(MapbuildModelContext)
-	let visuals = useContext(VisualResourcesContext);
 
 	let tiles: Array<JSX.Element> = [];
 
-	let tilesRaw = model.getProject().getTexturePack().getTextures("tile");
+	let visuals = model.getProject().getVisuals();
+	let tilesRaw = visuals.textures.getTextures("tile");
 
 	if(tilesRaw !== undefined) {
 		for(let tile of tilesRaw) {
@@ -27,9 +27,7 @@ const TileBrowser = ({}) => {
 					{tile.id}
 				</div>
 				<div className="right">
-					{/*
-						<img src={visuals.images.get(tile.img).src} />
-					*/}
+					<img src={tile.getSnapshot().src} />
 				</div>
 			</div>);
 		}

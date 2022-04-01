@@ -44,9 +44,9 @@ export default class LayerManager extends ConnectedComponent<ProjectEvents, Laye
 		return (
 			<>
 				<div className="buttonlist">
-					<div className="button" onClick={() => level!.addLayer()}>új réteg hozzáadása</div>
+					<div className="button" onClick={() => level!.level.addLayer()}>új réteg hozzáadása</div>
 				</div>
-				<Layers level={level} />
+				<Layers level={level.level} />
 			</>
 		)
 	}

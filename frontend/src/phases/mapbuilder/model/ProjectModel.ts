@@ -1,24 +1,26 @@
 import TexturePack from "game/graphics/texture/TexturePack";
 import ImageStore from "game/ImageStore";
+import VisualResources from "game/VisualResources";
 import Level from "visual_model/Level";
 import UpdateBroadcaster from "visual_model/UpdateBroadcaster";
+import NamedLevel from "./NamedLevel";
 
-export type ProjectEvents = "world-list";
+export type ProjectEvents = "world-list" | "world-change";
 
 export default class ProjectModel extends UpdateBroadcaster<ProjectEvents> {
 
-	private tpack: TexturePack = null!;
-	private levels: Map<string, Level> = null!;
+	private levels: Map<string, NamedLevel> = null!;
+	private visuals: VisualResources
 	//private activeLevel: Level | null = null
 
-	private constructor(tpack: TexturePack, levels: Map<string, Level>) {
+	private constructor(visuals: VisualResources, levels: Map<string, NamedLevel>) {
 		super();
-		this.tpack = tpack;
+		this.visuals = visuals;
 		this.levels = levels;
 	}
 
-	getTexturePack() {
-		return this.tpack;
+	getVisuals(): VisualResources {
+		return this.visuals;
 	}
 
 	/* getSelectedLevel(): Level | null {
@@ -29,11 +31,11 @@ export default class ProjectModel extends UpdateBroadcaster<ProjectEvents> {
 		if(this.levels.has(name)) {
 			throw new Error("ez a név már foglalt");
 		}
-		this.levels.set(name, new Level(1, 1));
+		this.levels.set(name, new NamedLevel(name, new Level(1, 1)));
 		this.triggerUpdate("world-list");
 	}
 
-	getLevel(name: string): Level | undefined {
+	getLevel(name: string): NamedLevel | undefined {
 		return this.levels.get(name)
 	}
 
@@ -55,12 +57,22 @@ export default class ProjectModel extends UpdateBroadcaster<ProjectEvents> {
 
 	}
 
-	getLevels(): Iterable<[string, Level]> {
-		return this.levels.entries();
+	getLevels(): Iterable<NamedLevel> {
+		return this.levels.values();
+	}
+
+	setLevel(name: string, l: Level) {
+		this.levels.set(name, new NamedLevel(name, l));
+		this.triggerUpdate("world-change");
+	}
+
+
+	static newProjectWithVisuals(visuals: VisualResources) {
+		return new ProjectModel(visuals, new Map());
 	}
 
 	static newProject(): ProjectModel {
-		return new ProjectModel(new TexturePack(new ImageStore()), new Map());
+		return new ProjectModel(VisualResources.empty(), new Map());
 	}
 
 }

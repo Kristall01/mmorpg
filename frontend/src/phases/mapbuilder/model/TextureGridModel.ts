@@ -16,35 +16,6 @@ export default class TextureGridModel extends UpdateBroadcaster<TextureGridModel
 		this.matrix = new Matrix(width, height);
 	}
 
-	private copyExpand(t: TextureGridModel, xShift: number, yShift: number) {
-		for(let y = 0; y < this.matrix.height; ++y) {
-			for(let x = 0; x < this.matrix.width; ++x) {
-				t.matrix.setElementAt([x+xShift,y+yShift], this.matrix.elementAt([x,y]));
-			}
-		}
-		this.triggerUpdate("resized");
-	}
-
-	expandRight(amount: number): void {
-		let t = new TextureGridModel(this.model, this.matrix.width+amount, this.matrix.height);
-		this.copyExpand(t, 0, 0);
-	}
-
-	expandLeft(amount: number) {
-		let t = new TextureGridModel(this.model, this.matrix.width+amount, this.matrix.height);
-		this.copyExpand(t, amount, 0);
-	}
-
-	expandTop(amount: number) {
-		let t = new TextureGridModel(this.model, this.matrix.width, this.matrix.height+amount);
-		this.copyExpand(t, 0, amount);
-	}
-
-	expandBottom(amount: number) {
-		let t = new TextureGridModel(this.model, this.matrix.width, this.matrix.height+amount);
-		this.copyExpand(t, 0, 0);
-	}
-
 }
 
 /* export function	gridToIndex(x: number, y: number, width: number, height: number): number | null {
