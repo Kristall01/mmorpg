@@ -10,6 +10,7 @@ import VisualModel from "visual_model/VisualModel";
 import "./GameScene.scss";
 import ImageStore from "game/ImageStore";
 import VisualResources from "game/VisualResources";
+import { Button } from "react-bootstrap";
 
 type props = {
 	modelGenerator: (callback: IEventReciever) => LogicModel
@@ -74,12 +75,20 @@ class GameScene extends Component<props, state>  {
 	}
 
 	render() {
+		let buttonElement = this.state.ended ? (
+			<Button className="button" variant="primary" onClick={() => this.context(<MenuScene visuals={this.props.visuals} />)}>
+				<div className="gapper">
+					<i className="fa-solid fa-left"></i>
+					<span>Vissza a menübe</span>
+				</div>
+			</Button>
+		) : null
 		if(this.state.text) {
 			return <div className="game-phase-component">
 				<div className="text">
 					{this.state.text}
 				</div>
-				{this.state.ended ? <button onClick={() => this.context(<MenuScene visuals={this.props.visuals} />)}>Vissza a menübe</button> : null}
+				{buttonElement}
 			</div>
 		}
 		return <GameView visuals={this.props.visuals} logicModel={this.model!} visualModel={this.state.model} />

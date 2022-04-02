@@ -7,6 +7,9 @@ import NetworkModel from "model/impl/ws/NetworkModel";
 import CozyPack from "game/graphics/texture/CozyPack";
 import ImageStore from "game/ImageStore";
 import VisualResources from "game/VisualResources";
+import ButtonMenu, { WrappedButton } from "shared/buttonmenu/ButtonMenu";
+import { Button } from "react-bootstrap";
+import { LandingPhase } from "phases/landing/LandingPhase";
 
 interface props {
 	visuals: VisualResources
@@ -28,24 +31,52 @@ const MenuScene = ({visuals}: props) => {
 		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new DModel(a, name!)} />)
 	}
 
-	const startLocalhostModel = () => {
+	const getRecommendedAddress = (): string | undefined => {
+		let {port, protocol, hostname} = window.location;
+		switch(protocol) {
+			case "http:": {
+				protocol = "ws://"
+				break;
+			}
+			case "https:": {
+				protocol = "wss://";
+				break;
+			}
+			default: {
+				return undefined;
+			}
+		}
+		if(port === "3000") {
+			port = "8080";
+		}
+		return protocol+hostname+":"+port+"/ws";
+	}
+
+	const startNetworkModel = () => {
 		let name = prompt("Add meg a neved");
 		if(name === null) {
 			return;
 		}
-		let address = prompt("szerver címe: ", "wss://rpg.ddominik.dev/ws");
+		let address = prompt("szerver címe: ", getRecommendedAddress());
 		if(address === null) {
 			return;
 		}
 		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new NetworkModel(a, address!, name!)} />)
 	}
 
+	const menuBack = () => {
+		setMenu(() => <LandingPhase />);
+	}
+
 	return (
-		<div>
-			Válassz modellt!
-			<button onClick={startDemo}>próba mód</button>
-			<button onClick={startLocalhostModel}>online mód</button>
-		</div>
+		<ButtonMenu>
+			<span>Válassz játékmódot!</span>
+			<div className="btngroup">
+				<WrappedButton text="teszt mód" onClick={startDemo} icon="fa-solid fa-flask" />
+				<WrappedButton text="online mód" onClick={startNetworkModel} icon="fa-solid fa-earth-americas" />
+			</div>
+			<WrappedButton text="Vissza a főmenübe" onClick={menuBack} icon="fa-solid fa-left" />
+		</ButtonMenu>
 	)
 }
 

@@ -48,7 +48,7 @@ class NetworkModel extends LogicModel {
 		});
 
 		this.addPacket("pong", ({time, id}) => this.handlePong(time, id));
-		this.addPacket("disconnect", ({reason}) => this.endConnection("disconnected from server: "+reason));
+		this.addPacket("disconnect", ({reason}) => this.endConnection("Ki lettél rúgva a szerverről: "+reason));
 		this.addPacketSignal("moveentity", ({x,y, id, startNanos}) => {
 			let points: Position[] = [];
 			for(let i = 0; i < x.length; ++i) {
@@ -100,10 +100,10 @@ class NetworkModel extends LogicModel {
 
 		this.ws.addEventListener("error", (e) => {
 			if(!this.connectionOpened) {
-				this.endConnection("websocket error: failed to connect to server");
+				this.endConnection("kapcsolódási hiba: nem sikerült kapcsolódni a szerverhez");
 			}
 			else {
-				this.endConnection("websocket error: WebSocket connection called error event");
+				this.endConnection("kapcsolati hiba: a websocket kapcsolat váratlanul megszakadt");
 			}
 		})
 
@@ -116,12 +116,12 @@ class NetworkModel extends LogicModel {
 				data = parsedPacket.data;
 			}
 			catch(err) {
-				this.endConnection("protocol error: packet sent by server has invalid format");
+				this.endConnection("kommunikációs hiba: a szerver hibás formátumú csomagot küldött");
 				return;
 			}
 			let a = this.packetMap.get(type);
 			if(a === undefined) {
-				console.warn("protocol error: packet sent by server has invalid type ("+type+")");
+				console.warn("kommunikációs hiba: a szerver ismeretlen típusú csomagot küldött ("+type+")");
 				//this.endConnection("protocol error: packet sent by server has invalid type ("+type+")");
 				return;
 			}
@@ -129,7 +129,7 @@ class NetworkModel extends LogicModel {
 		})
 
 		this.ws.addEventListener("close", () => {
-			this.endConnection("network error: connection closed prematurely")
+			this.endConnection("hálózati hiba: a szerver váratlanul megszűntette a kapcsolatot");
 		});
 	}
 
@@ -150,7 +150,6 @@ class NetworkModel extends LogicModel {
 	}
 
 	private endConnection(message?: string) {
-		console.log("ending connection with message:",message);
 		if(this.endSent) {
 			return;
 		}
