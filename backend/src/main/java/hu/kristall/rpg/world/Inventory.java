@@ -1,13 +1,12 @@
 package hu.kristall.rpg.world;
 
+import hu.kristall.rpg.ThreadCloneable;
+import hu.kristall.rpg.persistence.SavedItemStack;
 import hu.kristall.rpg.world.entity.Entity;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public class Inventory {
+public class Inventory implements ThreadCloneable<List<SavedItemStack>> {
 	
 	private Map<Item, Integer> items = new HashMap<>();
 	private Entity owner;
@@ -15,6 +14,11 @@ public class Inventory {
 	
 	public Inventory(Entity owner) {
 		this.owner = owner;
+	}
+	
+	public Inventory(Entity owner, Map<Item, Integer> items) {
+		this.owner = owner;
+		this.items = items;
 	}
 	
 	public void broadcastUpdate() {
@@ -67,4 +71,14 @@ public class Inventory {
 	public Collection<Map.Entry<Item, Integer>> getItems() {
 		return Collections.unmodifiableCollection(items.entrySet());
 	}
+	
+	@Override
+	public List<SavedItemStack> structuredClone() {
+		List<SavedItemStack> l = new ArrayList<>(this.items.size());
+		for (Map.Entry<Item, Integer> entry : this.items.entrySet()) {
+			l.add(new SavedItemStack(entry.getValue(), entry.getKey().structuredClone()));
+		}
+		return l;
+	}
+	
 }

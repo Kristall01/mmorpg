@@ -2,6 +2,7 @@ package hu.kristall.rpg.world;
 
 import hu.kristall.rpg.AsyncPlayer;
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.ISynchronized;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.EntityHuman;
@@ -55,11 +56,12 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 		return entity.isRemoved() ? null : entity;
 	}
 	
-	public EntityHuman spawnTo(Position pos) {
+	public EntityHuman spawnTo(Position pos, SavedPlayer savedPlayer) {
 		if(this.entity == null || this.entity.isRemoved()) {
-			this.entity = (EntityHuman) world.spawnEntity(EntityType.HUMAN, pos);
-			this.entity.setWorldPlayer(this);
-			this.entity.setName(player.name);
+			EntityHuman h = (EntityHuman) world.spawnEntity(EntityType.HUMAN, pos, savedPlayer);
+			h.setWorldPlayer(this);
+			h.setName(player.name);
+			this.entity = h;
 		}
 		return this.entity;
 	}

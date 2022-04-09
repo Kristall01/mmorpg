@@ -22,7 +22,7 @@ public abstract class Entity {
 	private double hp;
 	private double maxHp;
 	private boolean alive = true;
-	private Inventory inventory;
+	protected Inventory inventory;
 	
 	public Entity(World world, EntityType type, int entityID, double speed, double HP, double maxHp) {
 		this.type = type;
@@ -31,9 +31,6 @@ public abstract class Entity {
 		this.speed = speed;
 		this.hp = HP;
 		this.maxHp = maxHp;
-		this.hp = maxHp;
-		
-		this.inventory = new Inventory(this);
 	}
 	
 	public void setInventory(Inventory inventory) {
@@ -42,10 +39,6 @@ public abstract class Entity {
 	
 	public Inventory getInventory() {
 		return inventory;
-	}
-	
-	public Entity(World world, EntityType type, int entityID) {
-		this(world, type, entityID, type.speed, type.maxHP, type.maxHP);
 	}
 	
 	public abstract Position getPosition();

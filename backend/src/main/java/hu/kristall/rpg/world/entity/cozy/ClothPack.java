@@ -1,13 +1,22 @@
 package hu.kristall.rpg.world.entity.cozy;
 
+import hu.kristall.rpg.ThreadCloneable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ClothPack {
+public class ClothPack implements ThreadCloneable<List<String>> {
 	
 	private List<String> serialized;
 	private List<Cloth> clothes;
+	
+	public static ClothPack naked = new ClothPack(Cloth.NO_BOTTOM, Cloth.NO_TOP, Cloth.NO_SHOES);
+	
+	private ClothPack(List<String> serialized, List<Cloth> clothes) {
+		this.serialized = serialized;
+		this.clothes = clothes;
+	}
 	
 	public ClothPack(Cloth... clothes) {
 		byte b = 0;
@@ -31,4 +40,8 @@ public class ClothPack {
 		return Collections.unmodifiableList(this.serialized);
 	}
 	
+	@Override
+	public List<String> structuredClone() {
+		return this.serialized;
+	}
 }
