@@ -79,8 +79,11 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 			asyncEntity.sync(e -> {
 				SavedPlayer savedPlayer = pl;
 				if(e != null) {
-					savedPlayer = e.getWorld().leavePlayer(leaver.asyncPlayer);
-					this.setData(savedPlayer);
+					SavedPlayer exported = e.getWorld().leavePlayer(leaver.asyncPlayer);
+					if(exported != null) {
+						savedPlayer = exported;
+						this.setData(savedPlayer);
+					}
 				}
 				final SavedPlayer finalHuman = savedPlayer;
 				if(worldPos == null) {

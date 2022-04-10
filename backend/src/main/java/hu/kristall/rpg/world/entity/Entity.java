@@ -63,7 +63,7 @@ public abstract class Entity {
 		return maxHp;
 	}
 	
-	private boolean setHp(final double baseAmount) {
+	protected boolean setHp(final double baseAmount) {
 		double amount = baseAmount;
 		if(amount > getMaxHp()) {
 			amount = getMaxHp();
