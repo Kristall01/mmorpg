@@ -76,7 +76,7 @@ public class CommandClothes extends SimpleCommand {
 				}
 				ClothPack pack;
 				try {
-					pack = new ClothPack(clothes);
+					pack = ClothPack.validatedPack(clothes);
 				}
 				catch (IllegalArgumentException ex) {
 					sender.sendMessage("§cHiba: §4Érvénytelen ruha kombináció");

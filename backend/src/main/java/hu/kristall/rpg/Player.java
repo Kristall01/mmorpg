@@ -8,7 +8,6 @@ import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.ISynchronized;
 import hu.kristall.rpg.sync.Synchronizer;
-import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.WorldPlayer;
 
 import java.util.LinkedList;
@@ -24,7 +23,7 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	private final PlayerConnection connection;
 	private final Lock worldLock;
 	private Synchronizer<WorldPlayer> asyncEntity = new Synchronizer<>(null, AsyncExecutor.instance());
-	private final Queue<Synchronizer<World>> worldChangeQueue = new LinkedList<>();
+	private final Queue<WorldPosition> worldChangeQueue = new LinkedList<>();
 	private final Server server;
 	private Runnable quitHandler;
 	private final AsyncPlayer asyncPlayer;
@@ -56,9 +55,9 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	
 	private void repollWorldChange() {
 		synchronized(worldChangeQueue) {
-			Synchronizer<World> scheduledChange = worldChangeQueue.poll();
-			if(scheduledChange != null) {
-				exclusiveWorldChange(scheduledChange);
+			WorldPosition worldPos = worldChangeQueue.poll();
+			if(worldPos != null) {
+				exclusiveWorldChange(worldPos);
 			}
 			else {
 				worldLock.unlock();
@@ -72,24 +71,19 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 		this.persistence.savePlayer(savedPlayer);
 	}
 	
-	//this method is exclusively called during 'exclusiveWorldChange' (no interference)
-	private SavedPlayer getSavedPlayer() {
-		return this.savedPlayer;
-	}
-	
-	private void exclusiveWorldChange(Synchronizer<World> newAsyncWorld) {
+	private void exclusiveWorldChange(WorldPosition worldPos) {
 		final Player leaver = this;
 		final Synchronizer<Server> asyncServer = getServer().getSynchronizer();
 		final SavedPlayer pl = this.savedPlayer;
 		try {
 			asyncEntity.sync(e -> {
-				SavedPlayer savedPlayer = leaver.getSavedPlayer();
+				SavedPlayer savedPlayer = pl;
 				if(e != null) {
 					savedPlayer = e.getWorld().leavePlayer(leaver.asyncPlayer);
-					this.setData(this.savedPlayer);
+					this.setData(savedPlayer);
 				}
 				final SavedPlayer finalHuman = savedPlayer;
-				if(newAsyncWorld == null) {
+				if(worldPos == null) {
 					try {
 						asyncServer.sync(srv -> {
 							repollWorldChange();
@@ -103,9 +97,9 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 				}
 				else {
 					try {
-						newAsyncWorld.sync(newWorld -> {
+						worldPos.world.sync(newWorld -> {
 							
-							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer, finalHuman));
+							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer, finalHuman, worldPos.pos));
 							try {
 								asyncServer.sync(srv -> {
 									repollWorldChange();
@@ -132,14 +126,14 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 		}
 	}
 	
-	public void scheduleWorldChange(Synchronizer<World> newAsyncWorld) {
+	public void scheduleWorldChange(WorldPosition worldPos) {
 		synchronized(worldChangeQueue) {
 			if(!worldLock.tryLock()) {
-				worldChangeQueue.offer(newAsyncWorld);
+				worldChangeQueue.offer(worldPos);
 				return;
 			}
 		}
-		exclusiveWorldChange(newAsyncWorld);
+		exclusiveWorldChange(worldPos);
 	}
 	
 	private synchronized void setAsyncEntity(Synchronizer<WorldPlayer> asyncEntity) {

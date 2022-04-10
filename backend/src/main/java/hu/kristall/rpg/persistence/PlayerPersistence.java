@@ -18,7 +18,7 @@ public class PlayerPersistence {
 	public PlayerPersistence(File base) throws IOException {
 		this.playersDir = base;
 		logger = LoggerFactory.getLogger("PlayerPersistence");
-		if(!this.playersDir.mkdirs() && base.isDirectory()) {
+		if(!this.playersDir.mkdirs() && !base.isDirectory()) {
 			throw new IOException("failed to create player data directory");
 		}
 	}
@@ -39,6 +39,9 @@ public class PlayerPersistence {
 	}
 	
 	public void savePlayer(SavedPlayer sp) {
+		if(sp == null) {
+			return;
+		}
 		AsyncExecutor.instance().runTask(() -> {
 			String serialized = Utils.gson().toJson(sp);
 			File target = new File(playersDir, sp.name);

@@ -10,6 +10,7 @@ import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.Portal;
+import hu.kristall.rpg.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +175,24 @@ public class Server extends SynchronizedObject<Server> {
 					players.put(name, p);
 					c.complete(p);
 					conn.joinGame(p);
-					p.scheduleWorldChange(getWorldsManager().getDefaultWorld());
+					Synchronizer<World> targetWorld = null;
+					Position targetPos = null;
+					if(finalSavedPlayer != null) {
+						LogoutPosition lp = finalSavedPlayer.logoutPosition;
+						if(lp != null) {
+							if(lp.worldName != null) {
+								targetWorld = getWorldsManager().getWorld(lp.worldName);
+							}
+							if(lp.pos != null) {
+								targetPos = lp.pos;
+							}
+						}
+					}
+					if(targetWorld == null) {
+						targetWorld = getWorldsManager().getDefaultWorld();
+					}
+					WorldPosition worldPosition = new WorldPosition(targetWorld, targetPos);
+					p.scheduleWorldChange(worldPosition);
 				});
 			}
 			catch (Synchronizer.TaskRejectedException e) {

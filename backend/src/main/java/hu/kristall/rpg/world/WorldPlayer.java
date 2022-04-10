@@ -2,6 +2,7 @@ package hu.kristall.rpg.world;
 
 import hu.kristall.rpg.AsyncPlayer;
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.ISynchronized;
 import hu.kristall.rpg.sync.Synchronizer;
@@ -94,7 +95,7 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 					}
 				}
 				else {
-					syncedPLayer.scheduleWorldChange(w);
+					syncedPLayer.scheduleWorldChange(new WorldPosition(w,null));
 				}
 			});
 		}

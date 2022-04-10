@@ -142,10 +142,12 @@ public class World extends SynchronizedObject<World> {
 		}
 	}
 	
-	public Synchronizer<WorldPlayer> joinPlayer(AsyncPlayer player, SavedPlayer savedPlayer) {
+	public Synchronizer<WorldPlayer> joinPlayer(AsyncPlayer player, SavedPlayer savedPlayer, Position pos) {
 		try {
 			//sync world state to joining player
-			Position pos = new Position(3,3);
+			if(pos == null) {
+				pos = new Position(width >> 1, height >> 1);
+			}
 			PlayerConnection connectingConnection = player.connection;
 			connectingConnection.sendPacket(new PacketOutJoinworld(this, pos));
 			for (Entity e : this.worldEntities.values()) {
@@ -228,15 +230,14 @@ public class World extends SynchronizedObject<World> {
 		SavedPlayer savedPlayer = null;
 		if(h != null) {
 			savedPlayer = h.structuredClone();
-			oldWP.getEntity().remove();
+			h.remove();
 		}
 		oldWP.getSynchronizer().changeObject(null);
 		broadcastMessage("§e"+player.name+ " lelépett");
 		if(shuttingDown && worldPlayers.size() == 0) {
 			super.shutdown();
 		}
-		//return serializedHuman;
-		return null;
+		return savedPlayer;
 	}
 	
 	public void broadcastMessage(String message) {

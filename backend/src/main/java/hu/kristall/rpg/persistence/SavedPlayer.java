@@ -1,44 +1,37 @@
 package hu.kristall.rpg.persistence;
 
-import com.google.gson.*;
-import hu.kristall.rpg.Position;
-import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.entity.EntityHuman;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class SavedPlayer {
 	
 	public final String name;
-	public final String world;
-	public final Position pos;
+	public final LogoutPosition logoutPosition;
 	public final double hp;
 	public final List<SavedItemStack> inventory;
 	public final List<String> clothes;
+	public final boolean loaded;
 	
-	public SavedPlayer(String name, String world, Position pos, double hp, List<SavedItemStack> inventory, List<String> clothes) {
+	public SavedPlayer(String name, LogoutPosition pos, double hp, List<SavedItemStack> inventory, List<String> clothes) {
+		this.loaded = true;
 		this.name = name;
-		this.world = world;
-		this.pos = pos;
+		this.logoutPosition = pos;
 		this.hp = hp;
 		this.inventory = List.copyOf(inventory);
 		this.clothes = List.copyOf(clothes);
 	}
 	
 	public SavedPlayer(EntityHuman entityHuman) {
+		this.loaded = false;
 		this.name = entityHuman.getName();
-		this.world = entityHuman.getWorld().getName();
-		this.pos = entityHuman.getPosition();
+		this.logoutPosition = new LogoutPosition(entityHuman.getPosition(), entityHuman.getWorld().getName());
 		this.hp = entityHuman.getHp();
 		this.inventory = entityHuman.getInventory().structuredClone();
 		this.clothes = entityHuman.getClothes().structuredClone();
 	}
 	
-	public static class SavedPlayerPersistence implements JsonDeserializer<SavedPlayer> {
+	/*public static class SavedPlayerPersistence implements JsonDeserializer<SavedPlayer> {
 		
 		@Override
 		public SavedPlayer deserialize(JsonElement jsonElement, Type jsontype, JsonDeserializationContext ctx) throws JsonParseException {
@@ -46,6 +39,7 @@ public class SavedPlayer {
 				JsonObject base = jsonElement.getAsJsonObject();
 				String name = base.get("name").getAsString();
 				String world = base.get("world").getAsString();
+				
 				Position pos = ctx.deserialize(base.get("pos"), Position.class);
 				double hp = base.get("hp").getAsDouble();
 				JsonArray inventory = base.get("inventory").getAsJsonArray();
@@ -65,6 +59,6 @@ public class SavedPlayer {
 			}
 		}
 		
-	}
+	}*/
 	
 }

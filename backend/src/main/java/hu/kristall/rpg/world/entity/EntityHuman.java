@@ -2,6 +2,7 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.ThreadCloneable;
+import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
 import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
@@ -35,7 +36,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 	}
 	
 	public EntityHuman(World world, int entityID, Position startPosition) {
-		this(world, entityID, startPosition, 100, new ClothPack(Cloth.SUIT, Cloth.PANTS_SUIT, Cloth.SHOES), new HashMap<>());
+		this(world, entityID, startPosition, 100, ClothPack.suit, new HashMap<>());
 	}
 	
 	public static EntityHuman ofData(World world, int entityID, Position pos, Object data) {
@@ -45,11 +46,11 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		if(!(data instanceof SavedPlayer)) {
 			throw new IllegalArgumentException();
 		}
-		SavedPlayer h = (SavedPlayer) data;
-		Cloth[] clothes = new Cloth[h.clothes.size()];
+		SavedPlayer savedPlayer = (SavedPlayer) data;
+		Cloth[] clothes = new Cloth[savedPlayer.clothes.size()];
 		int i = 0;
 		ClothPack p = null;
-		for (String cloth : h.clothes) {
+		for (String cloth : savedPlayer.clothes) {
 			try {
 				Cloth c = Cloth.valueOf(cloth);
 				clothes[i++] = c;
@@ -60,14 +61,16 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 				break;
 			}
 		}
-		if(p != null) {
+		if(p == null) {
 			try {
-				p = new ClothPack(clothes);
+				p = ClothPack.unsafePack(clothes);
 			}
-			catch (Exception ignored) {}
+			catch (Exception ignored) {
+				p = ClothPack.naked;
+			}
 		}
 		Map<Item, Integer> items = new HashMap<>();
-		for (SavedItemStack stack : h.inventory) {
+		for (SavedItemStack stack : savedPlayer.inventory) {
 			SavedItem savedItem = stack.item;
 			Material m = null;
 			try {
@@ -77,7 +80,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 				world.getLogger().warn("failed to load item of type '" + savedItem.type+'\'');
 				continue;
 			}
-			Item it = new Item(Material.valueOf(savedItem.type), savedItem.name);
+			Item it = new Item(m, savedItem.name);
 			Integer n = items.get(it);
 			if(n == null) {
 				n = stack.amount;
@@ -87,7 +90,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 			}
 			items.put(it, n);
 		}
-		return new EntityHuman(world, entityID, pos, h.hp, p, items);
+		return new EntityHuman(world, entityID, pos, savedPlayer.hp, p, items);
 	}
 	
 	public WorldPlayer getWorldPlayer() {
@@ -137,7 +140,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 			worldPlayer.getAsyncPlayer().sync(p -> {
 				if(p != null) {
 					p.sendMessage("Meghaltál!");
-					p.scheduleWorldChange(p.getServer().getWorldsManager().getDefaultWorld());
+					p.scheduleWorldChange(new WorldPosition(p.getServer().getWorldsManager().getDefaultWorld(), null));
 				}
 			});
 		}
