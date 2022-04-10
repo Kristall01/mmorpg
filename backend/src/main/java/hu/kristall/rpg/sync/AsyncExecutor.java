@@ -41,6 +41,10 @@ public class AsyncExecutor implements TaskRunner {
 		return executor;
 	}
 	
+	public Logger getLogger() {
+		return logger;
+	}
+	
 	public Future<?> runTask(Runnable r) {
 		return executorService.submit(r);
 	}

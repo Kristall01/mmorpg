@@ -1,6 +1,10 @@
 package hu.kristall.rpg;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Utils {
 	
@@ -8,7 +12,24 @@ public class Utils {
 	public static final Runnable emptyRunnable = () -> {};
 	
 	static {
-		gson = new Gson();
+		GsonBuilder builder = new GsonBuilder();
+/*		builder.registerTypeAdapter(SavedLevel.class, new SavedLevel.SavedLevelParser());
+		builder.registerTypeAdapter(Position.class, Parsers.positionParser);
+		builder.registerTypeAdapter(SavedPortal.class, new SavedPortal.SavedPortalParser());
+		builder.registerTypeAdapter(SavedItem.class, new SavedItem.SavedItemPersistence());
+		builder.registerTypeAdapter(SavedMonsterspawn.class, new SavedMonsterspawn.SavedMonsterspawnPersistence());
+		builder.registerTypeAdapter(SavedItemStack.class, new SavedItemStack.SavedItemStackPersistence());*/
+		
+		gson = builder.create();
+	}
+	
+	public static <T> List<T> mapJsonArray(JsonElement e, Type type, JsonDeserializationContext ctx) {
+		JsonArray arr = e.getAsJsonArray();
+		ArrayList<T> elements = new ArrayList<>();
+		for (JsonElement portalJson : arr) {
+			elements.add(ctx.deserialize(portalJson, type));
+		}
+		return elements;
 	}
 	
 	public static Gson gson() {

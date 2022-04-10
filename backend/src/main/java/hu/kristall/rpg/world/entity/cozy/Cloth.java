@@ -1,6 +1,8 @@
 package hu.kristall.rpg.world.entity.cozy;
 
-public enum Cloth {
+import hu.kristall.rpg.ThreadCloneable;
+
+public enum Cloth implements ThreadCloneable<Cloth> {
 	
 	BASIC(1,0,0, false),
 	CLOWN(1,1,1, false),
@@ -47,4 +49,8 @@ public enum Cloth {
 		return (bitmap & 1) == 1;
 	}
 	
+	@Override
+	public Cloth structuredClone() {
+		return this;
+	}
 }

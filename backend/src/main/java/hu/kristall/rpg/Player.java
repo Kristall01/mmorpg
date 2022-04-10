@@ -3,10 +3,11 @@ package hu.kristall.rpg;
 import hu.kristall.rpg.command.senders.PlayerSender;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutChat;
+import hu.kristall.rpg.persistence.PlayerPersistence;
+import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.ISynchronized;
 import hu.kristall.rpg.sync.Synchronizer;
-import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.WorldPlayer;
 
 import java.util.LinkedList;
@@ -22,18 +23,22 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	private final PlayerConnection connection;
 	private final Lock worldLock;
 	private Synchronizer<WorldPlayer> asyncEntity = new Synchronizer<>(null, AsyncExecutor.instance());
-	private final Queue<Synchronizer<World>> worldChangeQueue = new LinkedList<>();
+	private final Queue<WorldPosition> worldChangeQueue = new LinkedList<>();
 	private final Server server;
 	private Runnable quitHandler;
 	private final AsyncPlayer asyncPlayer;
+	private PlayerPersistence persistence;
+	private SavedPlayer savedPlayer;
 	
-	public Player(Server server, Runnable quitHandler, PlayerConnection connection, String name) {
+	public Player(Server server, SavedPlayer savedPlayer, PlayerPersistence persistence, Runnable quitHandler, PlayerConnection connection, String name) {
 		this.server = server;
+		this.savedPlayer = savedPlayer;
 		this.name = name;
 		this.connection = connection;
 		this.quitHandler = quitHandler;
 		this.worldLock = new ReentrantLock();
 		this.asyncPlayer = new AsyncPlayer(this);
+		this.persistence = persistence;
 	}
 	
 	public void handleQuit() {
@@ -50,9 +55,9 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	
 	private void repollWorldChange() {
 		synchronized(worldChangeQueue) {
-			Synchronizer<World> scheduledChange = worldChangeQueue.poll();
-			if(scheduledChange != null) {
-				exclusiveWorldChange(scheduledChange);
+			WorldPosition worldPos = worldChangeQueue.poll();
+			if(worldPos != null) {
+				exclusiveWorldChange(worldPos);
 			}
 			else {
 				worldLock.unlock();
@@ -60,15 +65,25 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 		}
 	}
 	
-	private void exclusiveWorldChange(Synchronizer<World> newAsyncWorld) {
+	//this method is exclusively called during 'exclusiveWorldChange' (no interference)
+	private void setData(SavedPlayer savedPlayer) {
+		this.savedPlayer = savedPlayer;
+		this.persistence.savePlayer(savedPlayer);
+	}
+	
+	private void exclusiveWorldChange(WorldPosition worldPos) {
 		final Player leaver = this;
 		final Synchronizer<Server> asyncServer = getServer().getSynchronizer();
+		final SavedPlayer pl = this.savedPlayer;
 		try {
 			asyncEntity.sync(e -> {
+				SavedPlayer savedPlayer = pl;
 				if(e != null) {
-					e.getWorld().leavePlayer(leaver.asyncPlayer);
+					savedPlayer = e.getWorld().leavePlayer(leaver.asyncPlayer);
+					this.setData(savedPlayer);
 				}
-				if(newAsyncWorld == null) {
+				final SavedPlayer finalHuman = savedPlayer;
+				if(worldPos == null) {
 					try {
 						asyncServer.sync(srv -> {
 							repollWorldChange();
@@ -82,8 +97,9 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 				}
 				else {
 					try {
-						newAsyncWorld.sync(newWorld -> {
-							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer));
+						worldPos.world.sync(newWorld -> {
+							
+							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer, finalHuman, worldPos.pos));
 							try {
 								asyncServer.sync(srv -> {
 									repollWorldChange();
@@ -110,14 +126,14 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 		}
 	}
 	
-	public void scheduleWorldChange(Synchronizer<World> newAsyncWorld) {
+	public void scheduleWorldChange(WorldPosition worldPos) {
 		synchronized(worldChangeQueue) {
 			if(!worldLock.tryLock()) {
-				worldChangeQueue.offer(newAsyncWorld);
+				worldChangeQueue.offer(worldPos);
 				return;
 			}
 		}
-		exclusiveWorldChange(newAsyncWorld);
+		exclusiveWorldChange(worldPos);
 	}
 	
 	private synchronized void setAsyncEntity(Synchronizer<WorldPlayer> asyncEntity) {

@@ -1,32 +1,96 @@
 package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.ThreadCloneable;
+import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
 import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
 import hu.kristall.rpg.network.packet.out.PacketOutMoveentity;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
+import hu.kristall.rpg.persistence.SavedItem;
+import hu.kristall.rpg.persistence.SavedItemStack;
+import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.Synchronizer;
-import hu.kristall.rpg.world.Inventory;
-import hu.kristall.rpg.world.LabelType;
-import hu.kristall.rpg.world.World;
-import hu.kristall.rpg.world.WorldPlayer;
+import hu.kristall.rpg.world.*;
 import hu.kristall.rpg.world.entity.cozy.Cloth;
 import hu.kristall.rpg.world.entity.cozy.ClothPack;
 import hu.kristall.rpg.world.path.ConstantPosition;
 import hu.kristall.rpg.world.path.Path;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class EntityHuman extends Entity {
+public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> {
 	
 	private WorldPlayer worldPlayer;
 	private Path lastPath;
-	private ClothPack clothes = new ClothPack(Cloth.SUIT, Cloth.PANTS_SUIT, Cloth.SHOES);
+	private ClothPack clothes;
+	
+	private EntityHuman(World world, int entityID, Position startPosition, double hp, ClothPack clothes, Map<Item, Integer> items) {
+		super(world, EntityType.HUMAN, entityID, 2.0, hp, 100);
+		this.inventory = new Inventory(this, items);
+		this.clothes = clothes;
+		this.lastPath = new Path(startPosition, List.of(startPosition, startPosition), new ConstantPosition(startPosition), System.nanoTime());
+	}
 	
 	public EntityHuman(World world, int entityID, Position startPosition) {
-		super(world, EntityType.HUMAN,  entityID);
-		this.lastPath = new Path(startPosition, List.of(startPosition, startPosition), new ConstantPosition(startPosition), System.nanoTime());
+		this(world, entityID, startPosition, 100, ClothPack.suit, new HashMap<>());
+	}
+	
+	public static EntityHuman ofData(World world, int entityID, Position pos, Object data) {
+		if(data == null) {
+			return new EntityHuman(world, entityID, pos);
+		}
+		if(!(data instanceof SavedPlayer)) {
+			throw new IllegalArgumentException();
+		}
+		SavedPlayer savedPlayer = (SavedPlayer) data;
+		Cloth[] clothes = new Cloth[savedPlayer.clothes.size()];
+		int i = 0;
+		ClothPack p = null;
+		for (String cloth : savedPlayer.clothes) {
+			try {
+				Cloth c = Cloth.valueOf(cloth);
+				clothes[i++] = c;
+			}
+			catch (IllegalArgumentException ex) {
+				world.getLogger().warn("Failed to parse unknown cloth type '"+cloth+'\'');
+				p = ClothPack.naked;
+				break;
+			}
+		}
+		if(p == null) {
+			try {
+				p = ClothPack.unsafePack(clothes);
+			}
+			catch (Exception ignored) {
+				p = ClothPack.naked;
+			}
+		}
+		Map<Item, Integer> items = new HashMap<>();
+		for (SavedItemStack stack : savedPlayer.inventory) {
+			SavedItem savedItem = stack.item;
+			Material m = null;
+			try {
+				m = Material.valueOf(savedItem.type);
+			}
+			catch (Exception ex) {
+				world.getLogger().warn("failed to load item of type '" + savedItem.type+'\'');
+				continue;
+			}
+			Item it = new Item(m, savedItem.name);
+			Integer n = items.get(it);
+			if(n == null) {
+				n = stack.amount;
+			}
+			else {
+				n += stack.amount;
+			}
+			items.put(it, n);
+		}
+		return new EntityHuman(world, entityID, pos, savedPlayer.hp, p, items);
 	}
 	
 	public WorldPlayer getWorldPlayer() {
@@ -76,7 +140,7 @@ public class EntityHuman extends Entity {
 			worldPlayer.getAsyncPlayer().sync(p -> {
 				if(p != null) {
 					p.sendMessage("Meghaltál!");
-					p.scheduleWorldChange(p.getServer().getWorldsManager().getDefaultWorld());
+					p.scheduleWorldChange(new WorldPosition(p.getServer().getWorldsManager().getDefaultWorld(), null));
 				}
 			});
 		}
@@ -104,5 +168,10 @@ public class EntityHuman extends Entity {
 	public void sendStatusFor(PlayerConnection conn) {
 		super.sendStatusFor(conn);
 		conn.sendPacket(new PacketOutChangeClothes(this));
+	}
+	
+	@Override
+	public SavedPlayer structuredClone() {
+		return new SavedPlayer(this);
 	}
 }
