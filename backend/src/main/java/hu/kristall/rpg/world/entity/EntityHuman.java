@@ -137,6 +137,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 	@Override
 	public void kill() {
 		try {
+			setHp(getMaxHp());
 			worldPlayer.getAsyncPlayer().sync(p -> {
 				if(p != null) {
 					p.sendMessage("Meghaltál!");
@@ -148,7 +149,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 			//server won't be shut down while players are playing
 			e.printStackTrace();
 		}
-		super.kill();
+		//super.kill();
 	}
 	
 	@Override
