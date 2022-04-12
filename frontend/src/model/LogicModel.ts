@@ -1,3 +1,4 @@
+import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import { IEventReciever, ModelEvent, SignalIn } from "./Definitions";
 //import SignalOutChat from "./signals/out/SignalOutChat";
 //import SignalOut from "./signals/SignalOut";
@@ -27,5 +28,7 @@ export default abstract class LogicModel {
 	abstract sendChatMessage(message: string): void;
 
 	abstract collectNearbyItems(): void;
+
+	abstract applyClothes(clothes: ColoredCloth[]): void;
 
 }

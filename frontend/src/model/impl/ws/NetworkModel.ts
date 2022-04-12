@@ -1,3 +1,4 @@
+import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
@@ -191,6 +192,10 @@ class NetworkModel extends LogicModel {
 
 	sendChatMessage(message: string): void {
 		this.sendPacket("chat", {message});
+	}
+
+	applyClothes(clothes: ColoredCloth[]): void {
+		this.sendPacket("apply-clothes", clothes);
 	}
 
 	collectNearbyItems(): void {

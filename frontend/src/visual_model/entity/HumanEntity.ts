@@ -2,10 +2,12 @@ import CozyPack from "game/graphics/texture/CozyPack";
 import { RenderContext } from "game/graphics/GraphicsUtils";
 import Entity from "visual_model/Entity";
 import { EntityType } from "visual_model/EntityType";
-import { Activity, Cloth, Skintone } from "visual_model/human/HumanAssetConfig";
+import { Activity, Cloth, ClothColor, Skintone } from "visual_model/human/HumanAssetConfig";
 import { Position } from "visual_model/VisualModel";
 import { Direction } from "visual_model/Paths";
 import { enumValueOf } from "utils";
+import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
+import { ColoredClothData } from "model/signals/SignalChangeClothes";
 
 export default class HumanEntity extends Entity {
 
@@ -13,7 +15,7 @@ export default class HumanEntity extends Entity {
 	activity: Activity = Activity.enum.map.WALK;
 	activityStart: number = 0
 	
-	clothes: Cloth[] = [
+	clothes: ColoredCloth[] = [
 /* 		Cloth.enum.map.,
 		Cloth.enum.map.PANTS_SUIT,
 		Cloth.enum.map.SHOES,
@@ -30,14 +32,7 @@ export default class HumanEntity extends Entity {
 		super.walkBy(startTime, points);
 	}
 
-	changeClothes(clothesNames: string[]) {
-		let clothes: Cloth[] = [];
-		for(let clothName of clothesNames) {
-			let cloth = enumValueOf(Cloth.enum.map, clothName);
-			if(cloth !== null) {
-				clothes.push(cloth);
-			}
-		}
+	changeClothes(clothes: ColoredCloth[]) {
 		this.clothes = clothes;
 	}
 

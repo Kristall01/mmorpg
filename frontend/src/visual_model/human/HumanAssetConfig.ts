@@ -3,6 +3,8 @@ import { Direction } from "visual_model/Paths";
 
 export type Skintone = 0|1|2|3|4|5|6|7;
 
+export type ClothPosition = "ALL"|"TOP"|"BOTTOM"|"SHOES";
+
 export class ClothColor {
 
 	readonly ordinal: number;
@@ -15,16 +17,16 @@ export class ClothColor {
 
 	static readonly enum = {
 		map: {
-			BLACK: new ClothColor(0, "black"),
-			BLUE: new ClothColor(1, "blue"),
-			LIGHT_BLUE: new ClothColor(2, "light_blue"),
-			BROWN: new ClothColor(3, "brown"),
-			GREEN: new ClothColor(4, "green"),
-			LIGHT_GREEN: new ClothColor(5, "lightgreen"),
-			PINK: new ClothColor(6, "pink"),
-			PURPLE: new ClothColor(7, "purple"),
-			RED: new ClothColor(8, "red"),
-			WHITE: new ClothColor(9, "white")
+			BLACK: new ClothColor(0, "BLACK"),
+			BLUE: new ClothColor(1, "BLUE"),
+			LIGHT_BLUE: new ClothColor(2, "LIGHT_BLUE"),
+			BROWN: new ClothColor(3, "BROWN"),
+			GREEN: new ClothColor(4, "GREEN"),
+			LIGHT_GREEN: new ClothColor(5, "LIGHT_GREEN"),
+			PINK: new ClothColor(6, "PINK"),
+			PURPLE: new ClothColor(7, "PURPLE"),
+			RED: new ClothColor(8, "RED"),
+			WHITE: new ClothColor(9, "WHITE")
 		},
 		values: new Array<ClothColor>()
 	}
@@ -71,31 +73,33 @@ export class Cloth {
 	readonly id: string;
 	private static nextOrdinal: number = 0;
 	readonly colored: boolean
+	readonly position: ClothPosition
 
-	private constructor(id: string, colored: boolean, transparent: boolean = false) {
+	private constructor(id: string, colored: boolean, pos: ClothPosition) {
 		this.id = id;
 		this.ordinal = Cloth.nextOrdinal++;
 		this.colored = colored;
+		this.position = pos;
 	}
 
 	static readonly enum = {
 		map: {
-			BASIC: new Cloth('basic', true),
-			CLOWN_BLUE: new Cloth('clown_blue', false),
-			CLOWN: new Cloth('clown', false),
-			DRESS_WITCH: new Cloth('dress_witch', false),
-			FLORAL: new Cloth('floral', true),
-			OVERALL: new Cloth('overall', true),
-			PANTS_SUIT: new Cloth('pants_suit', true),
-			PANTS: new Cloth('pants', false),
-			PUMPKIN_PURPLE: new Cloth('pumpkin_purple', false),
-			PUMPKIN: new Cloth('pumpkin', false),
-			SAILOR_BOW: new Cloth('sailor_bow', true),
-			SHOES: new Cloth('shoes', true),
-			SKIRT: new Cloth('skirt', true),
-			SPOOKY: new Cloth('spooky', false),
-			SPORTY: new Cloth('sporty', true),
-			SUIT: new Cloth('suit', true),
+			BASIC: new Cloth('BASIC', true, "TOP"),
+			CLOWN_BLUE: new Cloth('CLOWN_BLUE', false, "ALL"),
+			CLOWN: new Cloth('CLOWN', false, "ALL"),
+			DRESS_WITCH: new Cloth('DRESS_WITCH', false, "ALL"),
+			FLORAL: new Cloth('FLORAL', true, "TOP"),
+			OVERALL: new Cloth('OVERALL', true, "TOP"),
+			PANTS_SUIT: new Cloth('PANTS_SUIT', true, "BOTTOM"),
+			PANTS: new Cloth('PANTS', false, "BOTTOM"),
+			PUMPKIN_PURPLE: new Cloth('PUMPKIN_PURPLE', false, "ALL"),
+			PUMPKIN: new Cloth('PUMPKIN', false, "ALL"),
+			SAILOR_BOW: new Cloth('SAILOR_BOW', true, "TOP"),
+			SHOES: new Cloth('SHOES', true, "SHOES"),
+			SKIRT: new Cloth('SKIRT', true, "BOTTOM"),
+			SPOOKY: new Cloth('SPOOKY', false, "ALL"),
+			SPORTY: new Cloth('SPORTY', true, "TOP"),
+			SUIT: new Cloth('SUIT', true, "TOP"),
 		},
 
 		values: new Array<Cloth>()
