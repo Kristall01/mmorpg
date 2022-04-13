@@ -79,7 +79,7 @@ const MenuScene = ({visuals}: props) => {
 			<div className="btngroup">
 				<WrappedButton text="teszt mód" onClick={startDemo} icon="fa-solid fa-flask" />
 				<WrappedButton text="online mód" onClick={startNetworkModel} icon="fa-solid fa-earth-americas" />
-				<WrappedButton text="ruha szerkesztő" onClick={startClothEditor} icon="fa-solid fa-clothes-hanger" />
+				{/*<WrappedButton text="ruha szerkesztő" onClick={startClothEditor} icon="fa-solid fa-clothes-hanger" />*/}
 			</div>
 			<WrappedButton text="Vissza a főmenübe" onClick={menuBack} icon="fa-solid fa-left" />
 		</ButtonMenu>

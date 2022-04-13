@@ -54,7 +54,7 @@ class DModel extends LogicModel {
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
 				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed, 70, 100));
 				this.broadcastSignal(new SignalRenameEntity(0, username));
-				this.broadcastSignal(new SignalChangeClothes(0, [{cloth: "FLORAL", "color": "PINK"}, {cloth: "PANTS_SUIT",color: "BLACK"}, {cloth: "SHOES",color: "BLACK"}]));
+				this.broadcastSignal(new SignalChangeClothes(0, [{type: "FLORAL", "color": "PINK"}, {type: "PANTS_SUIT",color: "BLACK"}, {type: "SHOES",color: "BLACK"}]));
 				this.broadcastSignal(new SignalFocus(0));
 			}, 1);
 	
@@ -63,7 +63,7 @@ class DModel extends LogicModel {
 	}
 
 	applyClothes(clothes: ColoredCloth[]): void {
-		this.broadcastSignal(new SignalChangeClothes(0, clothes.map(a => ({cloth: a.cloth.id, color: a.color.id}))));
+		this.broadcastSignal(new SignalChangeClothes(0, clothes.map(a => ({type: a.cloth.id, color: a.color.id}))));
 	}
 
 	/* sendSignal(signal: SignalOut) {

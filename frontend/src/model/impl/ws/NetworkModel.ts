@@ -195,7 +195,14 @@ class NetworkModel extends LogicModel {
 	}
 
 	applyClothes(clothes: ColoredCloth[]): void {
-		this.sendPacket("apply-clothes", clothes);
+		let jsonClothes = [];
+		for(let c of clothes) {
+			jsonClothes.push({
+				color: c.color.id,
+				type: c.cloth.id
+			});
+		}
+		this.sendPacket("apply-clothes", {clothes: jsonClothes});
 	}
 
 	collectNearbyItems(): void {
