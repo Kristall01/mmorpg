@@ -1,3 +1,4 @@
+import parseText from "game/ui/chat/textparser";
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
@@ -88,6 +89,10 @@ class DModel extends LogicModel {
 			case "clearchat": {
 				this.broadcastSignal(new SignalClarchat());
 				this.broadcastSignal(new SignalChat("§7§oChat törölve"));
+				break;
+			}
+			case "parse": {
+				console.log(parseText(args[0]));
 				break;
 			}
 			case "sethp": {
