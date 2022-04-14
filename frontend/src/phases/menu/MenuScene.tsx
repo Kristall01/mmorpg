@@ -10,6 +10,7 @@ import VisualResources from "game/VisualResources";
 import ButtonMenu, { WrappedButton } from "shared/buttonmenu/ButtonMenu";
 import { Button } from "react-bootstrap";
 import { LandingPhase } from "phases/landing/LandingPhase";
+import ClothEditor from "game/ui/clotheditor/ClothEditor";
 
 interface props {
 	visuals: VisualResources
@@ -68,12 +69,17 @@ const MenuScene = ({visuals}: props) => {
 		setMenu(() => <LandingPhase />);
 	}
 
+	const startClothEditor = () => {
+		setMenu(() => <div style={{height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}><ClothEditor cozyPack={visuals.cozy} /></div>);
+	}
+
 	return (
 		<ButtonMenu>
 			<span>Válassz játékmódot!</span>
 			<div className="btngroup">
 				<WrappedButton text="teszt mód" onClick={startDemo} icon="fa-solid fa-flask" />
 				<WrappedButton text="online mód" onClick={startNetworkModel} icon="fa-solid fa-earth-americas" />
+				<WrappedButton text="ruha szerkesztő" onClick={startClothEditor} icon="fa-solid fa-clothes-hanger" />
 			</div>
 			<WrappedButton text="Vissza a főmenübe" onClick={menuBack} icon="fa-solid fa-left" />
 		</ButtonMenu>

@@ -1,21 +1,45 @@
+import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import { SignalIn } from "model/Definitions";
+import { enumValueOf } from "utils";
 import HumanEntity from "visual_model/entity/HumanEntity";
+import { Cloth, ClothColor } from "visual_model/human/HumanAssetConfig";
 import VisualModel from "visual_model/VisualModel";
+
+export interface ColoredClothData {
+	color: string,
+	cloth: string
+}
 
 export default class SignalChangeClothes implements SignalIn {
 
-	private clothes: string[];
+	private clothes: ColoredClothData[];
 	private entityID: number;
 
-	constructor(entityID: number, clothes: string[]) {
+	constructor(entityID: number, clothes: ColoredClothData[]) {
 		this.clothes = clothes;
 		this.entityID = entityID;
 	}
 
 	execute(model: VisualModel): void {
 		let e = model.world?.getEntity(this.entityID);
+
+
+		let clothes: ColoredCloth[] = [];
+		for(let clothData of this.clothes) {
+			let cloth = enumValueOf(Cloth.enum.map, clothData.cloth);
+			if(cloth === null) {
+				console.warn(`Unknown cloth type '${clothData.cloth}'`)
+				continue;
+			}
+			let color = enumValueOf(ClothColor.enum.map, clothData.color);
+			if(color === null) {
+				console.warn(`Unknown cloth color '${clothData.color}'`)
+				continue;
+			}
+			clothes.push({cloth, color})
+		}
 		if(e !== undefined && e instanceof HumanEntity) {
-			e.changeClothes(this.clothes);
+			e.changeClothes(clothes);
 		}
 	}
 

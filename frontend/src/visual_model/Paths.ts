@@ -16,9 +16,10 @@ export class Direction {
 	static readonly enum = {
 		map: {
 			SOUTH: new Direction(0, [0,1]),
+			WEST: new Direction(3, [-1,0]),
 			NORTH: new Direction(1, [0,-1]),
 			EAST: new Direction(2, [1,0]),
-			WEST: new Direction(3, [-1,0])},
+		},
 		values: new Array<Direction>()
 	}
 

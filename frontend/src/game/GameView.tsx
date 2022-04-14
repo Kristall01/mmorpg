@@ -14,6 +14,7 @@ import ConditionalWorldView from "./graphics/world/ConditionalWorldView";
 import VisualResources from "./VisualResources";
 import EscapeMenu from "./ui/escapemenu/EscapeMenu";
 import InventoryMenu from "./ui/inventory/InventoryMenu";
+import ClothEditorLayer from "./ui/clotheditor/ClothEditorLayer";
 
 export type props = {
 	logicModel: LogicModel
@@ -67,6 +68,11 @@ export default class GameView extends React.Component<props, {}> {
 		if(this.visualModel.focus === "main") {
 			if(e.key === "e" || e.key === "E") {
 				this.visualModel.setInventoryOpen(true);
+				return
+			}
+			if(e.key === "r" || e.key === "R") {
+				this.visualModel.setClotheditorOpen(true);
+				return
 			}
 		}
 	}
@@ -81,6 +87,7 @@ export default class GameView extends React.Component<props, {}> {
 
 	render(): React.ReactNode {
 		let escapeMenu = this.visualModel.menuOpen ? <EscapeMenu /> : null;
+		let clothEditor = this.visualModel.clothEditorOpen ? <ClothEditorLayer cozy={this.visuals.cozy} /> : null;
 
 		let content = (
 			<div
@@ -93,6 +100,7 @@ export default class GameView extends React.Component<props, {}> {
 					<ConditionalWorldView logicModel={this.logicModel} visualModel={this.visualModel} visuals={this.visuals} />
 					<Chat />
 					{escapeMenu}
+					{clothEditor}
 				</ModelContext.Provider>
 			</div>
 		)
