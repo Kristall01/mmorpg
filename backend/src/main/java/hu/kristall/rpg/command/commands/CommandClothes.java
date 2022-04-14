@@ -74,15 +74,7 @@ public class CommandClothes extends SimpleCommand {
 						return;
 					}
 				}
-				ClothPack pack;
-				try {
-					pack = new ClothPack(clothes);
-				}
-				catch (IllegalArgumentException ex) {
-					sender.sendMessage("§cHiba: §4Érvénytelen ruha kombináció");
-					return;
-				}
-				entity.setClothes(pack);
+				entity.setClothes(new ClothPack(clothes));
 			});
 		}
 		catch (Synchronizer.TaskRejectedException e) {

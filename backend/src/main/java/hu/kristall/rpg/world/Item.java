@@ -1,8 +1,11 @@
 package hu.kristall.rpg.world;
 
+import hu.kristall.rpg.ThreadCloneable;
+import hu.kristall.rpg.persistence.SavedItem;
+
 import java.util.Objects;
 
-public class Item {
+public class Item implements ThreadCloneable<SavedItem> {
 	
 	private Material type;
 	private String name;
@@ -36,4 +39,10 @@ public class Item {
 	public int hashCode() {
 		return Objects.hash(getType(), getName());
 	}
+	
+	@Override
+	public SavedItem structuredClone() {
+		return new SavedItem(type.name(), this.name);
+	}
+	
 }

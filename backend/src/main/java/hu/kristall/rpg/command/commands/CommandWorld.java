@@ -1,6 +1,7 @@
 package hu.kristall.rpg.command.commands;
 
 import hu.kristall.rpg.Player;
+import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.command.CommandCheckers;
 import hu.kristall.rpg.command.CommandParent;
 import hu.kristall.rpg.command.impl.SimpleCommand;
@@ -40,6 +41,6 @@ public class CommandWorld extends SimpleCommand {
 			p = (Player) sender;
 		}
 		p.sendMessage("Felkészülés a világ váltásra...");
-		p.scheduleWorldChange(w);
+		p.scheduleWorldChange(new WorldPosition(w, null));
 	}
 }

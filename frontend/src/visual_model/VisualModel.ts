@@ -1,20 +1,21 @@
 import { convertToHtmlText } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
+import { ThemeConsumer } from "react-bootstrap/esm/ThemeProvider";
 import Entity from "./Entity";
 import ItemStack from "./ItemStack";
 import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
-export type focus = "main" | "chat" | "menu" | "inventory";
+export type focus = "main" | "chat" | "menu" | "inventory" | "clotheditor";
 
 export type Position = [number,number];
 
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open";
+export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -32,6 +33,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private listeners = []
 	private chatHistory: string[] = [];
 	private _inventoryOpen: boolean = false;
+	private _clothEditorOpen: boolean = false;
 
 	constructor() {
 		super();
@@ -48,6 +50,10 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		return this._inventoryOpen;
 	}
 
+	public get clothEditorOpen() {
+		return this._clothEditorOpen;
+	}
+
 	setInventoryOpen(value: boolean) {
 		if(this.inventoryOpen === value) {
 			return;
@@ -55,6 +61,15 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		this._inventoryOpen = value;
 		this.triggerUpdate("inventory-open");
 		this.setFocus(value ? "inventory" : "main");
+	}
+
+	setClotheditorOpen(value: boolean) {
+		if(this.clothEditorOpen === value) {
+			return;
+		}
+		this._clothEditorOpen = value;
+		this.triggerUpdate("clotheditor-open");
+		this.setFocus(value ? "clotheditor" : "main");
 	}
 
 	public pushHistoryEntry(msg: string) {
@@ -90,7 +105,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	}
 
 	addChatEntry(text: string) {
-		this.chatlog = [...this.chatlog, convertToHtmlText(text)];
+		this.chatlog = [...this.chatlog, text];
 		this.triggerUpdate("chatlog");
 	}
 

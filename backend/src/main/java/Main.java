@@ -1,10 +1,14 @@
 import hu.kristall.rpg.ChatColor;
 import hu.kristall.rpg.Server;
+import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.console.FilteredConsolePrinter;
 import hu.kristall.rpg.console.InputReader;
+import hu.kristall.rpg.persistence.Savefile;
 import hu.kristall.rpg.sync.Synchronizer;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class Main {
@@ -23,7 +27,29 @@ public class Main {
 		}
 	}
 	
-	public static void main(String[] args)  {
+	public static void main(String[] args) throws IOException {
+		/*List<List<String>> layers = List.of(List.of("GRASS","GRASS","GRASS"));
+		SavedLevel defaultLevel = new SavedLevel("defaultWorld", 10, 10, layers, Collections.emptyList(), Collections.emptyList());
+		
+		Map<String, SavedLevel> levels = new HashMap<>();
+		levels.put("defaultWorld", defaultLevel);
+		Map<String, SavedPlayer> players = new HashMap<>();
+		players.put("asd", new SavedPlayer("asd", "w0", new Position(0,0), 5, Collections.emptyList(), Collections.emptyList()));
+		Savefile savefile = new Savefile(levels, players, "defaultWorld");
+		
+		Path f = new File("/home/dominik/Asztal/savefile.json").toPath();
+		String serialized =  Utils.gson().toJson(savefile);
+		Files.write(f, serialized.getBytes(StandardCharsets.UTF_8));
+		try {
+			savefile = Utils.gson().fromJson(Files.readString(f), Savefile.class);
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		System.out.println("parsed savefile");
+		System.out.println(savefile);
+		System.exit(0);*/
+		
 		/*
 		Options opts = new Options();
 		opts.addOption(Option.builder()
@@ -66,7 +92,8 @@ public class Main {
 			System.setErr(new FilteredConsolePrinter(System.err, ChatColor::translateColorCodes));
 		}
 		String servePath = System.getenv("serve");
-		Synchronizer<Server> s = Server.createServer(servePath);
+		//Savefile savefile = Utils.gson().fromJson(new FileReader("/home/dominik/Asztal/savefile.json"), Savefile.class);
+		Synchronizer<Server> s = Server.createServer(servePath, null);
 		InputReader reader = new InputReader(s);
 		
 	}

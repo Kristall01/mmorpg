@@ -1,3 +1,5 @@
+import parseText from "game/ui/chat/textparser";
+import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
@@ -53,12 +55,16 @@ class DModel extends LogicModel {
 				this.broadcastSignal(new SignalChat("§eA chat megnyitásához nyomd meg az ENTER gombot!"));
 				this.broadcastSignal(new SignalEntityspawn(0, "HUMAN", startPos, entitySpeed, 70, 100));
 				this.broadcastSignal(new SignalRenameEntity(0, username));
-				this.broadcastSignal(new SignalChangeClothes(0, ["SUIT", "PANTS_SUIT","SHOES"]));
+				this.broadcastSignal(new SignalChangeClothes(0, [{type: "FLORAL", "color": "PINK"}, {type: "PANTS_SUIT",color: "BLACK"}, {type: "SHOES",color: "BLACK"}]));
 				this.broadcastSignal(new SignalFocus(0));
 			}, 1);
 	
 		}, 1);
 
+	}
+
+	applyClothes(clothes: ColoredCloth[]): void {
+		this.broadcastSignal(new SignalChangeClothes(0, clothes.map(a => ({type: a.cloth.id, color: a.color.id}))));
 	}
 
 	/* sendSignal(signal: SignalOut) {
@@ -88,6 +94,10 @@ class DModel extends LogicModel {
 			case "clearchat": {
 				this.broadcastSignal(new SignalClarchat());
 				this.broadcastSignal(new SignalChat("§7§oChat törölve"));
+				break;
+			}
+			case "parse": {
+				console.log(parseText(args[0]));
 				break;
 			}
 			case "sethp": {

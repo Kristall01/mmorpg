@@ -73,9 +73,8 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 			return;
 		}
 		try {
-			getAsyncServer().sync(srv -> {
-				getPlayer().handleQuit();
-			});
+			final Player player = getPlayer();
+			getAsyncServer().sync(srv -> player.handleQuit());
 		}
 		catch (Synchronizer.TaskRejectedException e) {
 			//server will be running while players are online
@@ -114,6 +113,7 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 		playPacketMapBuilder.register("ping", PacketInPlayPing.class);
 		playPacketMapBuilder.register("move", PacketInPlayMove.class);
 		playPacketMapBuilder.register("collect-items", PacketInPlayCollectitems.class);
+		playPacketMapBuilder.register("apply-clothes", PacketInPlayApplyClothes.class);
 		playPacketMap = playPacketMapBuilder.build();
 		
 		PacketMap.Builder<PacketInHandshake> handshakePacketMapBuilder = new PacketMap.Builder<PacketInHandshake>();

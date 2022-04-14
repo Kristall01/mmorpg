@@ -1,6 +1,7 @@
 package hu.kristall.rpg.world;
 
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.persistence.SavedPortal;
 import hu.kristall.rpg.world.entity.Entity;
 
 public class Portal {
@@ -32,4 +33,7 @@ public class Portal {
 		return this.position;
 	}
 	
+	public SavedPortal serialize() {
+		return new SavedPortal(this.position, this.targetWorldName, this.position);
+	}
 }

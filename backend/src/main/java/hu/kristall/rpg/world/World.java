@@ -6,6 +6,8 @@ import hu.kristall.rpg.network.packet.out.*;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutDespawnItem;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSpawnItem;
+import hu.kristall.rpg.persistence.SavedLevel;
+import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.Entity;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class World extends SynchronizedObject<World> {
 	
@@ -117,11 +120,11 @@ public class World extends SynchronizedObject<World> {
 		return nextEntityID++;
 	}
 	
-	public Entity spawnEntity(EntityType type, Position pos) {
+	public Entity spawnEntity(EntityType type, Position pos, Object optional) {
 		Entity createdEntity = null;
 		switch(type) {
 			case HUMAN: {
-				createdEntity = new EntityHuman(this, getNextEntityID(), pos);
+				createdEntity = EntityHuman.ofData(this, getNextEntityID(), pos, optional);
 				break;
 			}
 		}
@@ -139,10 +142,12 @@ public class World extends SynchronizedObject<World> {
 		}
 	}
 	
-	public Synchronizer<WorldPlayer> joinPlayer(AsyncPlayer player) {
+	public Synchronizer<WorldPlayer> joinPlayer(AsyncPlayer player, SavedPlayer savedPlayer, Position pos) {
 		try {
 			//sync world state to joining player
-			Position pos = new Position(3,3);
+			if(pos == null) {
+				pos = new Position(width >> 1, height >> 1);
+			}
 			PlayerConnection connectingConnection = player.connection;
 			connectingConnection.sendPacket(new PacketOutJoinworld(this, pos));
 			for (Entity e : this.worldEntities.values()) {
@@ -160,7 +165,7 @@ public class World extends SynchronizedObject<World> {
 			
 			WorldPlayer wp = new WorldPlayer(this, player);
 			worldPlayers.put(player, wp);
-			EntityHuman h = wp.spawnTo(pos);
+			EntityHuman h = wp.spawnTo(pos, savedPlayer);
 			connectingConnection.sendPacket(new PacketOutFollowEntity(h));
 			connectingConnection.sendPacket(new PacketOutSetInventory(h.getInventory()));
 			broadcastMessage("§e" + player.name + " csatlakozott");
@@ -215,17 +220,24 @@ public class World extends SynchronizedObject<World> {
 		}
 	}
 	
-	public void leavePlayer(AsyncPlayer player) {
-		WorldPlayer oldEntity = worldPlayers.remove(player);
-		player.connection.sendPacket(new PacketOutLeaveWorld());
-		if(oldEntity.getEntity() != null) {
-			oldEntity.getEntity().remove();
+	public SavedPlayer leavePlayer(AsyncPlayer player) {
+		WorldPlayer oldWP = worldPlayers.remove(player);
+		if(oldWP == null) {
+			return null;
 		}
-		oldEntity.getSynchronizer().changeObject(null);
+		player.connection.sendPacket(new PacketOutLeaveWorld());
+		EntityHuman h = oldWP.getEntity();
+		SavedPlayer savedPlayer = null;
+		if(h != null) {
+			savedPlayer = h.structuredClone();
+			h.remove();
+		}
+		oldWP.getSynchronizer().changeObject(null);
 		broadcastMessage("§e"+player.name+ " lelépett");
 		if(shuttingDown && worldPlayers.size() == 0) {
 			super.shutdown();
 		}
+		return savedPlayer;
 	}
 	
 	public void broadcastMessage(String message) {
@@ -238,6 +250,10 @@ public class World extends SynchronizedObject<World> {
 		for (WorldPlayer wp : worldPlayers.values()) {
 			wp.getAsyncPlayer().connection.sendPacket(out);
 		}
+	}
+	
+	public SavedLevel serialize() {
+		return new SavedLevel(this.name, this.width, this.height, null, new ArrayList<>(), this.portals.stream().map(Portal::serialize).collect(Collectors.toList()));
 	}
 	
 	public AsyncServer getAsyncServer() {
