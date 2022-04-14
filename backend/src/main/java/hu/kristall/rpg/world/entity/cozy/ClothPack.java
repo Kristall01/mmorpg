@@ -1,17 +1,16 @@
 package hu.kristall.rpg.world.entity.cozy;
 
+import com.google.gson.*;
 import hu.kristall.rpg.ThreadCloneable;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class ClothPack implements ThreadCloneable<List<String>> {
+public class ClothPack implements ThreadCloneable<ClothPack> {
 	
-	private List<String> serialized;
 	private List<ColoredCloth> clothes;
 	private JsonElement serializedJson;
 	
@@ -34,15 +33,12 @@ public class ClothPack implements ThreadCloneable<List<String>> {
 		for (ColoredCloth cloth : clothes) {
 			if(!cloth.cloth.transparent) {
 				JsonObject obj = new JsonObject();
-				names.add(cloth.cloth.name());
 				obj.addProperty("color", cloth.color.name());
 				obj.addProperty("type", cloth.cloth.name());
 				arr.add(obj);
 			}
 		}
 		this.serializedJson = arr;
-		this.serialized = names;
-		
 	}
 	
 	public ClothPack(Cloth... clothes) {
@@ -54,16 +50,51 @@ public class ClothPack implements ThreadCloneable<List<String>> {
 		init(List.of(c));
 	}
 	
-	public List<String> serialize() {
-		return Collections.unmodifiableList(this.serialized);
-	}
-	
 	@Override
-	public List<String> structuredClone() {
-		return this.serialized;
+	public ClothPack structuredClone() {
+		return this;
 	}
 	public JsonElement serializeJson() {
 		return this.serializedJson.deepCopy();
 	}
 	
+	public static class SavedClothpackParser implements JsonDeserializer<ClothPack>, JsonSerializer<ClothPack> {
+		
+		private Logger logger = LoggerFactory.getLogger("ClothPackSerializer");
+		
+		@Override
+		public ClothPack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			int i = 0;
+			JsonArray elements = json.getAsJsonArray();
+			ColoredCloth[] cc = new ColoredCloth[elements.size()];
+			for (JsonElement element : elements) {
+				JsonObject clothObj = element.getAsJsonObject();
+				String clothID = clothObj.get("type").getAsString();
+				String clothColorID = clothObj.get("color").getAsString();
+				Cloth cloth;
+				try {
+					cloth = Cloth.valueOf(clothID);
+				}
+				catch (IllegalArgumentException ex) {
+					logger.warn("Failed to parse unknown cloth type '"+clothID+'\'');
+					return ClothPack.naked;
+				}
+				ClothColor clothColor;
+				try {
+					clothColor = ClothColor.valueOf(clothColorID);
+				}
+				catch (IllegalArgumentException ex) {
+					logger.warn("Failed to parse unknown cloth color type '"+clothColorID+'\'');
+					return ClothPack.naked;
+				}
+				cc[i++] = new ColoredCloth(cloth, clothColor);
+			}
+			return new ClothPack(cc);
+		}
+		
+		@Override
+		public JsonElement serialize(ClothPack src, Type typeOfSrc, JsonSerializationContext context) {
+			return src.serializeJson();
+		}
+	}
 }

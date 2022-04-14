@@ -47,28 +47,6 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 			throw new IllegalArgumentException();
 		}
 		SavedPlayer savedPlayer = (SavedPlayer) data;
-		Cloth[] clothes = new Cloth[savedPlayer.clothes.size()];
-		int i = 0;
-		ClothPack p = null;
-		for (String cloth : savedPlayer.clothes) {
-			try {
-				Cloth c = Cloth.valueOf(cloth);
-				clothes[i++] = c;
-			}
-			catch (IllegalArgumentException ex) {
-				world.getLogger().warn("Failed to parse unknown cloth type '"+cloth+'\'');
-				p = ClothPack.naked;
-				break;
-			}
-		}
-		if(p == null) {
-			try {
-				p = new ClothPack(clothes);
-			}
-			catch (Exception ignored) {
-				p = ClothPack.naked;
-			}
-		}
 		Map<Item, Integer> items = new HashMap<>();
 		for (SavedItemStack stack : savedPlayer.inventory) {
 			SavedItem savedItem = stack.item;
@@ -90,7 +68,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 			}
 			items.put(it, n);
 		}
-		return new EntityHuman(world, entityID, pos, savedPlayer.hp, p, items);
+		return new EntityHuman(world, entityID, pos, savedPlayer.hp, savedPlayer.clothes, items);
 	}
 	
 	public WorldPlayer getWorldPlayer() {

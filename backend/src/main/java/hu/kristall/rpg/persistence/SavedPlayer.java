@@ -1,6 +1,7 @@
 package hu.kristall.rpg.persistence;
 
 import hu.kristall.rpg.world.entity.EntityHuman;
+import hu.kristall.rpg.world.entity.cozy.ClothPack;
 
 import java.util.List;
 
@@ -10,16 +11,16 @@ public class SavedPlayer {
 	public final LogoutPosition logoutPosition;
 	public final double hp;
 	public final List<SavedItemStack> inventory;
-	public final List<String> clothes;
+	public final ClothPack clothes;
 	public final boolean loaded;
 	
-	public SavedPlayer(String name, LogoutPosition pos, double hp, List<SavedItemStack> inventory, List<String> clothes) {
+	public SavedPlayer(String name, LogoutPosition pos, double hp, List<SavedItemStack> inventory, ClothPack pack) {
 		this.loaded = true;
 		this.name = name;
 		this.logoutPosition = pos;
 		this.hp = hp;
 		this.inventory = List.copyOf(inventory);
-		this.clothes = List.copyOf(clothes);
+		this.clothes = pack;
 	}
 	
 	public SavedPlayer(EntityHuman entityHuman) {
