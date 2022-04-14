@@ -63,7 +63,7 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		}
 		if(p == null) {
 			try {
-				p = ClothPack.unsafePack(clothes);
+				p = new ClothPack(clothes);
 			}
 			catch (Exception ignored) {
 				p = ClothPack.naked;

@@ -92,8 +92,8 @@ public class Main {
 			System.setErr(new FilteredConsolePrinter(System.err, ChatColor::translateColorCodes));
 		}
 		String servePath = System.getenv("serve");
-		Savefile savefile = Utils.gson().fromJson(new FileReader("/home/dominik/Asztal/savefile.json"), Savefile.class);
-		Synchronizer<Server> s = Server.createServer(servePath, savefile);
+		//Savefile savefile = Utils.gson().fromJson(new FileReader("/home/dominik/Asztal/savefile.json"), Savefile.class);
+		Synchronizer<Server> s = Server.createServer(servePath, null);
 		InputReader reader = new InputReader(s);
 		
 	}

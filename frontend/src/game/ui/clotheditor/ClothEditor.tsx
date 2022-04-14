@@ -49,7 +49,8 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 		let baseClothes = this.props.baseClothes;
 		if(baseClothes !== undefined) {
 			for(let cloth of baseClothes) {
-				
+				this.clothRenderer.clothColor = cloth.color;
+				this.clothRenderer.setClothAt(cloth.cloth.position, cloth.cloth);
 			}
 		}
 	}
@@ -125,9 +126,9 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 						<GraphicsComponent maxFPS={30} showFpsCounter={false} renderable={this.clothRenderer} />
 					</div>
 					<div className="control">
-						<Button size='sm' onClick={() => this.togglePlay()}>{this.state.play ? "pause":"play"}</Button>
+						<Button size='sm' onClick={() => this.togglePlay()}><i className={`fa-solid fa-${this.state.play ? "pause":"play"}`} /></Button>
 						<Button size='sm' onClick={() => this.rotate()}>forgatás</Button>
-						{this.props.onApply ? <Button size='sm' onClick={() => this.exportClothes()}>apply</Button>:null}
+						{this.props.onApply ? <Button size='sm' onClick={() => this.exportClothes()}>alkalmaz</Button>:null}
 						<select defaultValue={this.state.activity.id.toUpperCase()} onChange={(e) => this.handleAnimChange(e)}>
 							{Object.entries(Activity.enum.map).map(([name, activity],b) => <option value={name} key={b}>{name}</option>)}
 						</select>

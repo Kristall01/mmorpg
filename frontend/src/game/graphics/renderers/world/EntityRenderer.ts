@@ -19,7 +19,7 @@ export const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => 
 
 	let alive = e.alive;
 
-	let activity = view.cozyPack.getCozyActivity(alive ? Activity.enum.map.SWORD : Activity.enum.map.DIE);
+	let activity = view.cozyPack.getCozyActivity(alive ? human.activity : Activity.enum.map.DIE);
 	let sinceTime: number;
 	if(!alive) {
 		sinceTime = 0;

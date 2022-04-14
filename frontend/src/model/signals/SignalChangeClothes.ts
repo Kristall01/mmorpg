@@ -7,7 +7,7 @@ import VisualModel from "visual_model/VisualModel";
 
 export interface ColoredClothData {
 	color: string,
-	cloth: string
+	type: string
 }
 
 export default class SignalChangeClothes implements SignalIn {
@@ -26,9 +26,9 @@ export default class SignalChangeClothes implements SignalIn {
 
 		let clothes: ColoredCloth[] = [];
 		for(let clothData of this.clothes) {
-			let cloth = enumValueOf(Cloth.enum.map, clothData.cloth);
+			let cloth = enumValueOf(Cloth.enum.map, clothData.type);
 			if(cloth === null) {
-				console.warn(`Unknown cloth type '${clothData.cloth}'`)
+				console.warn(`Unknown cloth type '${clothData.type}'`)
 				continue;
 			}
 			let color = enumValueOf(ClothColor.enum.map, clothData.color);
