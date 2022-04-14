@@ -90,7 +90,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	}
 
 	addChatEntry(text: string) {
-		this.chatlog = [...this.chatlog, convertToHtmlText(text)];
+		this.chatlog = [...this.chatlog, text];
 		this.triggerUpdate("chatlog");
 	}
 
