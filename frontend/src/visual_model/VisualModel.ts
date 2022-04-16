@@ -145,6 +145,12 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		return this.zoomFn(rendertime);
 	}
 
+	setConstantZoom(val: number) {
+		this.zoomFn = () => val;
+		this.zoomTarget = val;
+		this.triggerUpdate("zoom");
+	}
+
 	multiplyZoom(val: number) {
 		//let from = zoomValue;
 		let now = performance.now();

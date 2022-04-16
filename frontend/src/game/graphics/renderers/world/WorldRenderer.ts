@@ -102,6 +102,7 @@ class WorldRenderer implements Renderable {
 		const camFocusY = 0.5;
 
 		let zoom = this.model.zoomAt(rendertime);
+		let zoomModified = false;
 
 		let camX = camProps[0];
 		let camY = camProps[1];
@@ -120,15 +121,21 @@ class WorldRenderer implements Renderable {
 	//			zoom = Math.min(zoom, Math.max(100, minVerticalZoom, minHorizontalZoom))
 			if(zoom < Math.min(minVerticalZoom, 100)) {
 				zoom = Math.min(minVerticalZoom, 100);
+				zoomModified = true;
 			}
 			if(zoom < Math.min(minHorizontalZoom, 100)) {
 				zoom = Math.min(minHorizontalZoom, 100);
+				zoomModified = true;
 			}
 		}
-		zoom = Math.min(zoom, 400);
+		if(zoom > 400) {
+			zoom = 400;
+			zoomModified = true;
+		}
 
  		if(zoom < this.model.maxZoom) {
 			zoom = this.model.maxZoom;
+			zoomModified = true;
 		}
 		if(height > world.height*zoom) {
 			camY = camFocusY * world.height;
@@ -160,6 +167,10 @@ class WorldRenderer implements Renderable {
 					camX = maxCamX;
 				}
 			}
+		}
+		if(zoomModified) {
+			this.model.setConstantZoom(zoom);
+			console.log("set constant zoom");
 		}
 
 		this.renderConfig = {
