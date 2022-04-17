@@ -41,7 +41,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		this.zoomFn = (rendertime: number) => this.zoomTarget
 	}
 
-	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
+	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Array<Matrix<string>>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
 		this.triggerUpdate("world");
 	}
