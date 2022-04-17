@@ -78,6 +78,8 @@ class DModel extends LogicModel {
 		}
 	}; */
 
+	attackTowards(x: number, y: number): void {}
+
 	sendChatMessage(message: string): void {
 		if(message[0] !== '/') {
 			this.broadcastSignal(Object.assign(new SignalChat("§a"+this.name+" §7»§r "+message)))

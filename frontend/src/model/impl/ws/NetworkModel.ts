@@ -136,6 +136,11 @@ class NetworkModel extends LogicModel {
 		});
 	}
 
+
+	attackTowards(x: number, y: number) {
+		this.sendPacket("attack", {x, y});
+	}
+
 	private convertServerNanos(nanos: number) {
 		return (nanos - this.pingDelay)/1000000;
 	}

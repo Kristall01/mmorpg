@@ -31,4 +31,6 @@ export default abstract class LogicModel {
 
 	abstract applyClothes(clothes: ColoredCloth[]): void;
 
+	abstract attackTowards(x: number, y: number): void;
+
 }
