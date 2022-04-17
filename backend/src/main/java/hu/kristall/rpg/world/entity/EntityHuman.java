@@ -5,6 +5,7 @@ import hu.kristall.rpg.ThreadCloneable;
 import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
+import hu.kristall.rpg.network.packet.out.PacketOutEntityTeleport;
 import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
 import hu.kristall.rpg.network.packet.out.PacketOutMoveentity;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
@@ -13,7 +14,6 @@ import hu.kristall.rpg.persistence.SavedItemStack;
 import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.*;
-import hu.kristall.rpg.world.entity.cozy.Cloth;
 import hu.kristall.rpg.world.entity.cozy.ClothPack;
 import hu.kristall.rpg.world.path.ConstantPosition;
 import hu.kristall.rpg.world.path.Path;
@@ -95,6 +95,8 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		return lastPath;
 	}
 	
+	
+	
 	public void setClothes(ClothPack clothes) {
 		this.clothes = clothes;
 		getWorld().broadcastPacket(new PacketOutChangeClothes(this));
@@ -110,6 +112,21 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		long now = System.nanoTime();
 		this.lastPath = this.getWorld().interpolatePath(getPosition(), to, getSpeed(), now);
 		getWorld().broadcastPacket(new PacketOutMoveentity(this));
+	}
+	
+	@Override
+	public void stop() {
+		teleport(getPosition(), false);
+	}
+	
+	public void teleport(Position pos, boolean instant) {
+		this.lastPath = getWorld().idlePath(pos);
+		getWorld().broadcastPacket(new PacketOutEntityTeleport(pos.getX(), pos.getY(), getID(), instant));
+	}
+	
+	@Override
+	public void teleport(Position pos) {
+		teleport(pos, true);
 	}
 	
 	@Override

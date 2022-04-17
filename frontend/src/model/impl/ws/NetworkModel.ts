@@ -11,6 +11,7 @@ import SignalEntityDespawn from "model/signals/SignalEntityDespawn";
 import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalEntityspeed from "model/signals/SignalEntityspeed";
+import SignalEntityTeleport from "model/signals/SignalEntityTeleport";
 import SignalFocus from "model/signals/SignalFocus";
 import SignalInPortalspawn from "model/signals/SignalInPortalspawn";
 import SignalInSpawnItem from "model/signals/SignalInSpawnItem";
@@ -84,6 +85,7 @@ class NetworkModel extends LogicModel {
 
 			return new SignalSetinventory(itemStacks);
 		});
+		this.addPacketSignal("teleport", ({x,y,entityID, instant}) => new SignalEntityTeleport(x,y,entityID,instant));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 

@@ -124,6 +124,10 @@ public abstract class Entity {
 	
 	public abstract void move(Position to);
 	
+	public abstract void stop();
+	
+	public abstract void teleport(Position pos);
+	
 	public double getSpeed() {
 		return this.speed;
 	}

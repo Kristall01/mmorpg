@@ -1,6 +1,6 @@
 import { RenderContext } from "game/graphics/GraphicsUtils"
 import { EntityType } from "./EntityType"
-import { ConstStatus, Direction, entityZigzagStatus, Status, StatusFn } from "./Paths"
+import { ConstStatus, Direction, EntityConstStatus, entityZigzagStatus, Status, StatusFn } from "./Paths"
 import UpdateBroadcaster from "./UpdateBroadcaster"
 import { Position } from "./VisualModel"
 
@@ -58,6 +58,17 @@ export default abstract class Entity {
 
 	setDead(alive: boolean) {
 		this.alive = !alive;
+	}
+
+	teleport(pos: Position, instant: boolean) {
+		let now = performance.now();
+		if(instant) {
+			this.statusFn = ConstStatus(pos, this.statusFn(now).facing);
+		}
+		else {
+			let status = this.statusFn(now)
+			this.statusFn = EntityConstStatus(status.position, pos, status.facing);
+		}
 	}
 
 /* 	walk(startTime: number, from: Position, target: Position) {
