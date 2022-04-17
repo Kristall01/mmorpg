@@ -170,7 +170,6 @@ class WorldRenderer implements Renderable {
 		}
 		if(zoomModified) {
 			this.model.setConstantZoom(zoom);
-			console.log("set constant zoom");
 		}
 
 		this.renderConfig = {
