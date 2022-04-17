@@ -145,7 +145,9 @@ public abstract class Entity {
 	
 	public void sendStatusFor(PlayerConnection conn) {
 		conn.sendPacket(new PacketOutSpawnEntity(this));
-		conn.sendPacket(new PacketOutMoveentity(this));
+		if(getLastPath().getPosiFn().moving()) {
+			conn.sendPacket(new PacketOutMoveentity(this));
+		}
 		conn.sendPacket(new PacketOutHpChange(this));
 		if(getName() != null) {
 			conn.sendPacket(new PacketOutEntityRename(this));
