@@ -12,6 +12,8 @@ class TexturePack {
 
 	constructor(images: ImageStore) {
 		this.images = images;
+		this.addTexture("null", "tile", NullTexture.instance);
+		this.addTexture("empty", "tile", EmptyTexture.instance);
 	}
 
 	public addTexture(key: string, categoryName: string, t: Texture) {
