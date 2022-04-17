@@ -1,6 +1,5 @@
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
-import Layer from "visual_model/Layer";
 import VisualModel from "visual_model/VisualModel";
 
 export default class SignalJoinworld implements SignalIn {
