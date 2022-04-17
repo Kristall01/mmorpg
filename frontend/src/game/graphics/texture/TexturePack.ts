@@ -1,6 +1,7 @@
 import ImageStore, { loadImage } from "game/ImageStore";
 import AnimatedGlobalColumnTexture from "./AnimatedGlobalColumnTexture";
 import EmptyTexture from "./EmptyTexture";
+import NullTexture from "./NullTexture";
 import StaticTexture from "./StaticTexture";
 import Texture, { ofType } from "./Texture";
 
@@ -25,6 +26,19 @@ class TexturePack {
 		category.set(key, t);
 	}
 
+	private addGeneratedTextures(baseName:string, category: string, textures: Texture | Map<string, Texture>) {
+		let a = new Map();
+		if((textures as any).__proto__.constructor !== Map) {
+			this.addTexture(baseName, category, (textures as Texture));
+		}
+		else {
+			for(let entryPair of (textures as Map<string, Texture>).entries()) {
+				let [generatedKey, t] = entryPair;
+				this.addTexture(baseName+"_"+generatedKey, category, t);
+			}
+		}
+	}
+
 	public async loadPack(url: string) {
 		let srcFileResponse = await fetch(url);
 		let textureJson = await srcFileResponse.json();
@@ -33,8 +47,8 @@ class TexturePack {
 			for(let [key, entryData] of Object.entries(textureJson.entries)) {
 				let data = Object.assign({}, textureJson.similarity, entryData);
 				let {texture_type, path, category} = data;
-				let texture = ofType(texture_type, this.images.get(path).img, data);
-				this.addTexture(key, category, texture);
+				let generateResult = ofType(texture_type, this.images.get(path).img, data);
+				this.addGeneratedTextures(key, category, generateResult);
 			}
 			return;
 		}
@@ -42,7 +56,19 @@ class TexturePack {
 			for(let [key, entryData] of Object.entries(textureJson.entries)) {
 				let data = (entryData as any);
 				let {texture_type, path, category} = data;
-				this.addTexture(key, category, ofType(texture_type, this.images.get(path).img, data))
+				let generateResult = ofType(texture_type, this.images.get(path).img, data);
+				this.addGeneratedTextures(key, category, generateResult);
+			}
+		}
+		else if(type === "index_sprite") {
+			for(let [key, entryData] of Object.entries(textureJson.entries)) {
+				let data = (entryData as any);
+				if(textureJson.similarity !== undefined) {
+					data = Object.assign({}, textureJson.similarity, entryData);
+				}
+				let {texture_type, path, category} = data;
+				let texture = ofType(texture_type, this.images.get(path).img, data);
+				this.addGeneratedTextures(key, category, texture);
 			}
 		}
 
