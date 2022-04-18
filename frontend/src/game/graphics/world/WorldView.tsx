@@ -100,26 +100,28 @@ class WorldView extends React.Component<props> {
 	}
 
 	handleMouseDown(e: React.MouseEvent) {
-		if(e.nativeEvent.button === 2) {
+		if(e.nativeEvent.button === 0) {
 			let {offsetX, offsetY} = e.nativeEvent;
 			this.logicModel.attackTowards(...this.worldRenderer.translateCanvasXY(offsetX, offsetY));
 			e.preventDefault();
 			return;
 		}
-		this.clearIntervalTask();
+		else if(e.nativeEvent.button === 2) {
+			this.clearIntervalTask();
 
-		if(e.target !== this.mainRef.current) {
-			return;
+			if(e.target !== this.mainRef.current) {
+				return;
+			}
+
+			const moveToOffset = (a: number, b: number) => {
+				let [logicX, logicY] = this.worldRenderer.translateCanvasXY(a, b);
+				this.logicModel.moveMeTo(logicX, logicY);
+			}
+
+			moveToOffset(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+			let h: TimerHandler = () => moveToOffset(this.mousePositionX, this.mousePositionY);
+			this.intervalTask = setInterval(h, 250);
 		}
-
-		const moveToOffset = (a: number, b: number) => {
-			let [logicX, logicY] = this.worldRenderer.translateCanvasXY(a, b);
-			this.logicModel.moveMeTo(logicX, logicY);
-		}
-
-		moveToOffset(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-		let h: TimerHandler = () => moveToOffset(this.mousePositionX, this.mousePositionY);
-		this.intervalTask = setInterval(h, 250);
 	}
 
 	componentWillUnmount() {
