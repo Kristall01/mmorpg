@@ -22,7 +22,7 @@ public abstract class Entity {
 	private double hp;
 	private double maxHp;
 	private boolean alive = true;
-	private Inventory inventory;
+	protected Inventory inventory;
 	
 	public Entity(World world, EntityType type, int entityID, double speed, double HP, double maxHp) {
 		this.type = type;
@@ -31,9 +31,6 @@ public abstract class Entity {
 		this.speed = speed;
 		this.hp = HP;
 		this.maxHp = maxHp;
-		this.hp = maxHp;
-		
-		this.inventory = new Inventory(this);
 	}
 	
 	public void setInventory(Inventory inventory) {
@@ -42,10 +39,6 @@ public abstract class Entity {
 	
 	public Inventory getInventory() {
 		return inventory;
-	}
-	
-	public Entity(World world, EntityType type, int entityID) {
-		this(world, type, entityID, type.speed, type.maxHP, type.maxHP);
 	}
 	
 	public abstract Position getPosition();
@@ -70,7 +63,7 @@ public abstract class Entity {
 		return maxHp;
 	}
 	
-	private boolean setHp(final double baseAmount) {
+	protected boolean setHp(final double baseAmount) {
 		double amount = baseAmount;
 		if(amount > getMaxHp()) {
 			amount = getMaxHp();
@@ -131,6 +124,10 @@ public abstract class Entity {
 	
 	public abstract void move(Position to);
 	
+	public abstract void stop();
+	
+	public abstract void teleport(Position pos);
+	
 	public double getSpeed() {
 		return this.speed;
 	}
@@ -152,7 +149,9 @@ public abstract class Entity {
 	
 	public void sendStatusFor(PlayerConnection conn) {
 		conn.sendPacket(new PacketOutSpawnEntity(this));
-		conn.sendPacket(new PacketOutMoveentity(this));
+		if(getLastPath().getPosiFn().moving()) {
+			conn.sendPacket(new PacketOutMoveentity(this));
+		}
 		conn.sendPacket(new PacketOutHpChange(this));
 		if(getName() != null) {
 			conn.sendPacket(new PacketOutEntityRename(this));

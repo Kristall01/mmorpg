@@ -34,4 +34,9 @@ public class LinearPosition implements PositionFunction {
 			yDiff * ((currentTime - startTimeNanos) / totalTime));
 	}
 	
+	@Override
+	public boolean moving() {
+		return System.nanoTime() < endTime;
+	}
+	
 }

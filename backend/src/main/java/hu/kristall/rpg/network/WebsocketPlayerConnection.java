@@ -3,6 +3,7 @@ package hu.kristall.rpg.network;
 import hu.kristall.rpg.Player;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.network.packet.in.play.*;
+import hu.kristall.rpg.network.packet.out.PacketOutAuthenticated;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.network.packet.in.PacketIn;
@@ -64,6 +65,7 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 	public void joinGame(Player player) {
 		this.player = player;
 		this.packets = playPacketMap;
+		this.sendPacket(new PacketOutAuthenticated());
 	}
 	
 	//called from network thread
@@ -73,9 +75,8 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 			return;
 		}
 		try {
-			getAsyncServer().sync(srv -> {
-				getPlayer().handleQuit();
-			});
+			final Player player = getPlayer();
+			getAsyncServer().sync(srv -> player.handleQuit());
 		}
 		catch (Synchronizer.TaskRejectedException e) {
 			//server will be running while players are online
@@ -114,6 +115,8 @@ public class WebsocketPlayerConnection implements NetworkConnection, PlayerConne
 		playPacketMapBuilder.register("ping", PacketInPlayPing.class);
 		playPacketMapBuilder.register("move", PacketInPlayMove.class);
 		playPacketMapBuilder.register("collect-items", PacketInPlayCollectitems.class);
+		playPacketMapBuilder.register("apply-clothes", PacketInPlayApplyClothes.class);
+		playPacketMapBuilder.register("attack", PacketInPlayAttack.class);
 		playPacketMap = playPacketMapBuilder.build();
 		
 		PacketMap.Builder<PacketInHandshake> handshakePacketMapBuilder = new PacketMap.Builder<PacketInHandshake>();

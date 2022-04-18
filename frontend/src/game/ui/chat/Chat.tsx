@@ -4,6 +4,7 @@ import { focus } from "visual_model/VisualModel";
 
 import "./textconverter.css";
 import "./Chat.scss";
+import ChatLine from "./ChatLine";
 
 type props = {
 	text: string
@@ -80,10 +81,10 @@ const Chat = (): JSX.Element | null => {
 			return;
 		}
 		if(e.key === "Enter") {
-			visualModel.pushHistoryEntry(chatText);
 			let chattext = e.currentTarget.value;
 			chattext = chattext.trim();
 			if(chattext.length !== 0) {
+				visualModel.pushHistoryEntry(chatText);
 				if(chatText.startsWith("/dev")) {
 					handleLocalCommand(chatText.substring(4));
 				}
@@ -133,7 +134,7 @@ const Chat = (): JSX.Element | null => {
 
 	return <div className={"nozoom chatwindow"+(visualModel.chatOpen ?" open":"")}>
 		<div className="log">
-			{visualModel.chatlog.map((e,v) => <div key={v} dangerouslySetInnerHTML={{__html: e}}></div>)}
+			{visualModel.chatlog.map((e,v) => <ChatLine key={v} line={e} />)}
 			<div ref={dummyDiv}></div>
 		</div>
 		<div className="input-placeholder">

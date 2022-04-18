@@ -26,14 +26,14 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	camPositionFn: (rendertime: number) => Position;
 	private _labels: WorldLabel[] = [];
 	public readonly model: VisualModel
-	public readonly tileGrid: Matrix<string>
+	public readonly tileGrid: Array<Matrix<string>>
 	private portals: Portal[] = []
 	private _items: Map<number, FloatingItem> = new Map();
 	public followedEntity: Entity | null = null;
 	private inventory: Array<ItemStack> = [];
 
 
-	constructor(model: VisualModel, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
+	constructor(model: VisualModel, width: number, height: number, tileGrid: Array<Matrix<string>>, camStart: Position) {
 		super();
 		this.tileGrid = tileGrid;
 		this.model = model;

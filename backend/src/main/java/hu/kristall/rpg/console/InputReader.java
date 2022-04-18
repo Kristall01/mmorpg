@@ -3,6 +3,8 @@ package hu.kristall.rpg.console;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.sync.Synchronizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -19,16 +21,17 @@ public class InputReader implements CommandSender {
 	public InputReader(Synchronizer<Server> asyncServer) {
 		this.asyncServer = asyncServer;
 		
+		Logger logger = LoggerFactory.getLogger("InputReader");
 		try {
 			if(System.console() == null) {
 				throw new IOException("system console was not found");
 			}
 			this.supplier = new TerminalReader(this, asyncServer);
-			System.out.println("initializing input reader from Terminal");
+			logger.info("initializing input reader from tty terminal");
 		}
 		catch (IOException ex) {
 			this.supplier = new PrimitiveReader();
-			System.out.println("initializing input reader from System.in");
+			logger.info("initializing input reader from stdin");
 		}
 		
 		this.consumer = (cmdline) -> {

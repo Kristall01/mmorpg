@@ -1,20 +1,21 @@
 import { convertToHtmlText } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
+import { ThemeConsumer } from "react-bootstrap/esm/ThemeProvider";
 import Entity from "./Entity";
 import ItemStack from "./ItemStack";
 import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
 
-export type focus = "main" | "chat" | "menu" | "inventory";
+export type focus = "main" | "chat" | "menu" | "inventory" | "clotheditor";
 
 export type Position = [number,number];
 
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open";
+export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -32,6 +33,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private listeners = []
 	private chatHistory: string[] = [];
 	private _inventoryOpen: boolean = false;
+	private _clothEditorOpen: boolean = false;
 
 	constructor() {
 		super();
@@ -39,13 +41,17 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		this.zoomFn = (rendertime: number) => this.zoomTarget
 	}
 
-	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Matrix<string>, camStart: Position) {
+	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Array<Matrix<string>>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
 		this.triggerUpdate("world");
 	}
 
 	public get inventoryOpen() {
 		return this._inventoryOpen;
+	}
+
+	public get clothEditorOpen() {
+		return this._clothEditorOpen;
 	}
 
 	setInventoryOpen(value: boolean) {
@@ -55,6 +61,15 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		this._inventoryOpen = value;
 		this.triggerUpdate("inventory-open");
 		this.setFocus(value ? "inventory" : "main");
+	}
+
+	setClotheditorOpen(value: boolean) {
+		if(this.clothEditorOpen === value) {
+			return;
+		}
+		this._clothEditorOpen = value;
+		this.triggerUpdate("clotheditor-open");
+		this.setFocus(value ? "clotheditor" : "main");
 	}
 
 	public pushHistoryEntry(msg: string) {
@@ -90,7 +105,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	}
 
 	addChatEntry(text: string) {
-		this.chatlog = [...this.chatlog, convertToHtmlText(text)];
+		this.chatlog = [...this.chatlog, text];
 		this.triggerUpdate("chatlog");
 	}
 
@@ -128,6 +143,12 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 
 	zoomAt(rendertime: number) {
 		return this.zoomFn(rendertime);
+	}
+
+	setConstantZoom(val: number) {
+		this.zoomFn = () => val;
+		this.zoomTarget = val;
+		this.triggerUpdate("zoom");
 	}
 
 	multiplyZoom(val: number) {

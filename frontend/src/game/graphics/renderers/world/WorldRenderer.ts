@@ -35,7 +35,7 @@ class WorldRenderer implements Renderable {
 	readonly cozyPack: CozyPack;
 	private world: World
 	private model: VisualModel
-	private tileTextures: Matrix<Texture>;
+	private tileTextures: Array<Matrix<Texture>>;
 	private portalIcon: HTMLImageElement
 	private floatingItems: Map<number, FloatingItemResource> = new Map();
 	private subs: SubManager = new SubManager();
@@ -49,7 +49,7 @@ class WorldRenderer implements Renderable {
 		this.world = world;
 		this.texturePack = visuals.textures;
 		this.cozyPack = visuals.cozy;
-		this.tileTextures = world.tileGrid.map(t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture());
+		this.tileTextures = world.tileGrid.map(tileGrid => tileGrid.map( t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture()));
 		this.updateFloatingItemList();
 	}
 
@@ -102,6 +102,7 @@ class WorldRenderer implements Renderable {
 		const camFocusY = 0.5;
 
 		let zoom = this.model.zoomAt(rendertime);
+		let zoomModified = false;
 
 		let camX = camProps[0];
 		let camY = camProps[1];
@@ -120,15 +121,21 @@ class WorldRenderer implements Renderable {
 	//			zoom = Math.min(zoom, Math.max(100, minVerticalZoom, minHorizontalZoom))
 			if(zoom < Math.min(minVerticalZoom, 100)) {
 				zoom = Math.min(minVerticalZoom, 100);
+				zoomModified = true;
 			}
 			if(zoom < Math.min(minHorizontalZoom, 100)) {
 				zoom = Math.min(minHorizontalZoom, 100);
+				zoomModified = true;
 			}
 		}
-		zoom = Math.min(zoom, 400);
+		if(zoom > 400) {
+			zoom = 400;
+			zoomModified = true;
+		}
 
  		if(zoom < this.model.maxZoom) {
 			zoom = this.model.maxZoom;
+			zoomModified = true;
 		}
 		if(height > world.height*zoom) {
 			camY = camFocusY * world.height;
@@ -160,6 +167,9 @@ class WorldRenderer implements Renderable {
 					camX = maxCamX;
 				}
 			}
+		}
+		if(zoomModified) {
+			this.model.setConstantZoom(zoom);
 		}
 
 		this.renderConfig = {
@@ -263,19 +273,21 @@ class WorldRenderer implements Renderable {
 		mostLeftRender = Math.floor(mostLeftRender);
 		mostTopRender = Math.floor(mostTopRender);
 
-		for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
-			for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
-				let floorX = Math.floor(x);
-				let floorY = Math.floor(y);
-				//let tileXPos = (width * camFocusX) + ((-camX + floorX) * tileSize);
-				//let tileYPos = (height * (1-camFocusY)) - ((-camY + floorY+1) * tileSize);
+		for(let tileLayerIndex = 0; tileLayerIndex < this.tileTextures.length; ++tileLayerIndex) {
+			for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
+				for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
+					let floorX = Math.floor(x);
+					let floorY = Math.floor(y);
+					//let tileXPos = (width * camFocusX) + ((-camX + floorX) * tileSize);
+					//let tileYPos = (height * (1-camFocusY)) - ((-camY + floorY+1) * tileSize);
 
-				//let [translatedX, translatedY] = this.translateXY(floorX, floorY);
-				let t = this.tileTextures.elementAt([floorX, floorY]);
-				if(t === null) {
-					t = this.texturePack.getDefaultTexture();
+					//let [translatedX, translatedY] = this.translateXY(floorX, floorY);
+					let t = this.tileTextures[tileLayerIndex].elementAt([floorX, floorY]);
+					if(t === null) {
+						t = this.texturePack.getDefaultTexture();
+					}
+					t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 				}
-				t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 			}
 		}
 		//this.ctx.fillStyle = "yellow";
@@ -283,7 +295,7 @@ class WorldRenderer implements Renderable {
 		this.ctx.fillStyle = "blue";
 		//render portals
 
-		let whRation = this.portalIcon.width / this.portalIcon.height;
+		//let whRation = this.portalIcon.width / this.portalIcon.height;
 
 
 		for(let p of this.world.getPortals()) {

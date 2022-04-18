@@ -9,4 +9,6 @@ export default class EmptyTexture implements Texture {
 		ctx.fillRect(position[0], position[1], size, size);
 	}
 
+	public static instance: EmptyTexture = new EmptyTexture();
+
 }

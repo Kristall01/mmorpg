@@ -100,20 +100,28 @@ class WorldView extends React.Component<props> {
 	}
 
 	handleMouseDown(e: React.MouseEvent) {
-		this.clearIntervalTask();
-
-		if(e.target !== this.mainRef.current) {
+		if(e.nativeEvent.button === 0) {
+			let {offsetX, offsetY} = e.nativeEvent;
+			this.logicModel.attackTowards(...this.worldRenderer.translateCanvasXY(offsetX, offsetY));
+			e.preventDefault();
 			return;
 		}
+		else if(e.nativeEvent.button === 2) {
+			this.clearIntervalTask();
 
-		const moveToOffset = (a: number, b: number) => {
-			let [logicX, logicY] = this.worldRenderer.translateCanvasXY(a, b);
-			this.logicModel.moveMeTo(logicX, logicY);
+			if(e.target !== this.mainRef.current) {
+				return;
+			}
+
+			const moveToOffset = (a: number, b: number) => {
+				let [logicX, logicY] = this.worldRenderer.translateCanvasXY(a, b);
+				this.logicModel.moveMeTo(logicX, logicY);
+			}
+
+			moveToOffset(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+			let h: TimerHandler = () => moveToOffset(this.mousePositionX, this.mousePositionY);
+			this.intervalTask = setInterval(h, 250);
 		}
-
-		moveToOffset(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-		let h: TimerHandler = () => moveToOffset(this.mousePositionX, this.mousePositionY);
-		this.intervalTask = setInterval(h, 250);
 	}
 
 	componentWillUnmount() {
@@ -131,6 +139,7 @@ class WorldView extends React.Component<props> {
 				onMouseUp={e => this.handleMouseUp(e)}
 				onMouseMove={e => this.handleMouseMove(e)}
 				onKeyDown={e => this.handleKeyDown(e)}
+				onContextMenu={e => e.preventDefault()}
 			>
 				{inventoryMenu}
 				<GraphicsComponent showFpsCounter={true} maxFPS={this.visualModel.maxFPS} renderable={this.worldRenderer} />

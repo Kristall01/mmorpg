@@ -1,9 +1,13 @@
 package hu.kristall.rpg.network.packet.in.handshake;
 
+import hu.kristall.rpg.Player;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.network.WebsocketPlayerConnection;
-import hu.kristall.rpg.network.packet.out.PacketOutAuthenticated;
+import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.Synchronizer;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class PacketInHandshakeAuth extends PacketInHandshake {
 	
@@ -15,8 +19,16 @@ public class PacketInHandshakeAuth extends PacketInHandshake {
 		try {
 			conn.getAsyncServer().sync(srv -> {
 				try {
-					srv.createPlayer(conn, name);
-					conn.sendPacket(new PacketOutAuthenticated());
+					Future<Player> futurePlayer = srv.createPlayer(conn, name);
+					AsyncExecutor.instance().runTask(() -> {
+						try {
+							futurePlayer.get();
+						}
+						catch (InterruptedException | ExecutionException e) {
+							conn.close("Hiba történt a csatlakozás során.");
+							e.printStackTrace();
+						}
+					});
 				}
 				catch (Server.PlayerNameAlreadyOnlineException e) {
 					conn.close("Ez a név már foglalt.");

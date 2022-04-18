@@ -43,6 +43,10 @@ public class WorldsManager {
 		return Collections.unmodifiableCollection(this.worlds.keySet());
 	}
 	
+	public Set<Map.Entry<String, Synchronizer<World>>> getWorlds() {
+		return Collections.unmodifiableSet(this.worlds.entrySet());
+	}
+	
 	public void shutdown() {
 		server.getLogger().info("Shutting down worlds");
 		List<Future<String>> shutdownTasks = new ArrayList<>();

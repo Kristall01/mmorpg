@@ -147,7 +147,7 @@ class ColoredCozyCloth implements CozyCloth {
 	private clothTextures: Sprite[];
 
 	constructor(key: Activity, cloth: Cloth, images: ImageStore) {
-		let baseSprite = new Sprite(images.get(`${cloth.id}_${key.id}.png`).img, key.frametimes);
+		let baseSprite = new Sprite(images.get(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
 		let colorValues = ClothColor.enum.values;
 		this.clothTextures = new Array(colorValues.length);
 		for(let i = 0; i < colorValues.length; ++i) {
@@ -167,7 +167,7 @@ class ColorlessCozyCloth implements CozyCloth {
 	private clothTexture: Sprite;
 
 	constructor(key: Activity, cloth: Cloth, images: ImageStore) {
-		this.clothTexture = new Sprite(images.get(`${cloth.id}_${key.id}.png`).img, key.frametimes);
+		this.clothTexture = new Sprite(images.get(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
 	}
 
 	ofColor(color: ClothColor): Sprite {
@@ -177,7 +177,7 @@ class ColorlessCozyCloth implements CozyCloth {
 
 }
 
-class CozyActivity {
+export class CozyActivity {
 
 	private skinTones: Sprite[]
 	private clothes: CozyCloth[]

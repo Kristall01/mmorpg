@@ -15,4 +15,9 @@ public class ConstantPosition implements PositionFunction {
 		return position;
 	}
 	
+	@Override
+	public boolean moving() {
+		return false;
+	}
+	
 }

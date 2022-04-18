@@ -1,0 +1,29 @@
+{
+	"type": "similar_list",
+	"similarity": {
+		"tile_width": 16,
+		"tile_height": 16,
+		"texture_type": "indexed_sprite",
+		"category": "tile"
+	},
+	"entries": {
+		"SPROUT_DIRT": {
+			"path": "sprout_dirt.png"
+		},
+		"SPROUT_FENCE": {
+			"path": "sprout_fence.png"
+		},
+		"SPROUT_GRASS": {
+			"path": "sprout_grass.png"
+		},
+		"SPROUT_HILLS": {
+			"path": "sprout_hills.png"
+		},
+		"SPROUT_HOUSE": {
+			"path": "sprout_house.png"
+		},
+		"SPROUT_WATER": {
+			"path": "sprout_water.png"
+		}
+	}
+}

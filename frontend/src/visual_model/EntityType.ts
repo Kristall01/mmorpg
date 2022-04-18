@@ -26,7 +26,7 @@ export class EntityType {
 
 	static readonly enum = {
 		map: {
-			HUMAN: new EntityType(1),
+			HUMAN: new EntityType(1.4),
 			UNKNOWN: new EntityType(0),
 		},
 		values: new Array<EntityType>()
