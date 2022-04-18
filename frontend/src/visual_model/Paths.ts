@@ -91,7 +91,7 @@ export const LinearStatus = (startTimeMs: number, from: Position, to: Position, 
 	}
 }
 
-const calculatedDirection = (x: number, y: number): Direction => {
+export const calculatedDirection = (x: number, y: number): Direction => {
 	let enumMap = Direction.enum.map;
 
 	//edge case
@@ -113,6 +113,18 @@ const calculatedDirection = (x: number, y: number): Direction => {
 export const radiusDistance = (p0: Position, p1: Position) => {
 	return Math.sqrt(Math.pow(p0[0] - p1[0], 2) + Math.pow(p0[1] - p1[1], 2));
 }
+
+export const facingFunction = (facing: Direction, fn: StatusFn): StatusFn => {
+	return (rendertime: number) => {
+		let val = fn(rendertime);
+		return {
+			facing: facing,
+			moving: val.moving,
+			position: val.position
+		}
+	}
+}
+
 
 export const zigzagStatus = (startTimeMs: number, points: Position[], cellsPerSec: number): StatusFn => {
 	let timePoints: number[] = [];

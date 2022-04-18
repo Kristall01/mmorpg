@@ -81,10 +81,10 @@ const Chat = (): JSX.Element | null => {
 			return;
 		}
 		if(e.key === "Enter") {
-			visualModel.pushHistoryEntry(chatText);
 			let chattext = e.currentTarget.value;
 			chattext = chattext.trim();
 			if(chattext.length !== 0) {
+				visualModel.pushHistoryEntry(chatText);
 				if(chatText.startsWith("/dev")) {
 					handleLocalCommand(chatText.substring(4));
 				}

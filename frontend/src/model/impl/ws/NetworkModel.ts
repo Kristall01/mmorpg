@@ -1,6 +1,7 @@
 import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
+import SignalAttack from "model/signals/SignalAttack";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
 import SignalChangeHp from "model/signals/SignalChangeHp";
 import SignalChat from "model/signals/SignalChat";
@@ -11,6 +12,7 @@ import SignalEntityDespawn from "model/signals/SignalEntityDespawn";
 import SignalEntitypath from "model/signals/SignalEntitypath";
 import SignalEntityspawn from "model/signals/SignalEntityspawn";
 import SignalEntityspeed from "model/signals/SignalEntityspeed";
+import SignalEntityTeleport from "model/signals/SignalEntityTeleport";
 import SignalFocus from "model/signals/SignalFocus";
 import SignalInPortalspawn from "model/signals/SignalInPortalspawn";
 import SignalInSpawnItem from "model/signals/SignalInSpawnItem";
@@ -84,6 +86,8 @@ class NetworkModel extends LogicModel {
 
 			return new SignalSetinventory(itemStacks);
 		});
+		this.addPacketSignal("teleport", ({x,y,entityID, instant}) => new SignalEntityTeleport(x,y,entityID,instant));
+		this.addPacketSignal("attack", ({x,y,entityID}) => new SignalAttack(entityID, x,y));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
@@ -132,6 +136,11 @@ class NetworkModel extends LogicModel {
 		this.ws.addEventListener("close", () => {
 			this.endConnection("hálózati hiba: a szerver váratlanul megszűntette a kapcsolatot");
 		});
+	}
+
+
+	attackTowards(x: number, y: number) {
+		this.sendPacket("attack", {x, y});
 	}
 
 	private convertServerNanos(nanos: number) {

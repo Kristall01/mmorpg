@@ -20,6 +20,8 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 	private Synchronizer<WorldPlayer> synchronizer = new Synchronizer<>(this);
 	private boolean changingWorld;
 	
+	private boolean hasQuit = false;
+	
 	public WorldPlayer(World world, AsyncPlayer player) {
 		this.world = world;
 		this.player = player;
@@ -108,4 +110,13 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 	public boolean hasEntity() {
 		return !(entity == null || entity.isRemoved());
 	}
+	
+	public void quit() {
+		this.hasQuit = true;
+	}
+	
+	public boolean hasQuit() {
+		return this.hasQuit;
+	}
+	
 }

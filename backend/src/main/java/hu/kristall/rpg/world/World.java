@@ -13,6 +13,7 @@ import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.Entity;
 import hu.kristall.rpg.world.entity.EntityHuman;
 import hu.kristall.rpg.world.entity.EntityType;
+import hu.kristall.rpg.world.path.ConstantPosition;
 import hu.kristall.rpg.world.path.LinearPosition;
 import hu.kristall.rpg.world.path.Path;
 import org.slf4j.Logger;
@@ -225,6 +226,7 @@ public class World extends SynchronizedObject<World> {
 		if(oldWP == null) {
 			return null;
 		}
+		oldWP.quit();
 		player.connection.sendPacket(new PacketOutLeaveWorld());
 		EntityHuman h = oldWP.getEntity();
 		SavedPlayer savedPlayer = null;
@@ -292,6 +294,10 @@ public class World extends SynchronizedObject<World> {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public Path idlePath(Position pos) {
+		return new Path(pos, List.of(pos), new ConstantPosition(pos), System.nanoTime());
 	}
 	
 	public Position fixValidate(Position to) {

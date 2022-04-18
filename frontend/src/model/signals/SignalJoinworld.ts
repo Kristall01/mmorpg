@@ -8,14 +8,22 @@ export default class SignalJoinworld implements SignalIn {
 	spawnY: number;
 	width: number;
 	height: number;
-	tileGrid: Matrix<string>
+	tileGrid: Array<Matrix<string>>
 
 	constructor(spawnX: number, spawnY: number, width: number, height: number, tileGrid: string[]) {
 		this.spawnX = spawnX;
 		this.spawnY = spawnY;
 		this.width = width;
 		this.height = height;
-		this.tileGrid = Matrix.fromArray(width, height, tileGrid);
+		let layerCells = width*height;
+		if(tileGrid.length % layerCells != 0) {
+			throw new Error(`TileGrid length (${tileGrid.length}) not divisible by layer size (${layerCells})`);
+		}
+		let grids: Array<Matrix<string>> = [];
+		for(let i = 0; i < (tileGrid.length/layerCells); ++i) {
+			grids.push(Matrix.fromArray(width, height, tileGrid.slice(i*layerCells, (i+1)*layerCells)));
+		}
+		this.tileGrid = grids;
 	}
 
 	execute(model: VisualModel): void {

@@ -46,7 +46,15 @@ public class AsyncExecutor implements TaskRunner {
 	}
 	
 	public Future<?> runTask(Runnable r) {
-		return executorService.submit(r);
+		return executorService.submit(() -> {
+			try {
+				r.run();
+			}
+			catch (Throwable t) {
+				logger.error("failed to execute task", t);
+				throw t;
+			}
+		});
 	}
 	
 	@Override
@@ -54,9 +62,16 @@ public class AsyncExecutor implements TaskRunner {
 		return executorService.isShutdown();
 	}
 	
-	@Override
-	public <T> Future<T> computeTask(Callable<T> c) {
-		return executorService.submit(c);
+	public <U> Future<U> computeTask(Callable<U> c) {
+		return executorService.submit(() -> {
+			try {
+				return c.call();
+			}
+			catch (Throwable t) {
+				logger.error("failed to execute task", t);
+				throw t;
+			}
+		});
 	}
 	
 	private static class AsyncThreadFactory implements ThreadFactory {

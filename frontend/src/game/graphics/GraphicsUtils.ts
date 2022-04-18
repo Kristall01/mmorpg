@@ -91,7 +91,6 @@ export const drawText = (ctx: RenderContext, canvasPosition: Position, text: str
 	ctx.font = '30px Roboto';
 
 	let fragments = parseText(text);
-	console.log(fragments);
 
 	let vModifier = Positioning[vertical];
 	let hModifier = Positioning[horizontal];

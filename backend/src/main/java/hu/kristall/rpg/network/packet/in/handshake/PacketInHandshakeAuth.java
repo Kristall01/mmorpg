@@ -3,7 +3,6 @@ package hu.kristall.rpg.network.packet.in.handshake;
 import hu.kristall.rpg.Player;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.network.WebsocketPlayerConnection;
-import hu.kristall.rpg.network.packet.out.PacketOutAuthenticated;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.Synchronizer;
 
@@ -24,7 +23,6 @@ public class PacketInHandshakeAuth extends PacketInHandshake {
 					AsyncExecutor.instance().runTask(() -> {
 						try {
 							futurePlayer.get();
-							conn.sendPacket(new PacketOutAuthenticated());
 						}
 						catch (InterruptedException | ExecutionException e) {
 							conn.close("Hiba történt a csatlakozás során.");
