@@ -163,7 +163,7 @@ public class Server extends SynchronizedObject<Server> {
 			try {
 				savedPlayer = playerPersistence.loadPlayer(name);
 			}
-			catch (IOException e) {
+			catch (Throwable e) {
 				AsyncExecutor.instance().getLogger().error("failed to load player data", e);
 				c.completeExceptionally(e);
 				return;
@@ -198,6 +198,7 @@ public class Server extends SynchronizedObject<Server> {
 			catch (Synchronizer.TaskRejectedException e) {
 				//server was shut down during loading player. feels bad man :/
 				e.printStackTrace();
+				c.completeExceptionally(e);
 			}
 		});
 		return c;

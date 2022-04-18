@@ -1,5 +1,6 @@
 package hu.kristall.rpg.persistence;
 
+import com.google.gson.JsonSyntaxException;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import org.slf4j.LoggerFactory;
@@ -23,15 +24,14 @@ public class PlayerPersistence {
 		}
 	}
 	
-	public synchronized SavedPlayer loadPlayer(String name) throws IOException {
+	public synchronized SavedPlayer loadPlayer(String name) throws IOException, JsonSyntaxException {
 		File f = new File(playersDir, name);
 		if(!f.isFile()) {
 			return null;
 		}
-		FileReader reader = new FileReader(f);
-		SavedPlayer p = Utils.gson().fromJson(reader, SavedPlayer.class);
-		reader.close();
-		return p;
+		try (FileReader reader = new FileReader(f)) {
+			return Utils.gson().fromJson(reader, SavedPlayer.class);
+		}
 	}
 	
 	private synchronized void logError(Exception ex, String json, File target) {

@@ -45,11 +45,27 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 	}
 	
 	public Future<?> runTask(Runnable r) {
-		return executor.submit(r);
+		return executor.submit(() -> {
+			try {
+				r.run();
+			}
+			catch (Throwable t) {
+				taskPoolLogger.error("failed to execute task", t);
+				throw t;
+			}
+		});
 	}
 	
 	public <U> Future<U> computeTask(Callable<U> c) {
-		return executor.submit(c);
+		return executor.submit(() -> {
+			try {
+				return c.call();
+			}
+			catch (Throwable t) {
+				taskPoolLogger.error("failed to execute task", t);
+				throw t;
+			}
+		});
 	}
 	
 	@Override
