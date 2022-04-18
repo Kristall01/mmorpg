@@ -19,20 +19,13 @@ export const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => 
 
 	let alive = e.alive;
 
-	let activity = view.cozyPack.getCozyActivity(alive ? human.activity : Activity.enum.map.DIE);
+	let {activity, animationTime} = human.activity(renderConfig.rendertime);
+
+	let cozyActivity = view.cozyPack.getCozyActivity(activity);
 	let sinceTime: number;
-	if(!alive) {
-		sinceTime = 0;
-	}
-	else if(status.moving) {
-		sinceTime = renderConfig.rendertime - human.activityStart;
-	}
-	else {
-		sinceTime = 0;
-	}
-	activity.human(human.skin).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, sinceTime);
+	cozyActivity.human(human.skin).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
 	for(let clothes of human.clothes) {
-		activity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, sinceTime);
+		cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
 	}
 }
 

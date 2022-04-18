@@ -14,4 +14,8 @@ export default class UnknownEntity extends Entity {
 		super(id, EntityType.enum.map.UNKNOWN, loc, speed, facing, hp, maxHp);
 	}
 
+	attack(pos: Position): void {
+		
+	}
+
 }

@@ -226,6 +226,7 @@ public class World extends SynchronizedObject<World> {
 		if(oldWP == null) {
 			return null;
 		}
+		oldWP.quit();
 		player.connection.sendPacket(new PacketOutLeaveWorld());
 		EntityHuman h = oldWP.getEntity();
 		SavedPlayer savedPlayer = null;

@@ -1,5 +1,6 @@
 package hu.kristall.rpg.network.packet.in.play;
 
+import hu.kristall.rpg.Position;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.EntityHuman;
 
@@ -21,7 +22,7 @@ public class PacketInPlayAttack extends PacketInPlay {
 					//player is dead, went shaco ult, or something like that
 					return;
 				}
-				h.stop();
+				h.attackTowards(new Position(x, y));
 			});
 		}
 		catch (Synchronizer.TaskRejectedException e) {

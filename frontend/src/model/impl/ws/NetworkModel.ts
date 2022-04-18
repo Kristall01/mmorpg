@@ -1,6 +1,7 @@
 import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
+import SignalAttack from "model/signals/SignalAttack";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
 import SignalChangeHp from "model/signals/SignalChangeHp";
 import SignalChat from "model/signals/SignalChat";
@@ -86,6 +87,7 @@ class NetworkModel extends LogicModel {
 			return new SignalSetinventory(itemStacks);
 		});
 		this.addPacketSignal("teleport", ({x,y,entityID, instant}) => new SignalEntityTeleport(x,y,entityID,instant));
+		this.addPacketSignal("attack", ({x,y,entityID}) => new SignalAttack(entityID, x,y));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 

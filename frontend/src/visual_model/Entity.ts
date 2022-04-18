@@ -60,6 +60,8 @@ export default abstract class Entity {
 		this.alive = !alive;
 	}
 
+	abstract attack(pos: Position): void;
+
 	teleport(pos: Position, instant: boolean) {
 		let now = performance.now();
 		if(instant) {
