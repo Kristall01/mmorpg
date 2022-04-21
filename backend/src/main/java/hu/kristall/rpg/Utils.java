@@ -34,6 +34,8 @@ public class Utils {
 		return elements;
 	}
 	
+	public static final double PI2 = Math.PI*2;
+	
 	public static Gson gson() {
 		return gson;
 	}

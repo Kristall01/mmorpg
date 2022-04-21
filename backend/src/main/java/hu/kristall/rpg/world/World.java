@@ -221,6 +221,10 @@ public class World extends SynchronizedObject<World> {
 		}
 	}
 	
+	public Collection<Entity> getEntities() {
+		return Collections.unmodifiableCollection(this.worldEntities.values());
+	}
+	
 	public SavedPlayer leavePlayer(AsyncPlayer player) {
 		WorldPlayer oldWP = worldPlayers.remove(player);
 		if(oldWP == null) {

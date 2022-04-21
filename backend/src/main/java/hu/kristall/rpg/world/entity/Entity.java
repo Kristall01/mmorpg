@@ -103,6 +103,14 @@ public abstract class Entity {
 		return true;
 	}
 	
+	public void attack(Entity entity, double damage) {
+		if(entity.equals(this)) {
+			//cannot attack self
+			return;
+		}
+		entity.damage(damage);
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 		world.broadcastPacket(new PacketOutEntityRename(this));

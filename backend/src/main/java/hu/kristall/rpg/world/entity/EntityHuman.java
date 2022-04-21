@@ -2,6 +2,7 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.ThreadCloneable;
+import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
@@ -184,6 +185,12 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		return new SavedPlayer(this);
 	}
 	
+	@Override
+	public void attack(Entity entity, double damage) {
+		getWorldPlayer().getAsyncPlayer().connection.sendPacket(new PacketOutLabelFor(entity.getID(), LabelType.DAMAGE, Integer.toString((int)Math.round(damage))));
+		super.attack(entity, damage);
+	}
+	
 	//0.5 sec
 	public void attackTowards(Position p) {
 		if(this.channel(400_000_000)) {
@@ -194,12 +201,36 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		getWorld().broadcastPacket(new PacketOutAttack(this, p));
 		EntityHuman thisHuman = this;
 		final WorldPlayer owner = this.getWorldPlayer();
+		
+		Position myPos = getPosition();
+		
+		double rads = Position.rads(myPos, p);
+		double treshold = Math.PI/6; //30 deg
+		
+		for (Entity entity : getWorld().getEntities()) {
+			if(entity.equals(this)) {
+				continue;
+			}
+			Position entityPosition = entity.getPosition();
+			double dist = Position.distance(entityPosition, myPos);
+			if(dist > 2) {
+				continue;
+			}
+			double entityRads = Position.rads(myPos, entityPosition);
+			double diff = entityRads - rads % (Utils.PI2);
+			if(diff < 0) {
+				diff *= -1;
+			}
+			if(diff > Math.PI) {
+				diff = Utils.PI2 - diff;
+			}
+			if(diff < treshold) {
+				this.attack(entity, 5);
+			}
+		}
 		getWorld().getTimer().schedule(() -> {
 			//this runs on world thread
-			if(owner.hasQuit()) {
-				return;
-			}
-			if(owner.hasEntity() && owner.getEntity().equals(thisHuman)) {
+			if(!owner.hasQuit() && moveTarget != null && owner.hasEntity() && owner.getEntity().equals(thisHuman)) {
 				thisHuman.move(moveTarget);
 			}
 		}, 400);
