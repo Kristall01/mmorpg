@@ -140,7 +140,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 			let a = e;
 			this.camPositionFn = () => {
 				let pos = a.cachedStatus.position;
-				return [pos[0], pos[1]-(a.type.height/2)];
+				return [pos[0], pos[1]/* -(a.type.height/2) */];
 			}
 		}
 	}

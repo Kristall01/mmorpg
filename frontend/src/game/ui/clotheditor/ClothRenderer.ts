@@ -80,10 +80,10 @@ export default class ClothRenderer extends StatelessRenderable {
 
 	render(renderTime: number, width: number, height: number): void {
 		this.ctx.clearRect(0, 0, width, height);
-		let minSize = Math.min(height*1.5, width);
+		let minSize = Math.min(height, width);
 		this.ctx.imageSmoothingEnabled = false;
 		let animTime = this.anim === null ? 0 : (performance.now() - this.anim.start)*this.anim.scale;
-		renderHuman(this.ctx, this.skin, this.facing, this.activity, animTime, [width/2,height], minSize, this.clothes);
+		renderHuman(this.ctx, this.skin, this.facing, this.activity, animTime, [width/2,height/2], minSize, this.clothes);
 	}
 	
 }

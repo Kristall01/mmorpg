@@ -23,9 +23,9 @@ export const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => 
 
 	let cozyActivity = view.cozyPack.getCozyActivity(activity);
 	let sinceTime: number;
-	cozyActivity.human(human.skin).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
+	cozyActivity.human(human.skin).drawTo(view.ctx, true, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
 	for(let clothes of human.clothes) {
-		cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
+		cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(view.ctx, true, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
 	}
 }
 
@@ -91,6 +91,20 @@ export const renderEntity = (view: WorldRenderer, e: Entity, renderConfig: Rende
 
 	let eHeight = e.type.height*1.25 * renderConfig.tileSize;
 	let top = pos[1] - eHeight;
+
+	if(e.alive) {
+		let hpPercent = e.hp / e.maxHp;
+		let rgb = "?";
+		if(hpPercent < 0.5) {
+			rgb = `rgb(255, ${Math.round(hpPercent*512)},0)`;
+		}
+		else {
+			rgb = `rgb(${(Math.round((1 - hpPercent)*512))},255,0)`;
+		}
+		let [barWidth, barHeight] = drawBar(view.ctx, [pos[0], top], (e.hp / e.maxHp), {fillColor: rgb});
+		top -= barHeight;
+	}
+
 	if(e.name !== null) {
 		view.ctx.font = '30px Roboto';
 
@@ -109,17 +123,7 @@ export const renderEntity = (view: WorldRenderer, e: Entity, renderConfig: Rende
 		view.ctx.fillStyle = "#fff";
 		view.ctx.fillText(e.name, xy[0], xy[1] - boxHeight);
 
-	}
-	if(e.alive) {
-		let hpPercent = e.hp / e.maxHp;
-		let rgb = "?";
-		if(hpPercent < 0.5) {
-			rgb = `rgb(255, ${Math.round(hpPercent*512)},0)`;
-		}
-		else {
-			rgb = `rgb(${(Math.round((1 - hpPercent)*512))},255,0)`;
-		}
-		drawBar(view.ctx, [pos[0]-50, top], 100, 10, (e.hp / e.maxHp), {fillColor: rgb, borderSize: 2});
+		top -= boxHeight +10;
 	}
 }
 
