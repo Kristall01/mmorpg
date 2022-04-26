@@ -4,6 +4,8 @@ public enum EntityType {
 	
 	HUMAN,
 	DUMMY,
-	SLIME;
+	SLIME,
+	SKELETON
+	;
 	
 }

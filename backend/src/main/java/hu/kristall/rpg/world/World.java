@@ -68,6 +68,7 @@ public class World extends SynchronizedObject<World> {
 		}
 		
 		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
+		spawnEntity(EntityType.SKELETON, new Position(10, 10));
 	}
 	
 	public Collection<FloatingItem> getItems() {
@@ -142,7 +143,11 @@ public class World extends SynchronizedObject<World> {
 				break;
 			}
 			case SLIME: {
-				createdEntity = EntitySlime.createPet(this,getNextEntityID(),pos, optional);
+				createdEntity = EntitySlime.createSlime(this,getNextEntityID(),pos, optional);
+				break;
+			}
+			case SKELETON: {
+				createdEntity = new EntitySkeleton(this, getNextEntityID(), pos);
 				break;
 			}
 		}

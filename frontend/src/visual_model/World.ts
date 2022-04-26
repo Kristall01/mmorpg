@@ -15,6 +15,7 @@ import FloatingItem from "./FloatingItem";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import ItemStack from "./ItemStack";
 import SlimeEntity from "./entity/SlimeEntity";
+import SkeletonEntity from "./entity/SkeletonEntity";
 
 export type WorldEvent = "item" | "inventory-update";
 
@@ -123,6 +124,10 @@ class World extends UpdateBroadcaster<WorldEvent> {
 			}
 			case entityEnum.SLIME: {
 				e = new SlimeEntity(id, pos, speed, hp, maxHp);
+				break;
+			}
+			case entityEnum.SKELETON: {
+				e = new SkeletonEntity(id, pos, speed, hp, maxHp);
 				break;
 			}
 			default: {
