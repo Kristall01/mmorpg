@@ -19,7 +19,7 @@ export default class VisualResources {
 
 	public static async load(): Promise<VisualResources> {
 		let images = new ImageStore();
-		let zipFiles = ["imagestore.zip", "items.zip", "sprout/sprout.zip", "mystic/mystic.zip"];
+		let zipFiles = ["imagestore.zip", "items.zip", "sprout/sprout.zip", "mystic/mystic.zip","bq.zip"];
 		await Promise.all(zipFiles.map(async f => images.loadZip(f)));
 
 		let cozy = new CozyPack(images);
