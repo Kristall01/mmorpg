@@ -4,6 +4,8 @@ import hu.kristall.rpg.Server;
 import hu.kristall.rpg.command.commands.*;
 import hu.kristall.rpg.command.commands.inventory.CommandInventoryAdd;
 import hu.kristall.rpg.command.commands.inventory.CommandInventoryListitems;
+import hu.kristall.rpg.command.commands.world.CommandWorldDummy;
+import hu.kristall.rpg.command.commands.world.CommandWorldPet;
 import hu.kristall.rpg.command.commands.world.CommandWorldSpawnitem;
 
 public class CommandCollections {
@@ -24,6 +26,8 @@ public class CommandCollections {
 			
 		CommandHandler world = map.registerSubHandler("world", "world commands");
 			world.registerCommand(new CommandWorldSpawnitem(world));
+			world.registerCommand(new CommandWorldDummy(world));
+			world.registerCommand(new CommandWorldPet(world));
 		
 		return map;
 	}

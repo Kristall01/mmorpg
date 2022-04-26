@@ -36,6 +36,20 @@ public class Position {
 		return Objects.hash(x, y);
 	}
 	
+	public static Double rads(Position p0, Position p1) {
+		if(p0.equals(p1)) {
+			return null;
+		}
+		double dist = distance(p0, p1);
+		double xDiff = (p0.getX() - p1.getX())/dist;
+		double yDiff = p0.getY() - p1.getY();
+		double rads = Math.acos(xDiff);
+		if(yDiff < 0) {
+			rads = (Math.PI*2) - rads;
+		}
+		return rads;
+	}
+	
 	public static double distance(Position p0, Position p1) {
 		return Math.sqrt(Math.pow(p0.getX() - p1.getX(), 2) + Math.pow(p0.getY() - p1.getY(), 2));
 	}

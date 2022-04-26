@@ -2,7 +2,7 @@ import { RenderContext } from "game/graphics/GraphicsUtils";
 import ImageStore from "game/ImageStore";
 import { sortAndDeduplicateDiagnostics } from "typescript";
 import { enumValueOf } from "utils";
-import { Activity, Cloth, ClothColor, PrimitiveFrametime, Skintone } from "visual_model/human/HumanAssetConfig";
+import { Activity, Cloth, ClothColor, PrimitiveFrametime, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 
@@ -94,12 +94,20 @@ class Sprite {
 
 	//abstract drawTo(ctx: RenderContext, direction: Direction, [tox, toy]: Position, size: number, activityTime: number): void;
 
- 	drawTo(ctx: RenderContext, direction: Direction, [tox, toy]: Position, size: number, activityTime: number) {
+ 	drawTo(ctx: RenderContext, centered: boolean, direction: Direction, [tox, toy]: Position, size: number, activityTime: number) {
+
+		const dx = centered ? tox - size/2 : tox;
+		const dy = centered ? toy-size*2/3 : toy;
+
+		//ctx.fillRect(tox-5, toy-5, 10, 10);
+
 		ctx.drawImage(this.img,
 			this.startCorner[0]+ this.frameTime.indexAt(direction, activityTime)*CozySize,
 			this.startCorner[1] + direction.ordinal*this.directionMultiplyer,
-			CozySize, CozySize, tox - size/2, toy-size, size, size);
-	}
+			CozySize, CozySize, dx, dy, size, size);
+/* 		ctx.fillStyle = "#f00";
+		ctx.strokeRect(dx, dy, size, size);
+ */	}
 
 /* 	drawTo(ctx: RenderContext, [spriteX, spriteY]: Position, [canvasX, canvasY]: Position, size: number) {
 		ctx.drawImage(this.img, (this.startCorner[0]+spriteX)* CozySize, (this.startCorner[1]+ spriteY)*CozySize, CozySize, CozySize, canvasX, canvasY, size, size);

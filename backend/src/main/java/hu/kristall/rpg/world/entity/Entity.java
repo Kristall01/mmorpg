@@ -94,13 +94,21 @@ public abstract class Entity {
 	
 	protected void handleHpChange(double amount) {}
 	
-	public boolean damage(double amount) {
+	public double damage(double amount) {
 		if(amount <= 0) {
 			world.getLogger().error("Entity::damage() got negative amount of damage");
-			return false;
+			return 0;
 		}
 		setHp(getHp() - amount);
-		return true;
+		return amount;
+	}
+	
+	public double attack(Entity entity, double damage) {
+		if(entity.equals(this)) {
+			//cannot attack self
+			return 0;
+		}
+		return entity.damage(damage);
 	}
 	
 	public void setName(String name) {

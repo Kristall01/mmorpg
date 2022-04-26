@@ -5,7 +5,7 @@ import CozyPack, { CozyActivity } from 'game/graphics/texture/CozyPack';
 import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
 import { enumValueOf } from 'utils';
-import { Activity, Cloth, ClothColor } from 'visual_model/human/HumanAssetConfig';
+import { Activity, Cloth, ClothColor } from 'visual_model/assetconfig/HumanAssetConfig';
 import { Direction } from 'visual_model/Paths';
 import { runInThisContext } from 'vm';
 import './ClothEditor.scss';

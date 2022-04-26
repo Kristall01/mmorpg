@@ -1,7 +1,7 @@
 import { StatelessRenderable } from "game/graphics/Renderable";
 import { ColoredCloth, renderHuman } from "game/graphics/renderers/world/HumanRenderer";
 import CozyPack, { CozyActivity } from "game/graphics/texture/CozyPack";
-import { Activity, Cloth, ClothColor, ClothPosition, Skintone } from "visual_model/human/HumanAssetConfig";
+import { Activity, Cloth, ClothColor, ClothPosition, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
 
 export interface AnimationProperties {
@@ -80,10 +80,10 @@ export default class ClothRenderer extends StatelessRenderable {
 
 	render(renderTime: number, width: number, height: number): void {
 		this.ctx.clearRect(0, 0, width, height);
-		let minSize = Math.min(height*1.5, width);
+		let minSize = Math.min(height, width);
 		this.ctx.imageSmoothingEnabled = false;
 		let animTime = this.anim === null ? 0 : (performance.now() - this.anim.start)*this.anim.scale;
-		renderHuman(this.ctx, this.skin, this.facing, this.activity, animTime, [width/2,height], minSize, this.clothes);
+		renderHuman(this.ctx, this.skin, this.facing, this.activity, animTime, [width/2,height/2], minSize, this.clothes);
 	}
 	
 }

@@ -11,28 +11,57 @@ export function resizeImage(img: CanvasImageSource, width: number, height: numbe
 
 interface DrawBarOptions {
 	fillColor?: string
-	borderSize: number
+	borderSize?: number,
+	verticalShift?: number,
+	horizontalShift?: number
+	width?: number,
+	height?: number
 }
 
-export const drawBar = (ctx: RenderContext, position: Position, width: number, height: number, fillLevel: number, options?: DrawBarOptions): Position => {
-	let newOptions: DrawBarOptions = options !== undefined ? options : Object.assign({}, {
+export const drawBar = (ctx: RenderContext, position: Position, fillLevel: number, options?: DrawBarOptions) => {
+	const baseOptions = {
 		fillColor: "#0f0",
-		borderSize: 2
-	}, options);
+		borderSize: 1,
+		verticalShift: -0.5,
+		horizontalShift: 0,
+		width: 100,
+		height: 10
+	};
 
-	let [posX, posY] = [Math.round(position[0]), Math.round(position[1])];
-	let {borderSize, fillColor} = newOptions;
+	let newOptions: DrawBarOptions = options === undefined ? baseOptions : Object.assign({}, baseOptions, options);
+
+	let {borderSize, fillColor, height, horizontalShift, verticalShift, width} = newOptions;
+
+	if(borderSize! % 2 == 1) {
+		borderSize! += 1;
+	}
+
+	let roundedFillLevel = Math.round(fillLevel*width!);
+
+	let fullWidth = width!+borderSize!;
+	let fullHeight = height!+borderSize!;
+
+	//border
+	let [posX, posY] = [position[0] - fullWidth*(0.5 - horizontalShift!), position[1] - fullHeight * (0.5 - verticalShift!)].map(Math.floor)//[Math.round(position[0]), Math.round(position[1])];
 	ctx.strokeStyle = "#000";
-	ctx.lineWidth = borderSize;
-	let doubleBorder = borderSize*2;
-	ctx.strokeRect(posX - 1, posY - 1, width+borderSize, height+borderSize);
-	
+	ctx.lineWidth = borderSize!;
+	ctx.strokeRect(posX, posY, fullWidth, fullHeight);
+
+	posX += borderSize!/2;
+	posY += borderSize!/2;
+
+	//green
 	ctx.fillStyle = fillColor!;
-	let roundedFillLevel = Math.round(fillLevel*100);
-	ctx.fillRect(posX, posY, roundedFillLevel, height);
+	ctx.fillRect(posX, posY, roundedFillLevel, height!);
+
+	posX += roundedFillLevel;
+
+	//black
 	ctx.fillStyle = "#000";
-	ctx.fillRect(posX+roundedFillLevel, posY, width-roundedFillLevel, height);
-	return [0,0];
+	ctx.fillRect(posX, posY, width!-roundedFillLevel, height!);
+
+	return [width!+borderSize!*2, height!+borderSize!*2];
+
 }
 
 export const drawDamageLabel = (ctx: RenderContext, drawPosition: Position, progress: number, text: string) => {

@@ -4,7 +4,7 @@ import { enumValueOf } from "utils";
 import Entity from "visual_model/Entity";
 import HumanEntity from "visual_model/entity/HumanEntity";
 import EntityType from "visual_model/EntityType";
-import { Activity, ClothColor } from "visual_model/human/HumanAssetConfig";
+import { Activity, ClothColor } from "visual_model/assetconfig/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
 import WorldRenderer, { RenderConfig } from "./WorldRenderer";
 
@@ -13,9 +13,7 @@ type RendererFunction = (view: WorldRenderer, e: Entity, renderConfig: RenderCon
 export const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => {
 	let human = e as HumanEntity;
 	let status = human.cachedStatus;
-	let [x,y] = status.position;
-	let translated = view.translateXY(x, y);
-	human.cachedCanvasPosition = translated;
+	let translated = human.cachedCanvasPosition;
 
 	let alive = e.alive;
 
@@ -23,14 +21,13 @@ export const renderHuman: RendererFunction = (view, e: Entity, renderConfig) => 
 
 	let cozyActivity = view.cozyPack.getCozyActivity(activity);
 	let sinceTime: number;
-	cozyActivity.human(human.skin).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
+	cozyActivity.human(human.skin).drawTo(view.ctx, true, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
 	for(let clothes of human.clothes) {
-		cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(view.ctx, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
+		cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(view.ctx, true, human.cachedStatus.facing, translated, renderConfig.tileSize*2, animationTime);
 	}
 }
 
 const renderUnknown = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => {
-	let t = Math.round(renderConfig.rendertime/2) % 1536;
 	/* //0, 256, 512, 768, 1024, 1280, 1536, 1792, 2048, 2304
 	if(t < 256) {
 		ctx.fillStyle = rgb(256, t, 0);
@@ -63,10 +60,7 @@ const renderUnknown = (view: WorldRenderer, e: Entity, renderConfig: RenderConfi
 		ctx.fillStyle = "red";
 	}
 
-	let [x,y] = e.cachedStatus.position;
-	let translated = view.translateXY(x, y);
-	e.cachedCanvasPosition = translated;
-	let [cX, cY] = translated;
+	let [cX, cY] = e.cachedCanvasPosition;
 	view.ctx.fillRect(cX-halfBlockSize, cY-halfBlockSize, blockSize, blockSize);
 	ctx.beginPath();
 	ctx.moveTo(cX, cY);
@@ -76,21 +70,44 @@ const renderUnknown = (view: WorldRenderer, e: Entity, renderConfig: RenderConfi
 	ctx.stroke();
 }
 
+const renderSlime = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => {
+	view.visuals.slimeRenderer.drawTo(view.ctx, e.cachedStatus.facing, view.translateXY(...e.cachedStatus.position), renderConfig.tileSize, renderConfig.rendertime);
+}
+
 let renderers = new Array<RendererFunction>(EntityType.enum.values.length);
 
 renderers[EntityType.enum.map.HUMAN.ordinal] = renderHuman;
 renderers[EntityType.enum.map.UNKNOWN.ordinal] = renderUnknown;
+renderers[EntityType.enum.map.SLIME.ordinal] = renderSlime;
 
 export const renderEntity = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => {
+
+	let [x,y] = e.cachedStatus.position;
+	let pos = view.translateXY(x, y);
+	e.cachedCanvasPosition = pos;
+
+
 	renderers[e.type.ordinal](view, e,renderConfig);
 
-
-	let pos = e.cachedCanvasPosition;
 	pos[0] = Math.floor(pos[0]);
 	pos[1] = Math.floor(pos[1]);
 
 	let eHeight = e.type.height*1.25 * renderConfig.tileSize;
 	let top = pos[1] - eHeight;
+
+	if(e.alive) {
+		let hpPercent = e.hp / e.maxHp;
+		let rgb = "?";
+		if(hpPercent < 0.5) {
+			rgb = `rgb(255, ${Math.round(hpPercent*512)},0)`;
+		}
+		else {
+			rgb = `rgb(${(Math.round((1 - hpPercent)*512))},255,0)`;
+		}
+		let [barWidth, barHeight] = drawBar(view.ctx, [pos[0], top], (e.hp / e.maxHp), {fillColor: rgb});
+		top -= barHeight;
+	}
+
 	if(e.name !== null) {
 		view.ctx.font = '30px Roboto';
 
@@ -109,17 +126,7 @@ export const renderEntity = (view: WorldRenderer, e: Entity, renderConfig: Rende
 		view.ctx.fillStyle = "#fff";
 		view.ctx.fillText(e.name, xy[0], xy[1] - boxHeight);
 
-	}
-	if(e.alive) {
-		let hpPercent = e.hp / e.maxHp;
-		let rgb = "?";
-		if(hpPercent < 0.5) {
-			rgb = `rgb(255, ${Math.round(hpPercent*512)},0)`;
-		}
-		else {
-			rgb = `rgb(${(Math.round((1 - hpPercent)*512))},255,0)`;
-		}
-		drawBar(view.ctx, [pos[0]-50, top], 100, 10, (e.hp / e.maxHp), {fillColor: rgb, borderSize: 2});
+		top -= boxHeight +10;
 	}
 }
 

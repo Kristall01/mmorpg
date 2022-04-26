@@ -1,4 +1,4 @@
-import { Activity } from "./human/HumanAssetConfig";
+import { Activity } from "./assetconfig/HumanAssetConfig";
 import { Status } from "./Paths";
 
 export interface ActivitySnapshot {

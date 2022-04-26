@@ -11,7 +11,7 @@ public class ConstantPosition implements PositionFunction {
 	}
 	
 	@Override
-	public Position getCurrentLocation() {
+	public Position getCurrentPosition() {
 		return position;
 	}
 	

@@ -4,7 +4,9 @@ import hu.kristall.rpg.Position;
 
 public interface PositionFunction {
 
-	Position getCurrentLocation();
+	Position getCurrentPosition();
+	
+	
 	boolean moving();
 
 }
