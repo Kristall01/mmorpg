@@ -142,7 +142,7 @@ public class World extends SynchronizedObject<World> {
 				break;
 			}
 			case SLIME: {
-				createdEntity = EntitySlime.createPet(this,getNextEntityID(),pos, optional);
+				createdEntity = EntitySlime.createSlime(this,getNextEntityID(),pos, optional);
 				break;
 			}
 		}
