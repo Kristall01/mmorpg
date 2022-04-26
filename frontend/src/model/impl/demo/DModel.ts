@@ -157,7 +157,7 @@ class DModel extends LogicModel {
 			let t = performance.now();
 			let currentPosition = this.statusFn(t)
 			let path: Position[] = [currentPosition.position, [x,y]];
-			this.statusFn = zigzagStatus(t, path, entitySpeed);
+			this.statusFn = zigzagStatus("4", t, path, entitySpeed);
 			setTimeout(() => {
 				this.broadcastSignal(new SignalEntitypath(0, t, path));
 			}, netLag/2);

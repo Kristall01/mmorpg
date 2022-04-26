@@ -120,8 +120,9 @@ const Chat = (): JSX.Element | null => {
 /* 		if(visualModel.chatOpen === false) {
 			setChatText("");
 		}
-		
- */		dummyDiv.current?.scrollIntoView();
+
+		*/
+		setTimeout(() => {dummyDiv.current?.scrollIntoView()});
 		if(!visualModel.chatOpen) {
 			setHistoryIndex(-1);
 		}

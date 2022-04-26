@@ -2,9 +2,12 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.ThreadCloneable;
+import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.network.PlayerConnection;
-import hu.kristall.rpg.network.packet.out.*;
+import hu.kristall.rpg.network.packet.out.PacketOutAttack;
+import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
+import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
 import hu.kristall.rpg.persistence.SavedItem;
 import hu.kristall.rpg.persistence.SavedItemStack;
@@ -12,27 +15,23 @@ import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.*;
 import hu.kristall.rpg.world.entity.cozy.ClothPack;
-import hu.kristall.rpg.world.path.ConstantPosition;
-import hu.kristall.rpg.world.path.Path;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> {
+public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<SavedPlayer> {
 	
 	private WorldPlayer worldPlayer;
-	private Path lastPath;
 	private ClothPack clothes;
 	private Position moveTarget;
 	
 	private long channel = 0;
 	
 	private EntityHuman(World world, int entityID, Position startPosition, double hp, ClothPack clothes, Map<Item, Integer> items) {
-		super(world, EntityType.HUMAN, entityID, 2.0, hp, 100);
+		super(world, EntityType.HUMAN, entityID, 2.0, hp, 100, startPosition);
 		this.inventory = new Inventory(this, items);
 		this.clothes = clothes;
-		this.lastPath = new Path(startPosition, List.of(startPosition, startPosition), new ConstantPosition(startPosition), System.nanoTime());
 	}
 	
 	private boolean channel(long time) {
@@ -94,18 +93,6 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		this.worldPlayer.getAsyncPlayer().connection.sendPacket(new PacketOutSetInventory(inventory));
 	}
 	
-	@Override
-	public Position getPosition() {
-		return lastPath.getPosiFn().getCurrentLocation();
-	}
-	
-	@Override
-	public Path getLastPath() {
-		return lastPath;
-	}
-	
-	
-	
 	public void setClothes(ClothPack clothes) {
 		this.clothes = clothes;
 		getWorld().broadcastPacket(new PacketOutChangeClothes(this));
@@ -117,29 +104,12 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 	
 	@Override
 	public void move(Position to) {
-		if(channel(0)) {
-			moveTarget = to;
+		
+		moveTarget = to;
+		if(channel(10_000_000)) {
 			return;
 		}
-		to = getWorld().fixValidate(to);
-		long now = System.nanoTime();
-		this.lastPath = this.getWorld().interpolatePath(getPosition(), to, getSpeed(), now);
-		getWorld().broadcastPacket(new PacketOutMoveentity(this));
-	}
-	
-	@Override
-	public void stop() {
-		teleport(getPosition(), false);
-	}
-	
-	public void teleport(Position pos, boolean instant) {
-		this.lastPath = getWorld().idlePath(pos);
-		getWorld().broadcastPacket(new PacketOutEntityTeleport(pos.getX(), pos.getY(), getID(), instant));
-	}
-	
-	@Override
-	public void teleport(Position pos) {
-		teleport(pos, true);
+		super.move(to);
 	}
 	
 	@Override
@@ -184,6 +154,15 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		return new SavedPlayer(this);
 	}
 	
+	@Override
+	public double attack(Entity entity, double damage) {
+		double amount = super.attack(entity, damage);
+		if(amount > 0) {
+			getWorldPlayer().getAsyncPlayer().connection.sendPacket(new PacketOutLabelFor(entity.getID(), LabelType.DAMAGE, Integer.toString((int)Math.round(amount))));
+		}
+		return amount;
+	}
+	
 	//0.5 sec
 	public void attackTowards(Position p) {
 		if(this.channel(400_000_000)) {
@@ -194,12 +173,54 @@ public class EntityHuman extends Entity implements ThreadCloneable<SavedPlayer> 
 		getWorld().broadcastPacket(new PacketOutAttack(this, p));
 		EntityHuman thisHuman = this;
 		final WorldPlayer owner = this.getWorldPlayer();
+		
+		Position myPos = getPosition();
+		
+		Double rads = Position.rads(myPos, p);
+		if(rads == null) {
+			rads = 0d;
+		}
+		double treshold = Math.PI/4; //90 deg
+		
+		
+		Collection<Entity> worldEntities = getWorld().getEntities();
+		
+		Entity[] attackTargets = new Entity[worldEntities.size()];
+		int attackTargetsIndex = 0;
+		
+		for (Entity entity : worldEntities) {
+			if(entity.equals(this)) {
+				continue;
+			}
+			Position entityPosition = entity.getPosition();
+			double dist = Position.distance(entityPosition, myPos);
+			if(dist > 1) {
+				continue;
+			}
+			Double entityRadsRaw = Position.rads(myPos, entityPosition);
+			if(entityRadsRaw == null) {
+				attackTargets[attackTargetsIndex++] = entity;
+				continue;
+			}
+			double entityRads = entityRadsRaw;
+			double diff = entityRads - rads % (Utils.PI2);
+			if(diff < 0) {
+				diff *= -1;
+			}
+			if(diff > Math.PI) {
+				diff = Utils.PI2 - diff;
+			}
+			if(diff < treshold) {
+				attackTargets[attackTargetsIndex++] = entity;
+			}
+		}
+		for (int i = 0; i < attackTargetsIndex; i++) {
+			this.attack(attackTargets[i], 5);
+		}
+		
 		getWorld().getTimer().schedule(() -> {
 			//this runs on world thread
-			if(owner.hasQuit()) {
-				return;
-			}
-			if(owner.hasEntity() && owner.getEntity().equals(thisHuman)) {
+			if(!owner.hasQuit() && moveTarget != null && owner.hasEntity() && owner.getEntity().equals(thisHuman)) {
 				thisHuman.move(moveTarget);
 			}
 		}, 400);

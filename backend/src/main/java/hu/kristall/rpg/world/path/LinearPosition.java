@@ -24,7 +24,7 @@ public class LinearPosition implements PositionFunction {
 		this.endTime = startTimeNanos + totalTime;
 	}
 	
-	public Position getCurrentLocation() {
+	public Position getCurrentPosition() {
 		long currentTime = System.nanoTime();
 		if(currentTime > endTime) {
 			return to;

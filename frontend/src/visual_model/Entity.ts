@@ -1,6 +1,6 @@
 import { RenderContext } from "game/graphics/GraphicsUtils"
 import { EntityType } from "./EntityType"
-import { ConstStatus, Direction, EntityConstStatus, entityZigzagStatus, Status, StatusFn } from "./Paths"
+import { ConstStatus, Direction, DirectionMode, EntityConstStatus, entityZigzagStatus, Status, StatusFn } from "./Paths"
 import UpdateBroadcaster from "./UpdateBroadcaster"
 import { Position } from "./VisualModel"
 
@@ -17,8 +17,9 @@ export default abstract class Entity {
 	private _hp: number
 	maxHp: number
 	alive: boolean = true
+	readonly directionMode: DirectionMode
 
-	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number) {
+	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number, directionMode: DirectionMode) {
 		this.id = id;
 		this.type = type;
 		this.statusFn = ConstStatus(loc, facing);
@@ -26,6 +27,7 @@ export default abstract class Entity {
 		this.speed = speed;
 		this._hp = hp;
 		this.maxHp = maxHp;
+		this.directionMode = directionMode;
 	}
 
 	calculateStatus(rendertime: number) {
@@ -39,7 +41,7 @@ export default abstract class Entity {
 
 	walkBy(startTime: number, points: Position[]) {
 		let now = performance.now();
-		this.statusFn = entityZigzagStatus(this.statusFn(now).position, startTime, points, this.speed);
+		this.statusFn = entityZigzagStatus(this.directionMode, this.statusFn(now).position, startTime, points, this.speed);
 	}
 
 	get hp() {
@@ -69,7 +71,7 @@ export default abstract class Entity {
 		}
 		else {
 			let status = this.statusFn(now)
-			this.statusFn = EntityConstStatus(status.position, pos, status.facing);
+			this.statusFn = EntityConstStatus(this.directionMode, status.position, pos, status.facing);
 		}
 	}
 

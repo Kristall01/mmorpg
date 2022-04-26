@@ -37,19 +37,6 @@ export class ClothColor {
 
 }
 
-enum HairStyle {
-	BRAIDS = 'braids',
-	BUZZCUT = 'buzzcut',
-	CURLY = 'curly',
-	EMO = 'emo',
-	EXTRALONG = 'extralong',
-	FRENCHCURL = 'frenchcurl',
-	GENTLEMAN = 'gentleman',
-	MIDIWAVE = 'midiwave',
-	SPACEBUNS = 'spacebuns',
-	WAVY = 'wavy'
-}
-
 enum HairColor {
 	BLACK = 0,
 	BLONDE = 1,
@@ -65,6 +52,41 @@ enum HairColor {
 	PURPLE = 11,
 	RED = 12,
 	TURQUOISE = 13
+}
+
+export class Hair {
+
+	readonly ordinal: number;
+	readonly id: string;
+	private static nextOrdinal: number = 0;
+
+	private constructor(id: string) {
+		this.id = id;
+		this.ordinal = Hair.nextOrdinal++;
+	}
+
+	static readonly enum = {
+		map: {
+
+			BRAIDS: new Hair('BRAIDS'),// = 'braids',
+			BUZZCUT: new Hair('BUZZCUT'),// = 'buzzcut',
+			CURLY: new Hair('CURLY'),// = 'curly',
+			EMO: new Hair('EMO'),// = 'emo',
+			EXTRALONG: new Hair('EXTRALONG'),// = 'extralong',
+			FRENCHCURL: new Hair('FRENCHCURL'),// = 'frenchcurl',
+			GENTLEMAN: new Hair('GENTLEMAN'),// = 'gentleman',
+			MIDIWAVE: new Hair('MIDIWAVE'),// = 'midiwave',
+			SPACEBUNS: new Hair('SPACEBUNS'),// = 'spacebuns',
+			WAVY: new Hair('WAVY'),// = 'wavy'
+		},
+
+		values: new Array<Hair>()
+	}
+
+	static {
+		Hair.enum.values = Object.values(Hair.enum.map);
+	}
+
 }
 
 export class Cloth {
