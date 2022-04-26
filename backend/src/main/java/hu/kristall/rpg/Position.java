@@ -36,9 +36,9 @@ public class Position {
 		return Objects.hash(x, y);
 	}
 	
-	public static double rads(Position p0, Position p1) {
+	public static Double rads(Position p0, Position p1) {
 		if(p0.equals(p1)) {
-			return 0;
+			return null;
 		}
 		double dist = distance(p0, p1);
 		double xDiff = (p0.getX() - p1.getX())/dist;

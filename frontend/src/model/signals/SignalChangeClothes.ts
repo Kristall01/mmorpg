@@ -2,7 +2,7 @@ import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import { SignalIn } from "model/Definitions";
 import { enumValueOf } from "utils";
 import HumanEntity from "visual_model/entity/HumanEntity";
-import { Cloth, ClothColor } from "visual_model/human/HumanAssetConfig";
+import { Cloth, ClothColor } from "visual_model/assetconfig/HumanAssetConfig";
 import VisualModel from "visual_model/VisualModel";
 
 export interface ColoredClothData {

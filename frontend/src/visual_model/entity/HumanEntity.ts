@@ -2,7 +2,7 @@ import CozyPack from "game/graphics/texture/CozyPack";
 import { RenderContext } from "game/graphics/GraphicsUtils";
 import Entity from "visual_model/Entity";
 import { EntityType } from "visual_model/EntityType";
-import { Activity, Cloth, ClothColor, Skintone } from "visual_model/human/HumanAssetConfig";
+import { Activity, Cloth, ClothColor, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Position } from "visual_model/VisualModel";
 import { calculatedDirection, Direction, facingFunction } from "visual_model/Paths";
 import { enumValueOf } from "utils";
@@ -23,12 +23,12 @@ export default class HumanEntity extends Entity {
  */	];
 
 	constructor(id: number, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number) {
-		super(id, EntityType.enum.map.HUMAN, loc, speed, facing, hp, maxHp);
+		super(id, EntityType.enum.map.HUMAN, loc, speed, facing, hp, maxHp, "4");
 	}
 
 	attack(pos: Position): void {
 		let currentPos = this.cachedStatus.position;
-		this.statusFn = facingFunction(calculatedDirection(pos[0]-currentPos[0], pos[1]-currentPos[1]), this.statusFn);
+		this.statusFn = facingFunction(calculatedDirection(this.directionMode, pos[0]-currentPos[0], pos[1]-currentPos[1]), this.statusFn);
 		this.activityFn = createSwordFunction();
 	}
 

@@ -1,6 +1,6 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
 import { CozyActivity } from "game/graphics/texture/CozyPack";
-import { Activity, Cloth, ClothColor, Skintone } from "visual_model/human/HumanAssetConfig";
+import { Activity, Cloth, ClothColor, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 

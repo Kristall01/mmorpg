@@ -14,6 +14,7 @@ import Item from "./Item";
 import FloatingItem from "./FloatingItem";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import ItemStack from "./ItemStack";
+import SlimeEntity from "./entity/SlimeEntity";
 
 export type WorldEvent = "item" | "inventory-update";
 
@@ -114,10 +115,15 @@ class World extends UpdateBroadcaster<WorldEvent> {
 
 	spawnEntity(id: number, type: EntityType, pos: Position, speed: number, hp: number, maxHp: number, facing: Direction = Direction.enum.map.SOUTH) {
 		let e: Entity;
+		const entityEnum = EntityType.enum.map;
 		switch(type) {
- 			case EntityType.enum.map.HUMAN: {
+ 			case entityEnum.HUMAN: {
 				e = new HumanEntity(id, pos, speed, facing, hp, maxHp);
 				break
+			}
+			case entityEnum.SLIME: {
+				e = new SlimeEntity(id, pos, speed, hp, maxHp);
+				break;
 			}
 			default: {
 				e = new UnknownEntity(id, pos, speed, facing, hp, maxHp);

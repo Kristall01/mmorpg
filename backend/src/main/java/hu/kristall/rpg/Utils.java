@@ -6,11 +6,13 @@ import hu.kristall.rpg.world.entity.cozy.ClothPack;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Utils {
 	
 	private static final Gson gson;
 	public static final Runnable emptyRunnable = () -> {};
+	public static final Random random = new Random();
 	
 	static {
 		GsonBuilder builder = new GsonBuilder();

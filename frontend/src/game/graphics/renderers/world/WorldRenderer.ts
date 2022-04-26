@@ -39,7 +39,7 @@ class WorldRenderer implements Renderable {
 	private portalIcon: HTMLImageElement
 	private floatingItems: Map<number, FloatingItemResource> = new Map();
 	private subs: SubManager = new SubManager();
-	private visuals: VisualResources
+	public readonly visuals: VisualResources
 	public ctx: RenderContext = null!;
 
 	constructor(world: World, visuals: VisualResources) {
@@ -313,7 +313,12 @@ class WorldRenderer implements Renderable {
 			this.ctx.fill();
 		}
  */
-		for(let entity of this.world.entities) {
+
+		let orderedEntities = Array.from(this.world.entities).sort((a,b) => {
+			return a.cachedStatus.position[1] - b.cachedStatus.position[1];
+		});
+
+		for(let entity of orderedEntities) {
 			renderEntity(this, entity, this.renderConfig);
 		}
 

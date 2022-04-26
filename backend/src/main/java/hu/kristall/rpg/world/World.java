@@ -10,9 +10,7 @@ import hu.kristall.rpg.persistence.SavedLevel;
 import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
-import hu.kristall.rpg.world.entity.Entity;
-import hu.kristall.rpg.world.entity.EntityHuman;
-import hu.kristall.rpg.world.entity.EntityType;
+import hu.kristall.rpg.world.entity.*;
 import hu.kristall.rpg.world.path.ConstantPosition;
 import hu.kristall.rpg.world.path.LinearPosition;
 import hu.kristall.rpg.world.path.Path;
@@ -105,6 +103,13 @@ public class World extends SynchronizedObject<World> {
 		return new Path(to, List.of(from, to), new LinearPosition(from, to, cellsPerSec, startTimeNanos), startTimeNanos);
 	}
 	
+	public Position getRandomPositionNear(Position pos, double minDistance, double maxDistance) {
+		double randDistance = Utils.random.nextDouble()*(maxDistance-minDistance)+minDistance;
+		double xVector = (Utils.random.nextDouble()*2-1)*randDistance;
+		double yVector = (Utils.random.nextDouble()*2-1)*randDistance;
+		return fixValidate(pos.add(xVector, yVector));
+	}
+	
 	public int getWidth() {
 		return width;
 	}
@@ -121,11 +126,23 @@ public class World extends SynchronizedObject<World> {
 		return nextEntityID++;
 	}
 	
+	public Entity spawnEntity(EntityType type, Position pos) {
+		return this.spawnEntity(type, pos, null);
+	}
+	
 	public Entity spawnEntity(EntityType type, Position pos, Object optional) {
 		Entity createdEntity = null;
 		switch(type) {
 			case HUMAN: {
 				createdEntity = EntityHuman.ofData(this, getNextEntityID(), pos, optional);
+				break;
+			}
+			case DUMMY: {
+				createdEntity = new EntityDummy(this, getNextEntityID(), pos);
+				break;
+			}
+			case SLIME: {
+				createdEntity = EntitySlime.createPet(this,getNextEntityID(),pos, optional);
 				break;
 			}
 		}
