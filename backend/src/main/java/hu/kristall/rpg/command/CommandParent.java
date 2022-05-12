@@ -26,7 +26,7 @@ public interface CommandParent extends Executable {
 		for (ICommand cmd : cmds) {
 			if(cmd.executionAllowed(sender)) {
 				if(!helpSent) {
-					sender.sendRawMessage(getServer().getLang(), "cil.handler.list", getTotalPath());
+					sender.sendTranslatedMessage("cil.handler.list", getTotalPath());
 					helpSent = true;
 				}
 				sender.sendMessage(cmd.toHelpEntry());

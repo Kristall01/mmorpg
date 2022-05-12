@@ -66,8 +66,7 @@ public class Server extends SynchronizedObject<Server> {
 			this.worldsManager.createWorld("w2", 10, 10);
 		}
 		catch (Throwable t) {
-			logger.error("failed to bootstrap server");
-			t.printStackTrace();
+			logger.error(lang.getMessage("bootstrap.failed"), t);
 			this.shutdown();
 		}
 	}
@@ -108,7 +107,7 @@ public class Server extends SynchronizedObject<Server> {
 		for (Consumer<Server> shutdownListener : shutdownListeners) {
 			shutdownListener.accept(this);
 		}
-		logger.info("shutting down server");
+		logger.info(lang.getMessage("server.shutting"));
 		networkServer.stop(() -> {
 			try {
 				getSynchronizer().sync(srv -> {
@@ -164,7 +163,7 @@ public class Server extends SynchronizedObject<Server> {
 				savedPlayer = playerPersistence.loadPlayer(name);
 			}
 			catch (Throwable e) {
-				AsyncExecutor.instance().getLogger().error("failed to load player data", e);
+				AsyncExecutor.instance().getLogger().error(lang.getMessage("server.playerdata.loadfail"), e);
 				c.completeExceptionally(e);
 				return;
 			}

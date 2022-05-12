@@ -19,7 +19,7 @@ public class WorldsManager {
 	
 	public Synchronizer<World> createWorld(String name, int width, int height) {
 		if(worlds.containsKey(name)) {
-			throw new IllegalStateException("there is a world with this name already");
+			throw new IllegalStateException(server.getLang().getMessage("worldmanager.create.name-taken"));
 		}
 		boolean defaultWorld = this.defaultWorld == null;
 		World world = new World(server.getSynchronizer(), defaultWorld, name, width, height);
@@ -48,7 +48,7 @@ public class WorldsManager {
 	}
 	
 	public void shutdown() {
-		server.getLogger().info("Shutting down worlds");
+		server.getLogger().info(server.getLang().getMessage("worldmanager.shutting"));
 		List<Future<String>> shutdownTasks = new ArrayList<>();
 		for (Synchronizer<World> world : worlds.values()) {
 			try {
@@ -65,10 +65,10 @@ public class WorldsManager {
 		}
 		for (Future<?> shutdownTask : shutdownTasks) {
 			try {
-				server.getLogger().info("World "+shutdownTask.get()+" shut down");
+				server.getLogger().info(server.getLang().getMessage("worldmanager.world-shut", String.valueOf(shutdownTask.get())));
 			}
 			catch (InterruptedException | ExecutionException e) {
-				server.getLogger().warn("world shutdown interrupted", e);
+				server.getLogger().warn(server.getLang().getMessage("worldmanager.world-shut-interrupted"), e);
 				e.printStackTrace();
 			}
 		}

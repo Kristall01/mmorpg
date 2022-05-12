@@ -101,7 +101,6 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 				else {
 					try {
 						worldPos.world.sync(newWorld -> {
-							
 							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer, finalHuman, worldPos.pos));
 							try {
 								asyncServer.sync(srv -> {
