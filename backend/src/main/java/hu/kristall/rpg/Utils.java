@@ -1,6 +1,8 @@
 package hu.kristall.rpg;
 
 import com.google.gson.*;
+import hu.kristall.rpg.persistence.SavedLevel;
+import hu.kristall.rpg.persistence.Savefile;
 import hu.kristall.rpg.world.entity.cozy.ClothPack;
 
 import java.lang.reflect.Type;
@@ -22,8 +24,10 @@ public class Utils {
 		builder.registerTypeAdapter(SavedItem.class, new SavedItem.SavedItemPersistence());
 		builder.registerTypeAdapter(SavedMonsterspawn.class, new SavedMonsterspawn.SavedMonsterspawnPersistence());
 		builder.registerTypeAdapter(SavedItemStack.class, new SavedItemStack.SavedItemStackPersistence());*/
+		builder.registerTypeAdapter(Savefile.class, new Savefile.SavefilePersistence());
+		builder.registerTypeAdapter(SavedLevel.class, new SavedLevel.SavedLevelParser());
 		builder.registerTypeAdapter(ClothPack.class, new ClothPack.SavedClothpackParser());
-		
+		builder.registerTypeAdapter(Position.class, new Position.PositionSerializer());
 		gson = builder.create();
 	}
 	

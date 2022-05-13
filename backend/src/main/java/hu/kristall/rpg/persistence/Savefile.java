@@ -9,12 +9,10 @@ import java.util.Map;
 public class Savefile {
 	
 	public final Map<String, SavedLevel> levels;
-	public final Map<String, SavedPlayer> players;
 	public final String defaultLevel;
 	
-	public Savefile(Map<String, SavedLevel> levels, Map<String, SavedPlayer> players, String defaultLevel) {
+	public Savefile(Map<String, SavedLevel> levels, String defaultLevel) {
 		this.levels = Map.copyOf(levels);
-		this.players = Map.copyOf(players);
 		this.defaultLevel = defaultLevel;
 	}
 	
@@ -28,17 +26,12 @@ public class Savefile {
 				JsonObject levelsObject = base.get("levels").getAsJsonObject();
 				for (String s : levelsObject.keySet()) {
 					SavedLevel level = ctx.deserialize(levelsObject.get(s), SavedLevel.class);
+					level.name = s;
 					levels.put(s, level);
 				}
 				
-				Map<String, SavedPlayer> players = new HashMap<>();
-				JsonObject playersObject = base.get("players").getAsJsonObject();
-				for (String s : playersObject.keySet()) {
-					SavedPlayer player = ctx.deserialize(playersObject.get(s), SavedPlayer.class);
-					players.put(s, player);
-				}
-				String defaultLevel = base.get("defaultLevel").getAsString();
-				return new Savefile(levels, players, defaultLevel);
+				String defaultLevel = base.get("default").getAsString();
+				return new Savefile(levels, defaultLevel);
 			}
 			catch (Throwable err) {
 				err.printStackTrace();

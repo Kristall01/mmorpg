@@ -7,13 +7,14 @@ import hu.kristall.rpg.world.entity.Entity;
 public class Portal {
 	
 	private String targetWorldName;
-	private Position position;
+	private Position position, targetPosition;
 	private double radius;
 	
-	public Portal(Position position, String targetWorld) {
+	public Portal(Position position, String targetWorld, Position targetPosition) {
 		this.position = position;
 		this.targetWorldName = targetWorld;
-		this.radius = 0.5;
+		this.targetPosition = targetPosition;
+		this.radius = 1;
 	}
 	
 	public double getRadius() {
@@ -22,6 +23,10 @@ public class Portal {
 	
 	public String getTargetWorldName() {
 		return targetWorldName;
+	}
+	
+	public Position getTargetPosition() {
+		return targetPosition;
 	}
 	
 	public boolean checkCollision(Entity e) {

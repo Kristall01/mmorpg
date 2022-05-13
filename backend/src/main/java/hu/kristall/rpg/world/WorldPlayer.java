@@ -8,6 +8,7 @@ import hu.kristall.rpg.sync.ISynchronized;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.EntityHuman;
 import hu.kristall.rpg.world.entity.EntityType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -73,7 +74,7 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 		changingWorld = false;
 	}
 	
-	public void startChangingWorld(final String targetWorld) {
+	public void startChangingWorld(final String targetWorld, final @Nullable Position targetPosition) {
 		if(this.changingWorld) {
 			return;
 		}
@@ -97,7 +98,7 @@ public class WorldPlayer implements ISynchronized<WorldPlayer> {
 					}
 				}
 				else {
-					syncedPLayer.scheduleWorldChange(new WorldPosition(w,null));
+					syncedPLayer.scheduleWorldChange(new WorldPosition(w,targetPosition));
 				}
 			});
 		}
