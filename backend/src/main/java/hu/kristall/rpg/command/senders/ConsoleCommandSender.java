@@ -2,14 +2,13 @@ package hu.kristall.rpg.command.senders;
 
 import hu.kristall.rpg.ChatColor;
 import hu.kristall.rpg.Server;
-import hu.kristall.rpg.sync.Synchronizer;
 
 public class ConsoleCommandSender implements CommandSender {
 	
-	private Synchronizer<Server> asyncServer;
+	private Server server;
 	
-	public ConsoleCommandSender(Synchronizer<Server> server) {
-		this.asyncServer = server;
+	public ConsoleCommandSender(Server server) {
+		this.server = server;
 	}
 	
 	@Override
@@ -23,8 +22,9 @@ public class ConsoleCommandSender implements CommandSender {
 		System.out.print(ChatColor.RESET.ansiCode);
 	}
 	
-	public Synchronizer<Server> getAsyncServer() {
-		return asyncServer;
+	@Override
+	public Server getServer() {
+		return server;
 	}
 	
 }

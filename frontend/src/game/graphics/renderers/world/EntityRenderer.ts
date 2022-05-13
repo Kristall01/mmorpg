@@ -74,11 +74,17 @@ const renderSlime = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig)
 	view.visuals.slimeRenderer.drawTo(view.ctx, e.cachedStatus.facing, view.translateXY(...e.cachedStatus.position), renderConfig.tileSize, renderConfig.rendertime);
 }
 
+const renderSkeleton = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => {
+	view.visuals.slimeRenderer.drawTo(view.ctx, e.cachedStatus.facing, view.translateXY(...e.cachedStatus.position), renderConfig.tileSize, renderConfig.rendertime);
+	return;
+}
+
 let renderers = new Array<RendererFunction>(EntityType.enum.values.length);
 
 renderers[EntityType.enum.map.HUMAN.ordinal] = renderHuman;
 renderers[EntityType.enum.map.UNKNOWN.ordinal] = renderUnknown;
 renderers[EntityType.enum.map.SLIME.ordinal] = renderSlime;
+renderers[EntityType.enum.map.SKELETON.ordinal] = renderSkeleton;
 
 export const renderEntity = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => {
 

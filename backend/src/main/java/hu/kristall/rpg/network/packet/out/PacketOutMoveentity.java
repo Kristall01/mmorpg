@@ -14,8 +14,12 @@ public class PacketOutMoveentity extends PacketOut {
 	int id;
 	long startNanos;
 	
-	private PacketOutMoveentity(int entityID)  {
+	private PacketOutMoveentity() {
 		super("moveentity");
+	}
+	
+	private PacketOutMoveentity(int entityID)  {
+		this();
 		this.id = entityID;
 	}
 	

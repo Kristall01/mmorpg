@@ -12,8 +12,12 @@ public class PacketOutJoinworld extends PacketOut {
 	double spawnX;
 	double spawnY;
 	
-	public PacketOutJoinworld(List<String> tileGrid, int worldHeight, int worldWidth, Position spawnPosition) {
+	private PacketOutJoinworld() {
 		super("joinworld");
+	}
+	
+	public PacketOutJoinworld(List<String> tileGrid, int worldHeight, int worldWidth, Position spawnPosition) {
+		this();
 		
 		this.tileGrid = tileGrid;
 		this.width = worldWidth;

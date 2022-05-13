@@ -15,8 +15,13 @@ public class PacketOutSetInventory extends PacketOut {
 	
 	List<JsonObject> items = new ArrayList<>();
 	
-	public PacketOutSetInventory(Inventory inventory) {
+	private PacketOutSetInventory() {
 		super("setinventory");
+	}
+	
+	
+	public PacketOutSetInventory(Inventory inventory) {
+		this();
 		
 		for (Map.Entry<Item, Integer> entry : inventory.getItems()) {
 			JsonObject obj = new JsonObject();

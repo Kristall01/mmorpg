@@ -26,7 +26,7 @@ public class Server extends SynchronizedObject<Server> {
 	private NetworkServer networkServer;
 	private CommandMap commandMap;
 	//private InputReader inputReader;
-	private Lang lang;
+	private Lang lang = new Lang();
 	private WorldsManager worldsManager;
 	private Map<String, Player> players = new HashMap<>();
 	private Set<String> takeNames = new HashSet<>();
@@ -38,12 +38,14 @@ public class Server extends SynchronizedObject<Server> {
 	
 	private Server(String servePath, Savefile savefile) throws IOException {
 		super("server");
+		
+		
 		changeSyncer(new AsyncServer(this));
 		this.playerPersistence = new PlayerPersistence(new File(System.getProperty("user.dir"), "playerdata"));
 		try {
-			this.networkServer = new NetworkServer(this, servePath);
-			lang = new Lang();
 			lang.loadConfigFromJar("lang.cfg");
+			this.networkServer = new NetworkServer(this, servePath);
+
 			
 			commandMap = CommandCollections.base(this);
 			//this.inputReader = new InputReader(text -> getSynchronizer().sync(srv -> srv.getCommandMap().executeConsoleCommand(text)), this.commandMap);
@@ -51,7 +53,17 @@ public class Server extends SynchronizedObject<Server> {
 			this.networkServer.startAcceptingConnections();
 			
 			
-			if(savefile != null) {
+			for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
+				SavedLevel level = levelEntry.getValue();
+				Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder);
+				final List<SavedPortal> portals = level.portals;
+				asyncWorld.sync(world -> {
+					for (SavedPortal portal : portals) {
+						world.addPortal(new Portal(portal.position, portal.targetWorld, portal.targetPosition));
+					}
+				});
+			}
+			/*if(savefile != null) {
 				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
 					SavedLevel level = levelEntry.getValue();
 					this.worldsManager.createWorld(levelEntry.getKey(), level.width, level.height).sync(w -> {
@@ -60,14 +72,10 @@ public class Server extends SynchronizedObject<Server> {
 						}
 					});
 				}
-			}
-			this.worldsManager.createWorld("w0", 20, 20);
-			this.worldsManager.createWorld("w1", 15, 15);
-			this.worldsManager.createWorld("w2", 10, 10);
+			}*/
 		}
 		catch (Throwable t) {
-			logger.error("failed to bootstrap server");
-			t.printStackTrace();
+			logger.error(lang.getMessage("bootstrap.failed"), t);
 			this.shutdown();
 		}
 	}
@@ -108,7 +116,7 @@ public class Server extends SynchronizedObject<Server> {
 		for (Consumer<Server> shutdownListener : shutdownListeners) {
 			shutdownListener.accept(this);
 		}
-		logger.info("shutting down server");
+		logger.info(lang.getMessage("server.shutting"));
 		networkServer.stop(() -> {
 			try {
 				getSynchronizer().sync(srv -> {
@@ -164,7 +172,7 @@ public class Server extends SynchronizedObject<Server> {
 				savedPlayer = playerPersistence.loadPlayer(name);
 			}
 			catch (Throwable e) {
-				AsyncExecutor.instance().getLogger().error("failed to load player data", e);
+				AsyncExecutor.instance().getLogger().error(lang.getMessage("server.playerdata.loadfail"), e);
 				c.completeExceptionally(e);
 				return;
 			}

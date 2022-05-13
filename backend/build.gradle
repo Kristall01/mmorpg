@@ -3,6 +3,7 @@ apply plugin: 'application'
 
 sourceCompatibility = 11
 targetCompatibility = 11
+compileJava.options.encoding = 'UTF-8'
 
 group 'hu.kristall'
 version '1.0-SNAPSHOT'

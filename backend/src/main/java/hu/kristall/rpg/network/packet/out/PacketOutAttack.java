@@ -8,8 +8,12 @@ public class PacketOutAttack extends PacketOut {
 	int entityID;
 	double x,y;
 	
-	public PacketOutAttack(int entityID, double x, double y) {
+	private PacketOutAttack() {
 		super("attack");
+	}
+	
+	public PacketOutAttack(int entityID, double x, double y) {
+		this();
 		
 		this.entityID = entityID;
 		this.x = x;

@@ -33,4 +33,37 @@ public class Path {
 	public PositionFunction getPosiFn() {
 		return posiFn;
 	}
+	
+	public static Position fixPosition(Position min, Position pos, Position max) {
+		double x = pos.getX(), y = pos.getY();
+		
+		double maxX = max.getX();
+		double maxY = max.getY();
+		
+		double minX = min.getX();
+		double minY = min.getY();
+		
+		boolean changed = false;
+		if(x < minX) {
+			changed = true;
+			x = minX;
+		}
+		else if(x > maxX) {
+			changed = true;
+			x = maxX;
+		}
+		
+		if(y < minY) {
+			changed = true;
+			y = minY;
+		}
+		else if(y > maxY) {
+			changed = true;
+			y = maxY;
+		}
+		if(!changed) {
+			return pos;
+		}
+		return new Position(x, y);
+	}
 }

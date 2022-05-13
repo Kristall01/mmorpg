@@ -24,7 +24,7 @@ public class TerminalReader implements CommandSupplier {
 				String text = line.line();
 				Collection<String> l = null;
 				try {
-					l = asyncServer.syncCompute(srv -> srv.getCommandMap().complete(inputReader, text)).get();
+					l = asyncServer.syncCompute(srv -> srv.getCommandMap().complete(srv.getCommandMap().getConsoleCommandSender(), text)).get();
 					for (String s : l) {
 						candidates.add(new Candidate(s));
 					}

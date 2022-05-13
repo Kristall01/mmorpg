@@ -10,7 +10,7 @@ import hu.kristall.rpg.world.Material;
 public class CommandInventoryAdd extends SimpleCommand {
 	
 	public CommandInventoryAdd(CommandParent parent) {
-		super(parent, "add", "<type>", "add item to inventory");
+		super(parent, "add", "<type>", "tárgy hozzáadása az inventoryhoz");
 	}
 	
 	@Override
@@ -23,7 +23,7 @@ public class CommandInventoryAdd extends SimpleCommand {
 			m = Material.valueOf(args[0]);
 		}
 		catch (IllegalArgumentException ex) {
-			sender.sendMessage("nincs ilyen item");
+			sender.sendTranslatedMessage("command.inventory-add.no-such-item");
 			return;
 		}
 		CommandCheckers.checkWorldPlayerEntity(sender, e -> {

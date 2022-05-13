@@ -7,8 +7,12 @@ public class PacketOutEntityspeed extends PacketOut {
 	int id;
 	double speed;
 	
-	public PacketOutEntityspeed(int entityID, double speed) {
+	private PacketOutEntityspeed() {
 		super("entityspeed");
+	}
+	
+	public PacketOutEntityspeed(int entityID, double speed) {
+		this();
 		this.id = entityID;
 		this.speed = speed;
 	}

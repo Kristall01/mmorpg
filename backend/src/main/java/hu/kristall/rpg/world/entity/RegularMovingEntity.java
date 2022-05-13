@@ -29,7 +29,11 @@ public abstract class RegularMovingEntity extends Entity {
 	public void move(Position to) {
 		to = getWorld().fixValidate(to);
 		long now = System.nanoTime();
-		this.lastPath = this.getWorld().interpolatePath(getPosition(), to, getSpeed(), now);
+		Path p = this.getWorld().findPath(getPosition(), to, getSpeed(), now);
+		if(p == null) {
+			return;
+		}
+		this.lastPath = p;
 		getWorld().broadcastPacket(new PacketOutMoveentity(this));
 	}
 	
