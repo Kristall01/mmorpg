@@ -19,7 +19,7 @@ public class CommandMap implements CommandParent {
 	
 	public CommandMap(Server server) {
 		this.server = server;
-		consoleCommandSender = new ConsoleCommandSender(server.getSynchronizer());
+		consoleCommandSender = new ConsoleCommandSender(server);
 	}
 	
 	public Server getServer() {
@@ -60,14 +60,14 @@ public class CommandMap implements CommandParent {
 		}
 		cmd = getCommand(prefix);
 		if(cmd == null) {
-			sender.sendRawMessage(server.getLang(), "cil.error.unknown-command");
+			sender.sendTranslatedMessage("cil.error.unknown-command");
 			return;
 		}
 		try {
 			cmd.execute(sender, prefix, args);
 		}
 		catch (Throwable t) {
-			sender.sendRawMessage(server.getLang(), "cil.error.exception");
+			sender.sendTranslatedMessage("cil.error.exception");
 		}
 	}
 	

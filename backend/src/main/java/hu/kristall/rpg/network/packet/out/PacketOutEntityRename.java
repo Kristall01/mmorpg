@@ -7,8 +7,12 @@ public class PacketOutEntityRename extends PacketOut {
 	String newname;
 	int id;
 	
-	public PacketOutEntityRename(int entityID, String newname) {
+	private PacketOutEntityRename() {
 		super("entityrename");
+	}
+	
+	public PacketOutEntityRename(int entityID, String newname) {
+		this();
 		this.id = entityID;
 		this.newname = newname;
 	}

@@ -1,12 +1,9 @@
 package hu.kristall.rpg.command.commands;
 
-import hu.kristall.rpg.Player;
+import hu.kristall.rpg.command.CommandCheckers;
 import hu.kristall.rpg.command.CommandParent;
 import hu.kristall.rpg.command.impl.SimpleCommand;
 import hu.kristall.rpg.command.senders.CommandSender;
-import hu.kristall.rpg.command.senders.PlayerSender;
-import hu.kristall.rpg.sync.Synchronizer;
-import hu.kristall.rpg.world.entity.EntityHuman;
 import hu.kristall.rpg.world.entity.cozy.Cloth;
 import hu.kristall.rpg.world.entity.cozy.ClothPack;
 
@@ -49,7 +46,20 @@ public class CommandClothes extends SimpleCommand {
 			
 			return;
 		}
-		if(!(sender instanceof PlayerSender)) {
+		CommandCheckers.checkWorldPlayerEntity(sender, h -> {
+			Cloth[] clothes = new Cloth[args.length];
+			for (int i = 0; i < args.length; ++i) {
+				try {
+					clothes[i] = Cloth.valueOf(args[i]);
+				}
+				catch (IllegalArgumentException ex) {
+					sender.sendMessage("§cHiba: §4Nem létezik §c'"+args[i]+"'§4 nevű ruha.");
+					return;
+				}
+			}
+			h.setClothes(new ClothPack(clothes));
+		});
+		/*if(!(sender instanceof PlayerSender)) {
 			sender.sendMessage("§cHiba: §4Ezt a parancsot csak játékosok használhatják.");
 			return;
 		}
@@ -80,7 +90,7 @@ public class CommandClothes extends SimpleCommand {
 		catch (Synchronizer.TaskRejectedException e) {
 			//world cannot be shut down while command is being processed
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 }

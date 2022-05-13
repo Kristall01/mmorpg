@@ -6,9 +6,7 @@ import hu.kristall.rpg.console.InputReader;
 import hu.kristall.rpg.persistence.Savefile;
 import hu.kristall.rpg.sync.Synchronizer;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
 
 public class Main {
@@ -92,8 +90,14 @@ public class Main {
 			System.setErr(new FilteredConsolePrinter(System.err, ChatColor::translateColorCodes));
 		}
 		String servePath = System.getenv("serve");
-		//Savefile savefile = Utils.gson().fromJson(new FileReader("/home/dominik/Asztal/savefile.json"), Savefile.class);
-		Synchronizer<Server> s = Server.createServer(servePath, null);
+		String sourcePath = System.getenv("savefile");
+		Savefile savefile;
+		InputStream in = sourcePath != null ? new FileInputStream(sourcePath) : Main.class.getResourceAsStream("/savefile.json");
+		try (in) {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			savefile = Utils.gson().fromJson(reader, Savefile.class);
+		}
+		Synchronizer<Server> s = Server.createServer(servePath, savefile);
 		InputReader reader = new InputReader(s);
 		
 	}

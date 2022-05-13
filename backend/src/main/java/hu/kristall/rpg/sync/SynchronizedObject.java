@@ -27,12 +27,12 @@ public class SynchronizedObject<T extends SynchronizedObject<T>> implements ISyn
 		this.timer = new SyncTimer(threadName+"-timer", this);
 	}
 	
-	protected void changeSyncer(Synchronizer<T> syncer) {
-		this.synchronizer = syncer;
-	}
-	
 	protected SynchronizedObject(String threadName) {
 		this(threadName, null);
+	}
+	
+	protected void changeSyncer(Synchronizer<T> syncer) {
+		this.synchronizer = syncer;
 	}
 	
 	/*	protected SynchronizedObject() {

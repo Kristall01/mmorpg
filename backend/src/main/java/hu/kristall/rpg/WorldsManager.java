@@ -2,6 +2,7 @@ package hu.kristall.rpg;
 
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.World;
+import hu.kristall.rpg.world.path.plan.PathFinder;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -17,12 +18,12 @@ public class WorldsManager {
 		this.server = server;
 	}
 	
-	public Synchronizer<World> createWorld(String name, int width, int height) {
+	public Synchronizer<World> createWorld(String name, int width, int height, String[] layers, PathFinder pathFinder) {
 		if(worlds.containsKey(name)) {
-			throw new IllegalStateException("there is a world with this name already");
+			throw new IllegalStateException(server.getLang().getMessage("worldmanager.create.name-taken"));
 		}
 		boolean defaultWorld = this.defaultWorld == null;
-		World world = new World(server.getSynchronizer(), defaultWorld, name, width, height);
+		World world = new World(server.getSynchronizer(), name, width, height, layers, pathFinder);
 		Synchronizer<World> worldSyncer = world.getSynchronizer();
 		this.worlds.put(name, worldSyncer);
 		if(defaultWorld) {
@@ -48,7 +49,7 @@ public class WorldsManager {
 	}
 	
 	public void shutdown() {
-		server.getLogger().info("Shutting down worlds");
+		server.getLogger().info(server.getLang().getMessage("worldmanager.shutting"));
 		List<Future<String>> shutdownTasks = new ArrayList<>();
 		for (Synchronizer<World> world : worlds.values()) {
 			try {
@@ -65,10 +66,10 @@ public class WorldsManager {
 		}
 		for (Future<?> shutdownTask : shutdownTasks) {
 			try {
-				server.getLogger().info("World "+shutdownTask.get()+" shut down");
+				server.getLogger().info(server.getLang().getMessage("worldmanager.world-shut", String.valueOf(shutdownTask.get())));
 			}
 			catch (InterruptedException | ExecutionException e) {
-				server.getLogger().warn("world shutdown interrupted", e);
+				server.getLogger().warn(server.getLang().getMessage("worldmanager.world-shut-interrupted"), e);
 				e.printStackTrace();
 			}
 		}

@@ -1,6 +1,5 @@
 package hu.kristall.rpg.command.commands;
 
-import hu.kristall.rpg.Player;
 import hu.kristall.rpg.WorldPosition;
 import hu.kristall.rpg.command.CommandCheckers;
 import hu.kristall.rpg.command.CommandParent;
@@ -17,15 +16,24 @@ public class CommandWorld extends SimpleCommand {
 	@Override
 	protected void checkedExecute(CommandSender sender, String label, String[] args) {
 		if(args.length == 0) {
-			sender.sendMessage("Ezekbe a világokba lehet csatlakozni:");
+			sender.sendTranslatedMessage("command.changeworld.worlds");
 			sender.sendMessage(String.join(", ",getServer().getWorldsManager().getWorldNames()));
 			return;
 		}
-		Synchronizer<World> w = getServer().getWorldsManager().getWorld(args[0]);
-		if(w == null && !args[0].contentEquals("null")) {
-			sender.sendMessage("§cHiba: §4Nincs ilyen világ");
-			return;
-		}
+		CommandCheckers.checkPlayerSender(sender, player -> {
+			WorldPosition wp = null;
+			if(!args[0].contentEquals("null")) {
+				Synchronizer<World> asyncWorld = getServer().getWorldsManager().getWorld(args[0]);
+				if(asyncWorld == null) {
+					sender.sendTranslatedMessage("command.changeworld.no-such-world");
+					return;
+				}
+				wp = new WorldPosition(asyncWorld, null);
+			}
+			sender.sendTranslatedMessage("command.changeworld.prepare");
+			player.scheduleWorldChange(wp);
+		});
+		/*
 		Player p;
 		if(!(sender instanceof Player)) {
 			if(!CommandCheckers.checkArgCount(sender, args, 2)) {
@@ -40,7 +48,6 @@ public class CommandWorld extends SimpleCommand {
 		else {
 			p = (Player) sender;
 		}
-		p.sendMessage("Felkészülés a világ váltásra...");
-		p.scheduleWorldChange(new WorldPosition(w, null));
+		*/
 	}
 }

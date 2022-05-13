@@ -1,7 +1,6 @@
 package hu.kristall.rpg.console;
 
 import hu.kristall.rpg.Server;
-import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.sync.Synchronizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +9,7 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
-public class InputReader implements CommandSender {
+public class InputReader {
 	
 	private Thread t;
 	private Consumer<String> consumer;
@@ -38,7 +37,7 @@ public class InputReader implements CommandSender {
 			try {
 				asyncServer.sync(srv -> {
 					if(srv != null) {
-						srv.getCommandMap().executeCommand(this, cmdline);
+						srv.getCommandMap().executeCommand(srv.getCommandMap().getConsoleCommandSender(), cmdline);
 					}
 				}).get();
 			}
@@ -96,16 +95,6 @@ public class InputReader implements CommandSender {
 		if(t != null) {
 			t.interrupt();
 		}
-	}
-	
-	@Override
-	public boolean hasPermission(String permission) {
-		return true;
-	}
-	
-	@Override
-	public void sendMessage(String message) {
-		supplier.sendMessage(message);
 	}
 	
 	public Synchronizer<Server> getAsyncServer() {

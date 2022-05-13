@@ -6,24 +6,20 @@ import hu.kristall.rpg.network.packet.out.*;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutDespawnItem;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSpawnItem;
-import hu.kristall.rpg.persistence.SavedLevel;
 import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.*;
 import hu.kristall.rpg.world.path.ConstantPosition;
-import hu.kristall.rpg.world.path.LinearPosition;
 import hu.kristall.rpg.world.path.Path;
+import hu.kristall.rpg.world.path.plan.PathFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class World extends SynchronizedObject<World> {
 	
-	protected final Tile[] tileMap;
-	protected Tile defaultTile;
 	protected final int width, height;
 	protected HashMap<AsyncPlayer, WorldPlayer> worldPlayers = new HashMap<>();
 	protected HashMap<Integer, Entity> worldEntities = new HashMap<>();
@@ -34,40 +30,30 @@ public class World extends SynchronizedObject<World> {
 	protected List<String> bakedMapSerialize;
 	protected Logger logger;
 	private boolean shuttingDown = false;
-	private boolean defaultWorld;
 	private List<Portal> portals = new ArrayList<>();
 	private Map<GeneratedID<FloatingItem>, FloatingItem> floatingItems = new HashMap<>();
+	private PathFinder pathFinder;
 	
-	public World(AsyncServer serverSynchronizer, boolean defaultWorld, String name, int width, int height) {
+	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder) {
 		super("world-"+name);
+		this.pathFinder = pathFinder;
 		
-		this.defaultWorld = defaultWorld;
 		this.logger = LoggerFactory.getLogger("world-"+name);
 		
 		this.asyncServer = serverSynchronizer;
 		this.name = name;
 		
-		this.tileMap = new Tile[width*height];
 		this.width = width;
 		this.height = height;
 		
-		Arrays.fill(tileMap, Tile.GRASS);
-		String[] s = new String[tileMap.length];
-		for (int i = 0; i < s.length; i++) {
-			s[i] = tileMap[i].name();
+		if(tileGrid == null) {
+			tileGrid = new String[width*height];
+			Arrays.fill(tileGrid, "GRASS");
 		}
-		this.bakedMapSerialize = List.of(s);
-		if(name.contentEquals("w0")) {
-			addPortal(new Portal(new Position(1, 1), "w1"));
-		}
-		else if(name.contentEquals("w1")) {
-			addPortal(new Portal(new Position(1, 1), "w2"));
-		}
-		else if(name.contentEquals("w2")) {
-			addPortal(new Portal(new Position(1, 1), "w0"));
-		}
+		this.bakedMapSerialize = List.of(tileGrid);
 		
 		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
+		spawnEntity(EntityType.SKELETON, new Position(10, 10));
 	}
 	
 	public Collection<FloatingItem> getItems() {
@@ -86,21 +72,14 @@ public class World extends SynchronizedObject<World> {
 			}
 			for (Portal portal : portals) {
 				if(portal.checkCollision(worldPlayer.getEntity())) {
-					worldPlayer.startChangingWorld(portal.getTargetWorldName());
+					worldPlayer.startChangingWorld(portal.getTargetWorldName(), portal.getTargetPosition());
 				}
 			}
 		}
 	}
 	
-	public Tile getTileAt(int x, int y) {
-		if(x < 0 || y < 0 || x > width || y > height) {
-			return Tile.WATER;
-		}
-		return tileMap[width*y + x];
-	}
-	
-	public Path interpolatePath(Position from, Position to, double cellsPerSec, long startTimeNanos) {
-		return new Path(to, List.of(from, to), new LinearPosition(from, to, cellsPerSec, startTimeNanos), startTimeNanos);
+	public Path findPath(Position from, Position to, double cellsPerSec, long startTimeNanos) {
+		return pathFinder.findPath(from, to, cellsPerSec, startTimeNanos);
 	}
 	
 	public Position getRandomPositionNear(Position pos, double minDistance, double maxDistance) {
@@ -143,6 +122,10 @@ public class World extends SynchronizedObject<World> {
 			}
 			case SLIME: {
 				createdEntity = EntitySlime.createSlime(this,getNextEntityID(),pos, optional);
+				break;
+			}
+			case SKELETON: {
+				createdEntity = new EntitySkeleton(this, getNextEntityID(), pos);
 				break;
 			}
 		}
@@ -275,9 +258,9 @@ public class World extends SynchronizedObject<World> {
 		}
 	}
 	
-	public SavedLevel serialize() {
+	/*public SavedLevel serialize() {
 		return new SavedLevel(this.name, this.width, this.height, null, new ArrayList<>(), this.portals.stream().map(Portal::serialize).collect(Collectors.toList()));
-	}
+	}*/
 	
 	public AsyncServer getAsyncServer() {
 		return asyncServer;

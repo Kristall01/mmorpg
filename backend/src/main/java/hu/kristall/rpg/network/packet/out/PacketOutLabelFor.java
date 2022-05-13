@@ -8,8 +8,13 @@ public class PacketOutLabelFor extends PacketOut {
 	int labelType;
 	int entityID;
 	
-	public PacketOutLabelFor(int id, LabelType type, String text) {
+	
+	private PacketOutLabelFor() {
 		super("labelFor");
+	}
+	
+	public PacketOutLabelFor(int id, LabelType type, String text) {
+		this();
 		this.entityID = id;
 		this.text = text;
 		this.labelType = type.code;

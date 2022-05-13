@@ -10,8 +10,12 @@ public class PacketOutSpawnEntity extends PacketOut {
 	int ID;
 	String type;
 	
-	public PacketOutSpawnEntity(int entityID, double speed, String type, Position startPosition, double hp, double maxHP) {
+	private PacketOutSpawnEntity() {
 		super("spawnentity");
+	}
+	
+	public PacketOutSpawnEntity(int entityID, double speed, String type, Position startPosition, double hp, double maxHP) {
+		this();
 		this.x = startPosition.getX();
 		this.y = startPosition.getY();
 		this.speed = speed;

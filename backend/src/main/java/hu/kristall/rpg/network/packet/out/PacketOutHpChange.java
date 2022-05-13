@@ -7,8 +7,12 @@ public class PacketOutHpChange extends PacketOut {
 	int id;
 	double newHp;
 	
-	public PacketOutHpChange(int entityID, double newHp) {
+	private PacketOutHpChange() {
 		super("hpchange");
+	}
+	
+	public PacketOutHpChange(int entityID, double newHp) {
+		this();
 		this.id = entityID;
 		this.newHp = newHp;
 	}

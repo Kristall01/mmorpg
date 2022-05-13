@@ -6,8 +6,12 @@ public class PacketOutEntityDeath extends PacketOut {
 
 	int id;
 	
-	public PacketOutEntityDeath(int entityID) {
+	private PacketOutEntityDeath() {
 		super("entityDeath");
+	}
+	
+	public PacketOutEntityDeath(int entityID) {
+		this();
 		this.id = entityID;
 	}
 	
