@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 public class Server extends SynchronizedObject<Server> {
 	
-	private NetworkServer networkServer;
+	//private NetworkServer networkServer;
 	private CommandMap commandMap;
 	//private InputReader inputReader;
 	private Lang lang = new Lang();
@@ -36,7 +36,7 @@ public class Server extends SynchronizedObject<Server> {
 	private Logger logger = LoggerFactory.getLogger("server");
 	private PlayerPersistence playerPersistence;
 	
-	private Server(String servePath, Savefile savefile) throws IOException {
+	private Server(Savefile savefile) throws IOException {
 		super("server");
 		
 		
@@ -44,13 +44,13 @@ public class Server extends SynchronizedObject<Server> {
 		this.playerPersistence = new PlayerPersistence(new File(System.getProperty("user.dir"), "playerdata"));
 		try {
 			lang.loadConfigFromJar("lang.cfg");
-			this.networkServer = new NetworkServer(this, servePath);
+			//this.networkServer = new NetworkServer(this, servePath);
 
 			
 			commandMap = CommandCollections.base(this);
 			//this.inputReader = new InputReader(text -> getSynchronizer().sync(srv -> srv.getCommandMap().executeConsoleCommand(text)), this.commandMap);
 			this.worldsManager = new WorldsManager(this);
-			this.networkServer.startAcceptingConnections();
+			//this.networkServer.startAcceptingConnections();
 			
 			
 			for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
@@ -98,21 +98,15 @@ public class Server extends SynchronizedObject<Server> {
 	}
 	
 	public boolean isStopping() {
-		//synchronized block is required, because this method can be called from any thread
-		synchronized(stoppingLock) {
-			return stopping;
-		}
+		return stopping;
 	}
 	
 	@Override
 	public void shutdown() {
-		//synchronized block is required, because this method can be called from any thread
-		synchronized(stoppingLock) {
-			if(stopping) {
-				return;
-			}
-			this.stopping = true;
+		if(stopping) {
+			return;
 		}
+		this.stopping = true;
 		for (Consumer<Server> shutdownListener : shutdownListeners) {
 			shutdownListener.accept(this);
 		}
@@ -136,8 +130,8 @@ public class Server extends SynchronizedObject<Server> {
 		});
 	}
 	
-	public static Synchronizer<Server> createServer(String servePath, Savefile save) throws IOException {
-		Server s = new Server(servePath, save);
+	public static AsyncServer createServer(Savefile save) throws IOException {
+		Server s = new Server(save);
 		return s.getSynchronizer();
 	}
 	
@@ -149,10 +143,6 @@ public class Server extends SynchronizedObject<Server> {
 	
 	public CommandMap getCommandMap() {
 		return commandMap;
-	}
-	
-	public NetworkServer getNetworkServer() {
-		return networkServer;
 	}
 	
 	public WorldsManager getWorldsManager() {

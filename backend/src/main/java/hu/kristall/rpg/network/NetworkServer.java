@@ -1,11 +1,14 @@
 package hu.kristall.rpg.network;
 
+import hu.kristall.rpg.AsyncServer;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.Synchronizer;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.websocket.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,13 +17,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NetworkServer {
 	
 	private final Map<WsContext, NetworkConnection> connections = new ConcurrentHashMap<>();
-	private final Synchronizer<Server> asyncServer;
-	private Javalin javalinServer;
-	private boolean wsAdded = false;
-	private AtomicBoolean stopping = new AtomicBoolean(false);
+	private Synchronizer<Server> asyncServer;
+	private final Javalin javalinServer;
+	private boolean stopping = false;
+	private final Object stopLock = new Object();
+	private Logger logger = LoggerFactory.getLogger("NetworkServer");
 	
-	public NetworkServer(Server server, String servePath) {
-		this.asyncServer = server.getSynchronizer();
+	public NetworkServer(String servePath) {
 		Javalin httpServer = Javalin.create(c -> {
 			c.showJavalinBanner = false;
 			if(servePath != null) {
@@ -28,7 +31,13 @@ public class NetworkServer {
 			}
 		});
 		this.javalinServer = httpServer;
-		httpServer.start(8080);
+		try {
+			httpServer.start(8080);
+		}
+		catch (Exception ex) {
+			logger.error("failed to bind port");
+			throw ex;
+		}
 	}
 	
 	//------------- ASYNC METHODS //-------------
@@ -42,25 +51,37 @@ public class NetworkServer {
 	}
 	
 	private void handleConnect(WsConnectContext ctx) {
-		if(stopping.get()) {
-			ctx.closeSession();
-			return;
+		synchronized(stopLock) {
+			if(stopping || asyncServer == null) {
+				ctx.closeSession();
+				return;
+			}
+			connections.put(ctx, new WebsocketPlayerConnection(this.asyncServer, ctx));
 		}
-		connections.put(ctx, new WebsocketPlayerConnection(this.asyncServer, ctx));
+	}
+	
+	private void handleServerShutdown() {
+	
 	}
 	
 	private void handleConnectionError(WsErrorContext wsErrorContext) {
 		wsErrorContext.session.close();
 	}
 	
-	public void stop(Runnable afterStop) {
-		stopping.set(true);
-		for (NetworkConnection value : connections.values()) {
-			value.close("server stopping");
+	public synchronized void stop() {
+		synchronized(stopLock) {
+			if(stopping) {
+				return;
+			}
+			stopping = true;
+			for (NetworkConnection value : connections.values()) {
+				value.close("server stopping");
+			}
 		}
+
 		AsyncExecutor.instance().runTask(() -> {
 			javalinServer.stop();
-			try {
+			/*try {
 				asyncServer.sync(srv -> {
 					afterStop.run();
 				});
@@ -68,21 +89,25 @@ public class NetworkServer {
 			catch (Synchronizer.TaskRejectedException e) {
 				//lol
 				e.printStackTrace();
-			}
+			}*/
 		});
 	}
 	
-	public void startAcceptingConnections() {
-		if(wsAdded) {
-			throw new IllegalStateException("ws is already added");
+	private final Object addServerLock = new Object();
+	
+	public synchronized void addServer(AsyncServer server) {
+		synchronized(addServerLock) {
+			if(asyncServer != null) {
+				throw new IllegalStateException("server is already added");
+			}
+			asyncServer = server;
+			javalinServer.ws("/ws", ws -> {
+				ws.onConnect(this::handleConnect);
+				ws.onMessage(this::handleConnectionMessage);
+				ws.onError(this::handleConnectionError);
+				ws.onClose(this::handleConnectionClose);
+			});
 		}
-		this.wsAdded =  true;
-		javalinServer.ws("/ws", ws -> {
-			ws.onConnect(this::handleConnect);
-			ws.onMessage(this::handleConnectionMessage);
-			ws.onError(this::handleConnectionError);
-			ws.onClose(this::handleConnectionClose);
-		});
 	}
 	
 }

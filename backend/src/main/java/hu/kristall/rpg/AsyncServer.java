@@ -11,7 +11,4 @@ public class AsyncServer extends Synchronizer<Server> {
 		this.server = server;
 	}
 	
-	public boolean isShuttingDown() {
-		return this.server.isStopping();
-	}
 }

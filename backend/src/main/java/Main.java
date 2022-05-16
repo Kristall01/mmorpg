@@ -1,8 +1,10 @@
+import hu.kristall.rpg.AsyncServer;
 import hu.kristall.rpg.ChatColor;
 import hu.kristall.rpg.Server;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.console.FilteredConsolePrinter;
 import hu.kristall.rpg.console.InputReader;
+import hu.kristall.rpg.network.NetworkServer;
 import hu.kristall.rpg.persistence.Savefile;
 import hu.kristall.rpg.sync.Synchronizer;
 
@@ -97,7 +99,11 @@ public class Main {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			savefile = Utils.gson().fromJson(reader, Savefile.class);
 		}
-		Synchronizer<Server> s = Server.createServer(servePath, savefile);
+		
+		
+		AsyncServer s = Server.createServer(savefile);
+		NetworkServer networkServer = new NetworkServer(servePath);
+		networkServer.addServer(s);
 		InputReader reader = new InputReader(s);
 		
 	}

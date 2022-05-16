@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class World extends SynchronizedObject<World> {
-	
 	protected final int width, height;
 	protected HashMap<AsyncPlayer, WorldPlayer> worldPlayers = new HashMap<>();
 	protected HashMap<Integer, Entity> worldEntities = new HashMap<>();
@@ -240,8 +239,18 @@ public class World extends SynchronizedObject<World> {
 		}
 		oldWP.getSynchronizer().changeObject(null);
 		broadcastMessage("§e"+player.name+ " lelépett");
+		
+		Synchronizer<World> asyncThis = getSynchronizer();
 		if(shuttingDown && worldPlayers.size() == 0) {
 			super.shutdown();
+			try {
+				asyncServer.sync(srv -> {
+					srv.getWorldsManager().removeStoppedWorld(asyncThis);
+				});
+			}
+			catch (Synchronizer.TaskRejectedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return savedPlayer;
 	}
@@ -267,6 +276,10 @@ public class World extends SynchronizedObject<World> {
 	}
 	
 	public void shutdownWorld() {
+		if(shuttingDown) {
+			return;
+		}
+		shuttingDown = true;
 		/*if(this.shuttingDown) {
 			return;
 		}
@@ -290,10 +303,16 @@ public class World extends SynchronizedObject<World> {
 		}
 		shuttingDown = true;
 		shutdownWorld0();*/
-		if(!asyncServer.isShuttingDown()) {
-			throw new IllegalStateException("worlds cannot be shut down while server is running");
+		for (WorldPlayer value : worldPlayers.values()) {
+			try {
+				value.getAsyncPlayer().sync(asyncPlayer -> {
+					asyncPlayer.kick("A világ amiben tartózkodtál leállt.");
+				});
+			}
+			catch (Synchronizer.TaskRejectedException e) {
+				//this player quit while enumerating
+			}
 		}
-		super.shutdown();
 	}
 	
 	public String getName() {

@@ -74,4 +74,17 @@ public class WorldsManager {
 			}
 		}
 	}
+	
+	public void removeStoppedWorld(Synchronizer<World> asyncThis) {
+		try {
+			asyncThis.
+			asyncThis.sync(world -> {});
+			//world is still running
+		}
+		catch (Synchronizer.TaskRejectedException e) {
+			//world has shut truly shut down
+			worlds.remove(asyncThis);
+		}
+	}
+	
 }
