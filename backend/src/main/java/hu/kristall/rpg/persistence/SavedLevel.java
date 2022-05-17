@@ -4,10 +4,7 @@ import com.google.gson.*;
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.world.grid.SearchGrid;
-import hu.kristall.rpg.world.path.plan.AStarPathFinder;
-import hu.kristall.rpg.world.path.plan.FreePathFinder;
-import hu.kristall.rpg.world.path.plan.PathFinder;
-import hu.kristall.rpg.world.path.plan.ReducedPathFinder;
+import hu.kristall.rpg.world.path.plan.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -62,6 +59,9 @@ public class SavedLevel {
 						walls[i/width][i%width] = arr.get(i).getAsBoolean();
 					}
 					pathFinder = new AStarPathFinder(new SearchGrid(walls, width, height));
+				}
+				else if(pathType.equals("navmesh")) {
+					pathFinder = new NavmeshPathfinder(base);
 				}
 				else {
 					pathFinder = new FreePathFinder();

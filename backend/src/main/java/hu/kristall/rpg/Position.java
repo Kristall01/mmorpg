@@ -2,11 +2,12 @@ package hu.kristall.rpg;
 
 import com.google.gson.*;
 import hu.kristall.rpg.world.grid.GridPosition;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class Position {
+public class Position implements Comparable<Position> {
 	
 	private final double x, y;
 	
@@ -60,6 +61,15 @@ public class Position {
 	
 	public static double distance(Position p0, Position p1) {
 		return Math.sqrt(Math.pow(p0.getX() - p1.getX(), 2) + Math.pow(p0.getY() - p1.getY(), 2));
+	}
+	
+	@Override
+	public int compareTo(@NotNull Position position) {
+		int c0 = Double.compare(this.x, position.x);
+		if(c0 == 0) {
+			return Double.compare(this.y, position.y);
+		}
+		return c0;
 	}
 	
 	public static class PositionSerializer implements JsonSerializer<Position>, JsonDeserializer<Position> {
