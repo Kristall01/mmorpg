@@ -99,7 +99,6 @@ public class Main {
 		}
 		Synchronizer<Server> s = Server.createServer(servePath, savefile);
 		InputReader reader = new InputReader(s);
-		
 	}
 	
 }

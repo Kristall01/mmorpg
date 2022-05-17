@@ -1,5 +1,6 @@
 package hu.kristall.rpg.world.navmesh;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import hu.kristall.rpg.Position;
@@ -10,7 +11,7 @@ import java.util.*;
 public class Graph {
 
 	private Map<String, Vertex> vertices = new HashMap<>();
-	private Map<String, Rectangle> rectangles = new HashMap<>();
+	private Map<String, Polygon> polygons = new HashMap<>();
 	
 	public Graph(JsonObject object) {
 		JsonObject jsonVertices = object.get("vertices").getAsJsonObject();
@@ -38,12 +39,12 @@ public class Graph {
 		}
 		*/
 		
-		JsonObject jsonRects = object.get("rectangles").getAsJsonObject();
-		for (Map.Entry<String, JsonElement> entry : jsonRects.entrySet()) {
-			JsonObject jsonRect = entry.getValue().getAsJsonObject();
-			Vertex[] v = new Vertex[4];
+		JsonObject jsonPolygons = object.get("polygons").getAsJsonObject();
+		for (Map.Entry<String, JsonElement> entry : jsonPolygons.entrySet()) {
+			JsonArray polygonJsonVertices = entry.getValue().getAsJsonArray();
+			Vertex[] v = new Vertex[polygonJsonVertices.size()];
 			int index = -1;
-			for (JsonElement vertex : jsonRect.get("vertices").getAsJsonArray()) {
+			for (JsonElement vertex : polygonJsonVertices) {
 				v[++index] = vertices.get(vertex.getAsString());
 			}
 			for (int i = 0; i < v.length-1; i++) {
@@ -54,9 +55,7 @@ public class Graph {
 			Edge sideEdge = new Edge(v[0], v[v.length-1]);
 			v[0].addEdge(sideEdge);
 			v[v.length-1].addEdge(sideEdge);
-			Vertex tl = vertices.get(jsonRect.get("tl").getAsString());
-			Vertex br = vertices.get(jsonRect.get("br").getAsString());
-			rectangles.put(entry.getKey(), new Rectangle(entry.getKey(), v, tl, br));
+			polygons.put(entry.getKey(), new Polygon(entry.getKey(), v));
 		}
 		for (Vertex value : vertices.values()) {
 			value.bakeNeighbourVerticies();
@@ -64,8 +63,8 @@ public class Graph {
 		
 	}
 	
-	private Rectangle getRectangle(Position pos) {
-		for (Rectangle value : rectangles.values()) {
+	private Polygon getPolygon(Position pos) {
+		for (Polygon value : polygons.values()) {
 			if(value.isIn(pos)) {
 				return value;
 			}
@@ -74,7 +73,7 @@ public class Graph {
 	}
 	
 	private boolean hasLineOfSight(Position pos0, Position pos1) {
-		Rectangle fromRectangle = getRectangle(pos0);
+		Polygon fromRectangle = getPolygon(pos0);
 		if(fromRectangle == null) {
 			return false;
 		}
@@ -87,34 +86,34 @@ public class Graph {
 		for (Vertex value : vertices.values()) {
 			value.reset();
 		}
-		Rectangle fromRectangle = null, toRecrangle = null;
-		for (Rectangle value : rectangles.values()) {
+		Polygon fromPolygon = null, toPolygon = null;
+		for (Polygon value : polygons.values()) {
 			if(value.isIn(from)) {
-				fromRectangle = value;
+				fromPolygon = value;
 				break;
 			}
 		}
-		if(fromRectangle == null) {
+		if(toPolygon == null) {
 			throw new IllegalArgumentException("from position is out of the map.");
 		}
-		for (Rectangle value : rectangles.values()) {
+		for (Polygon value : polygons.values()) {
 			if(value.isIn(to)) {
-				toRecrangle = value;
+				toPolygon = value;
 				break;
 			}
 		}
-		if(toRecrangle == null) {
+		if(toPolygon == null) {
 			throw new IllegalArgumentException("to position is out of the map.");
 		}
 		
-		if(fromRectangle.equals(toRecrangle)) {
+		if(fromPolygon.equals(toPolygon)) {
 			return List.of(from, to);
 		}
 		
 		Queue<Vertex> openList = new PriorityQueue<>();
 		
-		Vertex startVertex = fromRectangle.findVertexClosestTo(to);
-		Vertex endVertext = toRecrangle.findVertexClosestTo(from);
+		Vertex startVertex = fromPolygon.findVertexClosestTo(to);
+		Vertex endVertext = toPolygon.findVertexClosestTo(from);
 		
 		startVertex.setOpen(true);
 		startVertex.setG(0);

@@ -72,6 +72,22 @@ public class Position implements Comparable<Position> {
 		return c0;
 	}
 	
+	public static double distanceSquared(Position p0, Position p1) {
+		return Math.pow(p0.getX() - p1.getX(), 2) + Math.pow(p0.getY() - p1.getY(), 2);
+	}
+	
+	public static double angleBetween(Position p0, Position center, Position p2) {
+		/*
+		//THIS IGNORES CONCAVITY
+		double aPow2 = Position.distanceSquared(p0, center);
+		double bPow2 = Position.distanceSquared(p2, center);
+		double cPow2 = Position.distanceSquared(p0, p2);
+		return Math.acos((aPow2 + bPow2 - cPow2)/(2*Math.sqrt(aPow2)*Math.sqrt(bPow2)));
+		*/
+		return Math.atan2(p2.y - center.y, p2.x - center.x) -
+			Math.atan2(p0.y - center.y, p0.x - center.x);
+	}
+	
 	public static class PositionSerializer implements JsonSerializer<Position>, JsonDeserializer<Position> {
 		
 		@Override
