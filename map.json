@@ -1,0 +1,81 @@
+{
+	"vertices": {
+		"vA": [-2,-2],
+		"vB": [-4,-2],
+		"vC": [-2,2],
+		"vD": [-4,2],
+		"vE": [-4,4],
+		"vF": [-2,4],
+		"vG": [2,4],
+		"vH": [2,2],
+		"vI": [4,2],
+		"vJ": [4,4],
+		"vK": [2,-2],
+		"vL": [4,-2],
+
+		"vM": [2,-3],
+		"vN": [4,-3],
+		"vO": [6,-3],
+		"vP": [6,-2],
+		"vQ": [7,-3],
+		"vR": [7,-2],
+		"vS": [6,2],
+		"vT": [7,2],
+
+		"vU": [6,0],
+		"vV": [7,0]
+	},
+	"rectangles": {
+		"rCDBA": {
+			"vertices": ["vC","vD","vB","vA"],
+			"tl": "vD",
+			"br": "vA"
+		},
+		"rFEDC": {
+			"vertices": ["vF","vE","vD","vC"],
+			"tl": "vE",
+			"br": "vC"
+		},
+		"rGFCH": {
+			"vertices": ["vG","vF","vC","vH"],
+			"tl": "vF",
+			"br": "vH"
+		},
+		"rJGHI": {
+			"vertices": ["vJ","vG","vH","vI"],
+			"tl": "vG",
+			"br": "vI"
+		},
+		"rIHKL": {
+			"vertices": ["vI","vH","vK","vL"],
+			"tl": "vH",
+			"br": "vL"
+		},
+		"rLKMN": {
+			"vertices": ["vL", "vK", "vM", "vN"],
+			"tl": "vK",
+			"br": "vN"
+		},
+		"rPLNO": {
+			"vertices": ["vP", "vL", "vN", "vO"],
+			"tl": "vL",
+			"br": "vO"
+		},
+		"rRPOQ": {
+			"vertices": ["vR", "vP", "vO", "vQ"],
+			"tl": "vP",
+			"br": "vQ"
+		},
+		"rTSPR": {
+			"vertices": ["vV", "vU", "vP", "vR"],
+			"tl": "vU",
+			"br": "vR"
+		},
+		"rTSUV": {
+			"vertices": ["vT", "vS", "vU", "vV"],
+			"tl": "vS",
+			"br": "vV"
+		}
+
+	}
+}

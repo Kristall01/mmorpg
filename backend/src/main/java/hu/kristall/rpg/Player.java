@@ -13,6 +13,7 @@ import hu.kristall.rpg.world.WorldPlayer;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,7 +24,7 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	private final PlayerConnection connection;
 	private final Lock worldLock;
 	private Synchronizer<WorldPlayer> asyncEntity = new Synchronizer<>(null, AsyncExecutor.instance());
-	private final Queue<WorldPosition> worldChangeQueue = new LinkedList<>();
+	private final Queue<WorldChangeIntention> worldChangeQueue = new LinkedList<>();
 	private final Server server;
 	private Runnable quitHandler;
 	private final AsyncPlayer asyncPlayer;
@@ -55,9 +56,9 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	
 	private void repollWorldChange() {
 		synchronized(worldChangeQueue) {
-			WorldPosition worldPos = worldChangeQueue.poll();
-			if(worldPos != null) {
-				exclusiveWorldChange(worldPos);
+			WorldChangeIntention intention = worldChangeQueue.poll();
+			if(intention != null) {
+				exclusiveWorldChange(intention);
 			}
 			else {
 				worldLock.unlock();
@@ -71,7 +72,8 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 		this.persistence.savePlayer(savedPlayer);
 	}
 	
-	private void exclusiveWorldChange(WorldPosition worldPos) {
+	private void exclusiveWorldChange(WorldChangeIntention intention) {
+		WorldPosition worldPos = intention.pos;
 		final Player leaver = this;
 		final Synchronizer<Server> asyncServer = getServer().getSynchronizer();
 		final SavedPlayer pl = this.savedPlayer;
@@ -89,6 +91,7 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 				if(worldPos == null) {
 					try {
 						asyncServer.sync(srv -> {
+							intention.future.complete(null);
 							repollWorldChange();
 						});
 					}
@@ -104,6 +107,7 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 							leaver.setAsyncEntity(newWorld.joinPlayer(this.asyncPlayer, finalHuman, worldPos.pos));
 							try {
 								asyncServer.sync(srv -> {
+									intention.future.complete(null);
 									repollWorldChange();
 								});
 							}
@@ -128,14 +132,16 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 		}
 	}
 	
-	public void scheduleWorldChange(WorldPosition worldPos) {
+	public Future<?> scheduleWorldChange(WorldPosition worldPos) {
+		WorldChangeIntention intention = new WorldChangeIntention(worldPos, new CompletableFuture<>());
 		synchronized(worldChangeQueue) {
 			if(!worldLock.tryLock()) {
-				worldChangeQueue.offer(worldPos);
-				return;
+				worldChangeQueue.offer(intention);
+				return intention.future;
 			}
 		}
-		exclusiveWorldChange(worldPos);
+		exclusiveWorldChange(intention);
+		return intention.future;
 	}
 	
 	private synchronized void setAsyncEntity(Synchronizer<WorldPlayer> asyncEntity) {
@@ -188,7 +194,7 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	}
 	
 	@Override
-	public Synchronizer<Player> getSynchronizer() {
+	public AsyncPlayer getSynchronizer() {
 		return this.asyncPlayer;
 	}
 	
@@ -205,5 +211,17 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	@Override
 	public boolean isShutdown() {
 		return server.isShutdown();
+	}
+	
+	private static class WorldChangeIntention {
+		
+		public final WorldPosition pos;
+		public final CompletableFuture<?> future;
+		
+		public WorldChangeIntention(WorldPosition pos, CompletableFuture<?> future) {
+			this.pos = pos;
+			this.future = future;
+		}
+		
 	}
 }
