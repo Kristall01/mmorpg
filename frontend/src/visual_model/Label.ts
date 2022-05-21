@@ -1,5 +1,4 @@
 import Entity from "./Entity";
-import { PositionFn } from "./Paths";
 
 export class LabelType {
 

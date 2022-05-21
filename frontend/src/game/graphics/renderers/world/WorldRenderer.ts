@@ -1,5 +1,5 @@
 import { drawText, RenderContext } from "game/graphics/GraphicsUtils";
-import Renderable, { StatelessRenderable } from "game/graphics/Renderable";
+import Renderable from "game/graphics/Renderable";
 import CozyPack from "game/graphics/texture/CozyPack";
 import EmptyTexture from "game/graphics/texture/EmptyTexture";
 import Texture from "game/graphics/texture/Texture";
@@ -7,14 +7,12 @@ import TexturePack from "game/graphics/texture/TexturePack";
 import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
 import SubManager from "SubManager";
-import { DEFAULT_MAX_VERSION } from "tls";
 import { radiusDistance } from "visual_model/Paths";
-import Portal from "visual_model/Portal";
 import VisualModel, { Position } from "visual_model/VisualModel";
 import World, { WorldEvent } from "visual_model/World";
 import { renderEntity } from "./EntityRenderer";
 import FloatingItemResource from "./FloatingItemResource";
-import { renderLabel, renderLabels } from "./LabelsRenderer";
+import { renderLabels } from "./LabelsRenderer";
 
 export interface RenderConfig {
 	camX: number

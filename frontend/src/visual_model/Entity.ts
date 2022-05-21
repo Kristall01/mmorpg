@@ -1,7 +1,5 @@
-import { RenderContext } from "game/graphics/GraphicsUtils"
 import { EntityType } from "./EntityType"
 import { ConstStatus, Direction, DirectionMode, EntityConstStatus, entityZigzagStatus, Status, StatusFn } from "./Paths"
-import UpdateBroadcaster from "./UpdateBroadcaster"
 import { Position } from "./VisualModel"
 
 export default abstract class Entity {

@@ -1,5 +1,5 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import ImageStore, { ImageResource } from "game/ImageStore";
+import ImageStore from "game/ImageStore";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 

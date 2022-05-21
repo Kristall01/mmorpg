@@ -1,5 +1,3 @@
-import UpdateBroadcaster from "./UpdateBroadcaster";
-
 export type ItemEvent = "rename";
 
 export default class Item {

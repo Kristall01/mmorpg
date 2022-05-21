@@ -1,6 +1,5 @@
 import { ModelContext } from "game/GameView";
 import { createRef, FormEventHandler, forwardRef, KeyboardEventHandler, useContext, useEffect, useState } from "react"
-import { focus } from "visual_model/VisualModel";
 
 import "./textconverter.css";
 import "./Chat.scss";

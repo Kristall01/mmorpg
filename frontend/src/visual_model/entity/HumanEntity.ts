@@ -1,13 +1,9 @@
-import CozyPack from "game/graphics/texture/CozyPack";
-import { RenderContext } from "game/graphics/GraphicsUtils";
 import Entity from "visual_model/Entity";
 import { EntityType } from "visual_model/EntityType";
-import { Activity, Cloth, ClothColor, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
+import { Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Position } from "visual_model/VisualModel";
 import { calculatedDirection, Direction, facingFunction } from "visual_model/Paths";
-import { enumValueOf } from "utils";
 import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
-import { ColoredClothData } from "model/signals/SignalChangeClothes";
 import ActivityFunction, { ActivitySnapshot, createSwordFunction, createWalkFunction, idleFunction } from "visual_model/ActivityFunction";
 
 export default class HumanEntity extends Entity {

@@ -1,8 +1,7 @@
-import React, { Component, createRef, FunctionComponent, useEffect, useState } from 'react';
-import Menuswitch from '../Menuswitch';
 import buildno from 'buildno';
-
-import "./GameApp.scss"
+import { Component } from 'react';
+import Menuswitch from '../Menuswitch';
+import "./GameApp.scss";
 
 class GameApp extends Component {
 

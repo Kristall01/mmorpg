@@ -1,6 +1,3 @@
-import React from "react";
-import { enumValueOf } from "utils";
-
 export class Color {
 
 	readonly code: string;

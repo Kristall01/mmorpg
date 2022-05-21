@@ -1,11 +1,7 @@
 import { drawBar } from "game/graphics/GraphicsUtils";
-import CozyPack from "game/graphics/texture/CozyPack";
-import { enumValueOf } from "utils";
 import Entity from "visual_model/Entity";
 import HumanEntity from "visual_model/entity/HumanEntity";
 import EntityType from "visual_model/EntityType";
-import { Activity, ClothColor } from "visual_model/assetconfig/HumanAssetConfig";
-import { Direction } from "visual_model/Paths";
 import WorldRenderer, { RenderConfig } from "./WorldRenderer";
 
 type RendererFunction = (view: WorldRenderer, e: Entity, renderConfig: RenderConfig) => void;

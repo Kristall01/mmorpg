@@ -1,7 +1,6 @@
-import ActivityFunction, { createSwordFunction, createWalkFunction, idleFunction } from "visual_model/ActivityFunction";
 import Entity from "visual_model/Entity";
 import { EntityType } from "visual_model/EntityType";
-import { calculatedDirection, Direction, facingFunction } from "visual_model/Paths";
+import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 
 export default class SlimeEntity extends Entity {

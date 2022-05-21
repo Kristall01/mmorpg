@@ -1,13 +1,11 @@
 import GraphicsComponent from 'game/graphics/component/GraphicsComponent';
-import { renderHuman } from 'game/graphics/renderers/world/EntityRenderer';
 import { ColoredCloth } from 'game/graphics/renderers/world/HumanRenderer';
-import CozyPack, { CozyActivity } from 'game/graphics/texture/CozyPack';
+import CozyPack from 'game/graphics/texture/CozyPack';
 import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
 import { enumValueOf } from 'utils';
 import { Activity, Cloth, ClothColor } from 'visual_model/assetconfig/HumanAssetConfig';
 import { Direction } from 'visual_model/Paths';
-import { runInThisContext } from 'vm';
 import './ClothEditor.scss';
 import ClothRenderer from './ClothRenderer';
 import OpeningSection from './OpeningSection';

@@ -1,6 +1,6 @@
 import parseText from "game/ui/chat/textparser";
 import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
-import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
+import {IEventReciever, ModelEventType} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
 import SignalChangeHp from "model/signals/SignalChangeHp";

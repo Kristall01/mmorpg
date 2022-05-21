@@ -1,5 +1,3 @@
-import Texture from "game/graphics/texture/Texture";
-import TexturePack from "game/graphics/texture/TexturePack";
 import Entity from "./Entity";
 import VisualModel, { Position } from "./VisualModel";
 import { linearMove } from "utils";
@@ -10,7 +8,6 @@ import { Direction } from "./Paths";
 import { WorldLabel } from "./Label";
 import Matrix from "Matrix";
 import Portal from "./Portal";
-import Item from "./Item";
 import FloatingItem from "./FloatingItem";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import ItemStack from "./ItemStack";

@@ -4,8 +4,6 @@ import CozyPack from "game/graphics/texture/CozyPack";
 import { createRef, useContext } from "react";
 import HumanEntity from "visual_model/entity/HumanEntity";
 import EntityType from "visual_model/EntityType";
-import { Cloth, ClothColor } from "visual_model/assetconfig/HumanAssetConfig";
-import VisualModel from "visual_model/VisualModel";
 import ClothEditor from "./ClothEditor";
 
 export type ClothEditorLayerProps = {

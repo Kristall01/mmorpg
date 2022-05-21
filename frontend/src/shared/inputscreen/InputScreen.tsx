@@ -1,7 +1,7 @@
 import MenuContext from "MenuContext";
 import React, { ReactNode, useContext } from "react";
 import { createRef } from "react";
-import { Button, ButtonGroup, FormControl, InputGroup } from "react-bootstrap";
+import { FormControl } from "react-bootstrap";
 import ButtonMenu, { WrappedButton, WrappedButtonProps } from "shared/buttonmenu/ButtonMenu";
 import "./InputScreen.scss";
 

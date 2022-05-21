@@ -2,7 +2,6 @@ import MenuContext from "MenuContext";
 import LoadingScene from "phases/loading/LoadingScene";
 import MenuScene from "phases/menu/MenuScene";
 import { useContext } from "react";
-import { Button } from "react-bootstrap";
 import ButtonMenu, { WrappedButton } from "shared/buttonmenu/ButtonMenu";
 import "./LandingPhase.scss";
 

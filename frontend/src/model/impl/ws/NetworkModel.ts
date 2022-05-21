@@ -1,5 +1,5 @@
 import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
-import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
+import {IEventReciever, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalAttack from "model/signals/SignalAttack";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";

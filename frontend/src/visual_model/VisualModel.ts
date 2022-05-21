@@ -1,9 +1,6 @@
-import { convertToHtmlText } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
-import { ThemeConsumer } from "react-bootstrap/esm/ThemeProvider";
 import Entity from "./Entity";
-import ItemStack from "./ItemStack";
 import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";

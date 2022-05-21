@@ -1,5 +1,4 @@
 import { drawDamageLabel, drawHealLabel } from "game/graphics/GraphicsUtils";
-import WorldView from "game/graphics/world/WorldView";
 import { LabelType, WorldLabel } from "visual_model/Label";
 import { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";

@@ -1,19 +1,12 @@
 import LogicModel from "model/LogicModel";
 import React, { createContext, createRef } from "react";
-import VisualModel, {focus, Position, UpdateTypes} from "visual_model/VisualModel";
-import GraphicsComponent from "./graphics/component/GraphicsComponent";
-import WorldRenderer from "./graphics/renderers/world/WorldRenderer";
+import VisualModel, {UpdateTypes} from "visual_model/VisualModel";
 import Chat from "./ui/chat/Chat";
 
 import "./GameView.scss";
-import CozyPack from "./graphics/texture/CozyPack";
-import ImageStore from "./ImageStore";
-import TexturePack from "./graphics/texture/TexturePack";
-import WorldView from "./graphics/world/WorldView";
 import ConditionalWorldView from "./graphics/world/ConditionalWorldView";
 import VisualResources from "./VisualResources";
 import EscapeMenu from "./ui/escapemenu/EscapeMenu";
-import InventoryMenu from "./ui/inventory/InventoryMenu";
 import ClothEditorLayer from "./ui/clotheditor/ClothEditorLayer";
 
 export type props = {

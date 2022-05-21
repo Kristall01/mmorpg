@@ -1,4 +1,3 @@
-import CozyPack from "game/graphics/texture/CozyPack";
 import GameView from "game/GameView";
 import MenuContext from "MenuContext";
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
@@ -8,7 +7,6 @@ import { Component, Context, createContext, useState } from "react";
 import VisualModel from "visual_model/VisualModel";
 
 import "./GameScene.scss";
-import ImageStore from "game/ImageStore";
 import VisualResources from "game/VisualResources";
 import { Button } from "react-bootstrap";
 

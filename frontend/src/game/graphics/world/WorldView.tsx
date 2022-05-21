@@ -1,16 +1,11 @@
 import InventoryMenu from "game/ui/inventory/InventoryMenu";
 import VisualResources from "game/VisualResources";
 import LogicModel from "model/LogicModel";
-import React, { Component, createRef } from "react";
-import VisualModel, { UpdateTypes } from "visual_model/VisualModel";
+import React, { createRef } from "react";
+import VisualModel from "visual_model/VisualModel";
 import World from "visual_model/World";
 import GraphicsComponent from "../component/GraphicsComponent";
-import Renderable from "../Renderable";
-import EmptyRenderer from "../renderers/empty/EmptyRenderer";
 import WorldRenderer from "../renderers/world/WorldRenderer";
-import CozyPack from "../texture/CozyPack";
-import TexturePack from "../texture/TexturePack";
-import ConditionalWorldView from "./ConditionalWorldView";
 import "./WorldView.scss";
 
 export type props = {
