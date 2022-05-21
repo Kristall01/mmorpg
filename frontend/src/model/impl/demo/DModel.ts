@@ -52,6 +52,18 @@ class DModel extends LogicModel {
 		this.statusFn = ConstStatus(startPos, Direction.enum.map.SOUTH);
 
 		setTimeout(() => {
+			if(username.length < 3) {
+				this.broadcastEvent({type: ModelEventType.END, data: "A névnek legalább 3 karakterből kell állnia."});
+				return;
+			}
+			if(username.length > 16) {
+				this.broadcastEvent({type: ModelEventType.END, data: "A név legfeljebb 16 karakterből állhat."});
+				return;
+			}
+			if(!username.match('^[a-zA-Z0-9áÁéÉíÍóÓöÖőŐúÚüÜüŰ].*$')) {
+				this.broadcastEvent({type: ModelEventType.END, data: "A név csak számokból és a magyar ABC betűiből állhat."});
+				return;
+			}
 			this.broadcastEvent({type: ModelEventType.CONNECTED});
 			setTimeout(() => {
 				this.broadcastEvent({type: ModelEventType.PLAY});
