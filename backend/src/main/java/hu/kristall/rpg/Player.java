@@ -145,7 +145,6 @@ public class Player implements PlayerSender, ISynchronized<Player> {
 	}
 	
 	private synchronized void setAsyncEntity(Synchronizer<WorldPlayer> asyncEntity) {
-		System.out.println("setting async entity");
 		this.asyncEntity = asyncEntity;
 	}
 	
