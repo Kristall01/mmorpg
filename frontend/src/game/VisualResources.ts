@@ -12,6 +12,8 @@ export default class VisualResources {
 	public readonly slimeRenderer: SlimeRenderer
 	public readonly skeletonRenderer: SkeletonRenderer
 
+	private static instance: VisualResources | null = null;
+
 	private constructor(images: ImageStore, cozy: CozyPack, texture: TexturePack, slimeRenderer: SlimeRenderer, skeletonRenderer: SkeletonRenderer) {
 		this.cozy = cozy;
 		this.textures = texture;
@@ -21,6 +23,9 @@ export default class VisualResources {
 	}
 
 	public static async load(): Promise<VisualResources> {
+		if(this.instance !== null) {
+			return this.instance;
+		}
 		let images = new ImageStore();
 		let zipFiles = ["imagestore.zip", "items.zip", "sprout/sprout.zip", "mystic/mystic.zip","bq.zip"];
 		await Promise.all(zipFiles.map(async f => images.loadZip(f)));
@@ -32,7 +37,9 @@ export default class VisualResources {
 
 		let textureJsons = ["texturepack.json","items.json","sprout/sprout_index.json"];
 		await Promise.all(textureJsons.map(async t => textures.loadPack(t)));
-		return new VisualResources(images, cozy, textures, slimeRenderer, skeletonRenderer);
+		let resources = new VisualResources(images, cozy, textures, slimeRenderer, skeletonRenderer);
+		this.instance = resources;
+		return resources;
 	}
 
 }
