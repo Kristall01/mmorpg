@@ -97,7 +97,7 @@ public class Main {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			savefile = Utils.gson().fromJson(reader, Savefile.class);
 		}
-		Synchronizer<Server> s = Server.createServer(servePath, savefile, 8006);
+		Synchronizer<Server> s = Server.createServer(servePath, savefile, 8080);
 		InputReader reader = new InputReader(s);
 		
 	}
