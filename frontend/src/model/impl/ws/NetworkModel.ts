@@ -113,12 +113,15 @@ class NetworkModel extends LogicModel {
 		})
 
 		this.ws.addEventListener("message", (e) => {
-			let rawPacketData = e.data;
-			let type, data;
+			let rawPacketData: string = e.data;
+			let type: string, data;
 			try {
-				let parsedPacket = JSON.parse(rawPacketData);
-				type = parsedPacket.type;
-				data = parsedPacket.data;
+				let separatorIndex = rawPacketData.indexOf(';') ;
+				if(separatorIndex === -1) {
+					throw new Error("ilelgal packet format");
+				}
+				type = rawPacketData.substring(0, separatorIndex);
+				data = JSON.parse(rawPacketData.substring(separatorIndex+1));
 			}
 			catch(err) {
 				this.endConnection("kommunikációs hiba: a szerver hibás formátumú csomagot küldött");
