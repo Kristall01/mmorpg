@@ -1,7 +1,7 @@
 import { useContext } from "react"
 
 import MenuContext from "MenuContext";
-import GameScene from "phases/game/GameScene";
+import GamePhase from "phases/game/GamePhase";
 import DModel from "model/impl/demo/DModel";
 import NetworkModel from "model/impl/ws/NetworkModel";
 import VisualResources from "game/VisualResources";
@@ -14,7 +14,7 @@ interface props {
 	visuals: VisualResources
 }
 
-const MenuScene = ({visuals}: props) => {
+const MenuPhase = ({visuals}: props) => {
 
 	let setMenu = useContext(MenuContext);
 
@@ -22,8 +22,8 @@ const MenuScene = ({visuals}: props) => {
 		let m: InputMap = new Map<string, string>();
 		m.set("username", "felhasználónév");
 		setMenu(() => <InputScreen buttonProps={{text: "kapcsolódás", icon: "fa-solid fa-arrow-right-to-bracket"}} submitHandler={(result) => {
-			setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new DModel(a, result.get("username")!)} />)
-		}} title="teszt mód" map={m} returnMenu={() => <MenuScene visuals={visuals} />} />);
+			setMenu(() => <GamePhase visuals={visuals} modelGenerator={(a) => new DModel(a, result.get("username")!)} />)
+		}} title="teszt mód" map={m} returnMenu={() => <MenuPhase visuals={visuals} />} />);
 	}
 
 	const getRecommendedAddress = (): string | undefined => {
@@ -53,8 +53,8 @@ const MenuScene = ({visuals}: props) => {
 		m.set("address", {defaultValue: getRecommendedAddress(), label: "szerver címe"});
 
 		setMenu(() => <InputScreen buttonProps={{text: "kapcsolódás", icon: "fa-solid fa-arrow-right-to-bracket"}} submitHandler={(result) => {
-			setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new NetworkModel(a, result.get("address")!, result.get("username")!)} />)
-		}} title="Online mód" map={m} returnMenu={() => <MenuScene visuals={visuals} />} />);
+			setMenu(() => <GamePhase visuals={visuals} modelGenerator={(a) => new NetworkModel(a, result.get("address")!, result.get("username")!)} />)
+		}} title="Online mód" map={m} returnMenu={() => <MenuPhase visuals={visuals} />} />);
 	}
 
 	const menuBack = () => {
@@ -78,4 +78,4 @@ const MenuScene = ({visuals}: props) => {
 	)
 }
 
-export default MenuScene;
+export default MenuPhase;
