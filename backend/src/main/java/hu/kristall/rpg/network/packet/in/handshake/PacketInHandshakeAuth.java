@@ -19,7 +19,7 @@ public class PacketInHandshakeAuth extends PacketInHandshake {
 		try {
 			conn.getAsyncServer().sync(srv -> {
 				try {
-					Future<Player> futurePlayer = srv.createPlayer(conn, name);
+					Future<Player> futurePlayer = srv.createPlayer(conn, name, true);
 					AsyncExecutor.instance().runTask(() -> {
 						try {
 							futurePlayer.get();
