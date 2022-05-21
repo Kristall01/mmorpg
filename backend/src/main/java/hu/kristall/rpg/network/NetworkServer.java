@@ -19,7 +19,7 @@ public class NetworkServer {
 	private boolean wsAdded = false;
 	private AtomicBoolean stopping = new AtomicBoolean(false);
 	
-	public NetworkServer(Server server, String servePath) {
+	public NetworkServer(Server server, String servePath, int port) {
 		this.asyncServer = server.getSynchronizer();
 		Javalin httpServer = Javalin.create(c -> {
 			c.showJavalinBanner = false;
@@ -28,7 +28,7 @@ public class NetworkServer {
 			}
 		});
 		this.javalinServer = httpServer;
-		httpServer.start(8080);
+		httpServer.start(port);
 	}
 	
 	//------------- ASYNC METHODS //-------------

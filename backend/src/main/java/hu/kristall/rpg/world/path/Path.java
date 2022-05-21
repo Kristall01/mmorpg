@@ -2,16 +2,16 @@ package hu.kristall.rpg.world.path;
 
 import hu.kristall.rpg.Position;
 
-import java.util.Collection;
+import java.util.List;
 
 public class Path {
 	
-	private Collection<Position> collection;
+	private List<Position> collection;
 	private PositionFunction posiFn;
 	private Position target;
 	private long startNanos;
 	
-	public Path(Position target, Collection<Position> collection, PositionFunction posiFn, long startNanos) {
+	public Path(Position target, List<Position> collection, PositionFunction posiFn, long startNanos) {
 		this.collection = collection;
 		this.posiFn = posiFn;
 		this.target = target;
@@ -26,7 +26,7 @@ public class Path {
 		return target;
 	}
 	
-	public Collection<Position> getCollection() {
+	public List<Position> getCollection() {
 		return collection;
 	}
 	
