@@ -9,24 +9,26 @@ export class ClothColor {
 
 	readonly ordinal: number;
 	readonly id: string
+	readonly label: string;
 
-	private constructor(ordinal: number, id: string) {
+	private constructor(ordinal: number, id: string, label: string) {
 		this.ordinal = ordinal;
 		this.id = id;
+		this.label = label;
 	}
 
 	static readonly enum = {
 		map: {
-			BLACK: new ClothColor(0, "BLACK"),
-			BLUE: new ClothColor(1, "BLUE"),
-			LIGHT_BLUE: new ClothColor(2, "LIGHT_BLUE"),
-			BROWN: new ClothColor(3, "BROWN"),
-			GREEN: new ClothColor(4, "GREEN"),
-			LIGHT_GREEN: new ClothColor(5, "LIGHT_GREEN"),
-			PINK: new ClothColor(6, "PINK"),
-			PURPLE: new ClothColor(7, "PURPLE"),
-			RED: new ClothColor(8, "RED"),
-			WHITE: new ClothColor(9, "WHITE")
+			BLACK: new ClothColor(0, "BLACK", "fekete"),
+			BLUE: new ClothColor(1, "BLUE", "kék"),
+			LIGHT_BLUE: new ClothColor(2, "LIGHT_BLUE", "világos kék"),
+			BROWN: new ClothColor(3, "BROWN", "barna"),
+			GREEN: new ClothColor(4, "GREEN", "zöld"),
+			LIGHT_GREEN: new ClothColor(5, "LIGHT_GREEN", "világos zöld"),
+			PINK: new ClothColor(6, "PINK", "rózsaszín"),
+			PURPLE: new ClothColor(7, "PURPLE", "lila"),
+			RED: new ClothColor(8, "RED", "piros"),
+			WHITE: new ClothColor(9, "WHITE", "fehér")
 		},
 		values: new Array<ClothColor>()
 	}
@@ -93,12 +95,14 @@ export class Cloth {
 
 	readonly ordinal: number;
 	readonly id: string;
+	readonly label: string;
 	private static nextOrdinal: number = 0;
 	readonly colored: boolean
 	readonly position: ClothPosition
 
-	private constructor(id: string, colored: boolean, pos: ClothPosition) {
+	private constructor(id: string, label: string, colored: boolean, pos: ClothPosition) {
 		this.id = id;
+		this.label = label;
 		this.ordinal = Cloth.nextOrdinal++;
 		this.colored = colored;
 		this.position = pos;
@@ -106,22 +110,22 @@ export class Cloth {
 
 	static readonly enum = {
 		map: {
-			BASIC: new Cloth('BASIC', true, "TOP"),
-			CLOWN_BLUE: new Cloth('CLOWN_BLUE', false, "ALL"),
-			CLOWN: new Cloth('CLOWN', false, "ALL"),
-			DRESS_WITCH: new Cloth('DRESS_WITCH', false, "ALL"),
-			FLORAL: new Cloth('FLORAL', true, "TOP"),
-			OVERALL: new Cloth('OVERALL', true, "TOP"),
-			PANTS_SUIT: new Cloth('PANTS_SUIT', true, "BOTTOM"),
-			PANTS: new Cloth('PANTS', false, "BOTTOM"),
-			PUMPKIN_PURPLE: new Cloth('PUMPKIN_PURPLE', false, "ALL"),
-			PUMPKIN: new Cloth('PUMPKIN', false, "ALL"),
-			SAILOR_BOW: new Cloth('SAILOR_BOW', true, "TOP"),
-			SHOES: new Cloth('SHOES', true, "SHOES"),
-			SKIRT: new Cloth('SKIRT', true, "BOTTOM"),
-			SPOOKY: new Cloth('SPOOKY', false, "ALL"),
-			SPORTY: new Cloth('SPORTY', true, "TOP"),
-			SUIT: new Cloth('SUIT', true, "TOP"),
+			BASIC: new Cloth('BASIC', 'alap', true, "TOP"),
+			CLOWN_BLUE: new Cloth('CLOWN_BLUE', 'kék bohóc', false, "ALL"),
+			CLOWN: new Cloth('CLOWN', 'bohóc', false, "ALL"),
+			DRESS_WITCH: new Cloth('DRESS_WITCH', 'boszorkány', false, "ALL"),
+			FLORAL: new Cloth('FLORAL', 'virágos', true, "TOP"),
+			OVERALL: new Cloth('OVERALL', 'overál', true, "TOP"),
+			PANTS_SUIT: new Cloth('PANTS_SUIT', 'öltönynadrág', true, "BOTTOM"),
+			PANTS: new Cloth('PANTS', 'nadrág', false, "BOTTOM"),
+			PUMPKIN_PURPLE: new Cloth('PUMPKIN_PURPLE', 'lila tök', false, "ALL"),
+			PUMPKIN: new Cloth('PUMPKIN', 'tök', false, "ALL"),
+			SAILOR_BOW: new Cloth('SAILOR_BOW', 'tengerész', true, "TOP"),
+			SHOES: new Cloth('SHOES', 'sima cipő', true, "SHOES"),
+			SKIRT: new Cloth('SKIRT', 'szoknya', true, "BOTTOM"),
+			SPOOKY: new Cloth('SPOOKY', 'csontváz', false, "ALL"),
+			SPORTY: new Cloth('SPORTY', 'sportos', true, "TOP"),
+			SUIT: new Cloth('SUIT', 'öltöny', true, "TOP"),
 		},
 
 		values: new Array<Cloth>()
@@ -241,11 +245,13 @@ export class Activity {
 	readonly ordinal: number;
 	readonly id: string;
 	readonly frametimes: PrimitiveFrametime
+	readonly label: string
 	private static nextOrdinal: number = 0;
 	readonly frameCount: number
 
-	private constructor(id: string, frametimes: PrimitiveFrametime) {
+	private constructor(id: string, label: string, frametimes: PrimitiveFrametime) {
 		this.id = id;
+		this.label = label;
 		this.ordinal = Activity.nextOrdinal++;
 		this.frametimes = frametimes;
 		this.frameCount = frametimes.frameCount;
@@ -253,23 +259,23 @@ export class Activity {
 
 	static readonly enum = {
 		map: {
-			AXE: new Activity("axe", new DirectionlessFrametime([100, 100, 250, 60, 100])),
-			BLOCK: new Activity("block", new DirectionlessFrametime([])),
-			CARRY: new Activity("carry", new DirectionlessFrametime(new Array(8).fill(100))),
-			DIE: new Activity("die", new DirectionlessFrametime([500, 500])),
-			FISH: new Activity("fish", new DirectedFrametime([
+			AXE: new Activity("axe", "favágás", new DirectionlessFrametime([100, 100, 250, 60, 100])),
+			BLOCK: new Activity("block", "védekezés", new DirectionlessFrametime([])),
+			CARRY: new Activity("carry", "cipekedés", new DirectionlessFrametime(new Array(8).fill(100))),
+			DIE: new Activity("die", "halott", new DirectionlessFrametime([500, 500])),
+			FISH: new Activity("fish", "horgászás", new DirectedFrametime([
 				[100, 250, 60, 100, 100],
 				[100, 250, 60, 100, 100],
 				[100, 100, 250, 60, 100],
 				[100, 100, 250, 60, 100]
 			])),
-			HOE: new Activity("hoe", new DirectionlessFrametime([200, 150, 200, 200, 200])),
-			HURT: new Activity("hurt", new DirectionlessFrametime([])),
-			JUMP: new Activity("jump", new DirectionlessFrametime([100, 200, 100, 120, 100])),
-			PICKAXE: new Activity("pickaxe", new DirectionlessFrametime([100, 100, 250, 60, 100])),
-			SWORD: new Activity("sword", new DirectionlessFrametime([100, 200, 80, 100])),
-			WALK: new Activity("walk", new DirectionlessFrametime(new Array(8).fill(100))),
-			WATER: new Activity("water", new DirectionlessFrametime([300, 600]))
+			HOE: new Activity("hoe", "kapálás", new DirectionlessFrametime([200, 150, 200, 200, 200])),
+			HURT: new Activity("hurt", "megsérült", new DirectionlessFrametime([])),
+			JUMP: new Activity("jump", "ugrálás", new DirectionlessFrametime([100, 200, 100, 120, 100])),
+			PICKAXE: new Activity("pickaxe", "bányászás", new DirectionlessFrametime([100, 100, 250, 60, 100])),
+			SWORD: new Activity("sword", "kardozás", new DirectionlessFrametime([100, 200, 80, 100])),
+			WALK: new Activity("walk", "sétálás", new DirectionlessFrametime(new Array(8).fill(100))),
+			WATER: new Activity("water", "öntözés", new DirectionlessFrametime([300, 600]))
 		},
 		values: new Array<Activity>()
 	}

@@ -18,10 +18,14 @@ const ClothEditorLayer = ({cozy}: ClothEditorLayerProps) => {
 
 	const [logicModel, visualModel] = useContext(ModelContext);
 
+	const closeWindow = () => {
+		visualModel.setClotheditorOpen(false);
+	}
+
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		e.stopPropagation();
 		if(e.key === "r" || e.key === "R" || e.key === "Escape") {
-			visualModel.setClotheditorOpen(false);
+			closeWindow();
 		}
 	}
 
@@ -34,7 +38,7 @@ const ClothEditorLayer = ({cozy}: ClothEditorLayerProps) => {
 
 	return (
 		<div ref={mainRef} onKeyDown={handleKeyDown} tabIndex={-1} className="cloth-editor-layer">
-			<ClothEditor baseClothes={clothes} onApply={c => logicModel.applyClothes(c)} cozyPack={cozy} />
+			<ClothEditor onClose={closeWindow} baseClothes={clothes} onApply={c => logicModel.applyClothes(c)} cozyPack={cozy} />
 		</div>
 	)
 

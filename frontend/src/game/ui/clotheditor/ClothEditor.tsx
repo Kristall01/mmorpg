@@ -16,13 +16,14 @@ export type ClothEditorProps = {
 	cozyPack: CozyPack,
 	baseClothes?: ColoredCloth[]
 	onApply?: (clothes: ColoredCloth[]) => void,
+	onClose?: () => void,
 }
 
 const clothMapping = {
 	TOP: "felsők",
 	BOTTOM: "alsók",
 	SHOES: "cipők",
-	ALL: "együttesek"
+	ALL: "jelmezek"
 }
 
 interface ClothEditorState {
@@ -97,6 +98,10 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 	}
 
 	render() {
+		let closeBtn: React.ReactNode;
+		if(this.props.onClose !== undefined) {
+			closeBtn = <div title='ablak bezárása' onClick={this.props.onClose} className='close'><i className="fa-solid fa-x" /></div>
+		}
 		return (
 			<div className="cloth-editor-component">
 				<div className="left section">
@@ -108,7 +113,7 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 										{Cloth.enum.values.filter(f => f.position === s0).map((a,innerKey) => (
 											<div title={a.id} className='line' onClick={() => this.clothRenderer.setClothAt((s0 as any), a)} key={innerKey}>
 												<div className="text">
-													{a.id}
+													{a.label}
 												</div>
 											</div>
 										))}
@@ -123,6 +128,7 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 				</div>
 				<div className="right section">
 					<div className="graphics">
+						{closeBtn}
 						<GraphicsComponent maxFPS={30} showFpsCounter={false} renderable={this.clothRenderer} />
 					</div>
 					<div className="control">
@@ -130,10 +136,10 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 						<Button size='sm' onClick={() => this.rotate()}>forgatás</Button>
 						{this.props.onApply ? <Button size='sm' onClick={() => this.exportClothes()}>alkalmaz</Button>:null}
 						<select defaultValue={this.state.activity.id.toUpperCase()} onChange={(e) => this.handleAnimChange(e)}>
-							{Object.entries(Activity.enum.map).map(([name, activity],b) => <option value={name} key={b}>{name}</option>)}
+							{Object.entries(Activity.enum.map).map(([name, activity],b) => <option value={name} key={b}>{activity.label}</option>)}
 						</select>
 						<select defaultValue="BLACK" onChange={(e) => this.handleColorChange(e)}>
-							{Object.entries(ClothColor.enum.map).map(([name, color],b) => <option value={name} key={b}>{name}</option>)}
+							{Object.entries(ClothColor.enum.map).map(([name, color],b) => <option value={name} key={b}>{color.label}</option>)}
 						</select>
 					</div>
 				</div>
