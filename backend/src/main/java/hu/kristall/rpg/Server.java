@@ -36,7 +36,7 @@ public class Server extends SynchronizedObject<Server> {
 	private Logger logger = LoggerFactory.getLogger("server");
 	private PlayerPersistence playerPersistence;
 	
-	private Server(String servePath, Savefile savefile) throws IOException {
+	private Server(String servePath, Savefile savefile, int port) throws IOException {
 		super("server");
 		
 		
@@ -44,8 +44,8 @@ public class Server extends SynchronizedObject<Server> {
 		this.playerPersistence = new PlayerPersistence(new File(System.getProperty("user.dir"), "playerdata"));
 		try {
 			lang.loadConfigFromJar("lang.cfg");
-			this.networkServer = new NetworkServer(this, servePath);
-
+			this.networkServer = new NetworkServer(this, servePath, port);
+			
 			
 			commandMap = CommandCollections.base(this);
 			//this.inputReader = new InputReader(text -> getSynchronizer().sync(srv -> srv.getCommandMap().executeConsoleCommand(text)), this.commandMap);
@@ -53,15 +53,17 @@ public class Server extends SynchronizedObject<Server> {
 			this.networkServer.startAcceptingConnections();
 			
 			
-			for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
-				SavedLevel level = levelEntry.getValue();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder);
-				final List<SavedPortal> portals = level.portals;
-				asyncWorld.sync(world -> {
-					for (SavedPortal portal : portals) {
-						world.addPortal(new Portal(portal.position, portal.targetWorld, portal.targetPosition));
-					}
-				});
+			if(savefile != null) {
+				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
+					SavedLevel level = levelEntry.getValue();
+					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder);
+					final List<SavedPortal> portals = level.portals;
+					asyncWorld.sync(world -> {
+						for (SavedPortal portal : portals) {
+							world.addPortal(new Portal(portal.position, portal.targetWorld, portal.targetPosition));
+						}
+					});
+				}
 			}
 			/*if(savefile != null) {
 				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
@@ -136,8 +138,8 @@ public class Server extends SynchronizedObject<Server> {
 		});
 	}
 	
-	public static Synchronizer<Server> createServer(String servePath, Savefile save) throws IOException {
-		Server s = new Server(servePath, save);
+	public static Synchronizer<Server> createServer(String servePath, Savefile save, int port) throws IOException {
+		Server s = new Server(servePath, save, port);
 		return s.getSynchronizer();
 	}
 	
@@ -159,7 +161,7 @@ public class Server extends SynchronizedObject<Server> {
 		return worldsManager;
 	}
 	
-	public Future<Player> createPlayer(PlayerConnection conn, String name) throws PlayerNameAlreadyOnlineException{
+	public Future<Player> createPlayer(PlayerConnection conn, String name, boolean autoJoin) throws PlayerNameAlreadyOnlineException{
 		if(takeNames.contains(name)) {
 			throw new PlayerNameAlreadyOnlineException();
 		}
@@ -183,6 +185,9 @@ public class Server extends SynchronizedObject<Server> {
 					players.put(name, p);
 					c.complete(p);
 					conn.joinGame(p);
+					if(!autoJoin) {
+						return;
+					}
 					Synchronizer<World> targetWorld = null;
 					Position targetPos = null;
 					if(finalSavedPlayer != null) {

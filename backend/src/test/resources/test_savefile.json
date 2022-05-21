@@ -1,0 +1,40 @@
+{
+	"levels": {
+		"level0": {
+			"height": 1,
+			"width": 2,
+			"layers": [
+				"img_0","img_1"
+			],
+			"portals": [
+				{
+					"position": [0, 1],
+					"targetPosition": [2, 3],
+					"targetWorld": "level1"
+				}
+			],
+			"type": "free"
+		},
+		"level1": {
+			"height": 2,
+			"width": 2,
+			"portals": [
+				{
+					"position": [4, 5],
+					"targetPosition": [6, 7],
+					"targetWorld": "level0"
+				},
+				{
+					"position": [29, 10],
+					"targetPosition": [3, 10],
+					"targetWorld": "w1"
+				}
+			],
+			"layers": [
+				"img0","img1","img2","img3"
+			],
+			"type": "free"
+		}
+	},
+	"default": "level0"
+}
