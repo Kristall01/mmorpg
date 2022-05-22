@@ -344,12 +344,12 @@ class WorldRenderer implements Renderable {
 
 		let showPickupMessage = false;
 
-		let tile3 = tileSize / 3;
+		let tile3 = tileSize / 1.5;
 
 		for(let item of this.floatingItems.values()) {
 			let pos = this.translateXY(...item.item.pos);
 			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -1);
-			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 0.5)) {
+			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 1)) {
 				showPickupMessage = true;
 			}
 			if(item.item.item.name !== null) {
@@ -360,7 +360,7 @@ class WorldRenderer implements Renderable {
 		if(showPickupMessage) {
 //			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
 			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
-			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle", "middle",)
+			drawText(this.ctx, [width / 2, height*0.8], "nyomj §e§l[A]§r gombot a tárgyak felvételéhez", "middle", "middle",)
 		}
 
 		// for(let entity of this.model.world.entities) {
