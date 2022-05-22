@@ -73,7 +73,6 @@ const InputScreen = ({map, title, returnMenu, buttonProps, submitHandler}: Input
 		let obj = new FormData(form).entries();
 		let entries = Array.from(obj);
 		let map = new Map<string,string>(entries.map(([val, value]) => ([val,value.toString()])));
-		console.log(map);
 		submitHandler(map);
 	}
 
