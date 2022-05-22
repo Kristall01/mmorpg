@@ -14,7 +14,7 @@ export const createRendererFor = (e: Entity<any>, visuals: VisualResources): (wo
 			return (world: WorldRenderer, config: RenderConfig) => {
 				let activity = e.activity(config.rendertime);
 				let cachedStatus = e.cachedStatus;
-				visuals.skeletonRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize, activity.animationTime, activity.activity);
+				visuals.skeletonRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*3, activity.animationTime, activity.activity);
 			}
 		}
 		case entityTypes.SLIME: {

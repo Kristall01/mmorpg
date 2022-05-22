@@ -44,7 +44,6 @@ export default class SkeletonRenderer extends EntityRenderer {
 
 	drawTo(ctx: RenderContext, direction: Direction, pos: Position, skeleton: EntityLike, size: number, activityTime: number, activity: SkeletonActivity) {
 		super.renderEntity(ctx, skeleton, pos, size);
-		size *= 2;
 
 		let row: number;
 		let drawSource: HTMLImageElement | OffscreenCanvas;

@@ -18,7 +18,7 @@ export default class SkeletonActivity {
 	static readonly enum = {
 		map: {
 			SWORD: new SkeletonActivity("sword", 3, 500, 0),
-			WALK: new SkeletonActivity("walk", 4, 1000, 1),
+			WALK: new SkeletonActivity("walk", 4, 500, 1),
 		},
 		values: new Array<SkeletonActivity>()
 	}

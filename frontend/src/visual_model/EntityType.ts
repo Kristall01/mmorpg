@@ -29,7 +29,7 @@ export class EntityType {
 			HUMAN: new EntityType(0.6),
 			UNKNOWN: new EntityType(0.25),
 			SLIME: new EntityType(0.75),
-			SKELETON: new EntityType(1.0),
+			SKELETON: new EntityType(0.5),
 		},
 		values: new Array<EntityType>()
 	}
