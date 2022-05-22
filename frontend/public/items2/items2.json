@@ -1,0 +1,13 @@
+{
+	"type": "regular_list",
+	"entries": {
+		"BONE": {
+			"cell_size": 32,
+			"path": "bone.png",
+			"texture_type": "static_global",
+			"category": "item",
+			"translateX": -0.5,
+			"translateY": -1
+		}
+	}
+}

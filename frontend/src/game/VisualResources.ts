@@ -33,7 +33,7 @@ export default class VisualResources {
 			return this.instance;
 		}
 		let images = new ImageStore();
-		let zipFiles = ["imagestore.zip", "items.zip", "sprout/sprout.zip", "mystic/mystic.zip","bq.zip"];
+		let zipFiles = ["imagestore.zip", "items.zip", "sprout/sprout.zip", "mystic/mystic.zip","bq.zip","items2/items2.zip"];
 		await Promise.all(zipFiles.map(async f => images.loadZip(f)));
 
 		let cozy = new CozyPack(images);
@@ -42,7 +42,7 @@ export default class VisualResources {
 		let skeletonRenderer = new SkeletonRenderer(images);
 		let humanRenderer = new HumanRenderer(cozy);
 
-		let textureJsons = ["texturepack.json","items.json","sprout/sprout_index.json"];
+		let textureJsons = ["texturepack.json","items.json","sprout/sprout_index.json","items2/items2.json"];
 		await Promise.all(textureJsons.map(async t => textures.loadPack(t)));
 		let resources = new VisualResources(images, cozy, textures, slimeRenderer, skeletonRenderer, humanRenderer);
 		this.instance = resources;
