@@ -1,7 +1,8 @@
 import { StatelessRenderable } from "game/graphics/Renderable";
-import { ColoredCloth, renderHuman } from "game/graphics/renderers/world/HumanRenderer";
+import HumanRenderer, { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import CozyPack, { CozyActivity } from "game/graphics/texture/CozyPack";
-import { Activity, Cloth, ClothColor, ClothPosition, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
+import VisualResources from "game/VisualResources";
+import { HumanActivity, Cloth, ClothColor, ClothPosition, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
 
 export interface AnimationProperties {
@@ -18,11 +19,14 @@ export default class ClothRenderer extends StatelessRenderable {
 	private anim: AnimationProperties | null = null;
 	clothes: Array<ColoredCloth | null> = [null,null,null,null]
 	clothColor: ClothColor = ClothColor.enum.map.BLACK;
+	private humanRenderer: HumanRenderer
 
-	constructor(cozyPack: CozyPack) {
+	constructor(visuals: VisualResources) {
 		super();
+		let cozyPack = visuals.cozy;
 		this.cozyPack = cozyPack;
-		this.activity = cozyPack.getCozyActivity(Activity.enum.map.WALK);
+		this.activity = cozyPack.getCozyActivity(HumanActivity.enum.map.WALK);
+		this.humanRenderer = visuals.humanRenderer;
 	}
 
 	exportClothes(): ColoredCloth[] {
@@ -83,7 +87,7 @@ export default class ClothRenderer extends StatelessRenderable {
 		let minSize = Math.min(height, width);
 		this.ctx.imageSmoothingEnabled = false;
 		let animTime = this.anim === null ? 0 : (performance.now() - this.anim.start)*this.anim.scale;
-		renderHuman(this.ctx, this.skin, this.facing, this.activity, animTime, [width/2,height/2], minSize, this.clothes);
+		this.humanRenderer.drawToCozy(this.ctx, this.skin, this.facing, this.activity, animTime, [width/2,height/2], minSize, this.clothes);
 	}
 	
 }

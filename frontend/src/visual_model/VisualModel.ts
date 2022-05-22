@@ -167,8 +167,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		return this._maxFPS;
 	}
 
-	showLabelFor(text: string, labelType: LabelType, entity: Entity) {
-		let pos = entity.cachedCanvasPosition;
+	showLabelFor(text: string, labelType: LabelType, entity: Entity<any>) {
 		//drawDamageLabel(view.ctx, [pos[0], top+(eHeight*0.75)], (renderConfig.rendertime % 1000)/750, "20");
 		this.world?.addLabel(new WorldLabel(text, labelType, entity));
 /* 		let eHeight = entity.type.height*1.25 * renderConfig.tileSize;

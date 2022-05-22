@@ -14,13 +14,13 @@ import ItemStack from "./ItemStack";
 import SlimeEntity from "./entity/SlimeEntity";
 import SkeletonEntity from "./entity/SkeletonEntity";
 
-export type WorldEvent = "item" | "inventory-update";
+export type WorldEvent = "item" | "inventory-update" | "entity-change";
 
 class World extends UpdateBroadcaster<WorldEvent> {
 
 	public width: number
 	public height: number
-	private _entities: Map<number, Entity> = new Map();
+	private _entities: Map<number, Entity<unknown>> = new Map();
 	//private humanTextures: null = null;
 	camPositionFn: (rendertime: number) => Position;
 	private _labels: WorldLabel[] = [];
@@ -28,7 +28,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	public readonly tileGrid: Array<Matrix<string>>
 	private portals: Portal[] = []
 	private _items: Map<number, FloatingItem> = new Map();
-	public followedEntity: Entity | null = null;
+	public followedEntity: Entity<unknown> | null = null;
 	private inventory: Array<ItemStack> = [];
 
 
@@ -79,7 +79,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 		return this.portals;
 	}
 
-	get entities(): IterableIterator<Entity> {
+	get entities(): IterableIterator<Entity<unknown>> {
 		return this._entities.values();
 	}
 
@@ -112,7 +112,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	}
 
 	spawnEntity(id: number, type: EntityType, pos: Position, speed: number, hp: number, maxHp: number, facing: Direction = Direction.enum.map.SOUTH) {
-		let e: Entity;
+		let e: Entity<unknown>;
 		const entityEnum = EntityType.enum.map;
 		switch(type) {
  			case entityEnum.HUMAN: {
@@ -132,6 +132,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 			}
 		}
 		this._entities.set(id, e);
+		this.triggerUpdate("entity-change");
 	}
 
 	despawnEntiy(id: number) {
@@ -139,6 +140,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 			this.followedEntity = null;
 		}
 		this._entities.delete(id);
+		this.triggerUpdate("entity-change");
 	}
 
 	followEntity(id: number) {

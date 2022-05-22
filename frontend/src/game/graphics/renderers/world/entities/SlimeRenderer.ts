@@ -2,8 +2,9 @@ import { RenderContext } from "game/graphics/GraphicsUtils";
 import ImageStore from "game/ImageStore";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
+import EntityRenderer, { EntityLike } from "./EntityRenderer";
 
-export default class SlimeRenderer {
+export default class SlimeRenderer extends EntityRenderer{
 
 	private slime: HTMLImageElement
 	private mirroredSlime: OffscreenCanvas;
@@ -11,6 +12,7 @@ export default class SlimeRenderer {
 	readonly animFrames = 7;
 
 	constructor(images: ImageStore) {
+		super();
 		let slimeImg = images.get("slime.png").img;
 		this.slime = slimeImg;
 		let mirroredCanvas = new OffscreenCanvas(slimeImg.width, slimeImg.height);
@@ -23,13 +25,14 @@ export default class SlimeRenderer {
 		this.mirroredSlime = mirroredCanvas;
 	}
 
-	drawTo(ctx: RenderContext, direction: Direction, [tox, toy]: Position, size: number, activityTime: number) {
+	drawTo(ctx: RenderContext, direction: Direction, pos: Position, e: EntityLike, size: number, activityTime: number) {
+		super.renderEntity(ctx, e, pos, size);
 		let currentAnimTime = (activityTime % this.fullAnimTime) / this.fullAnimTime;
 		let frameIndex = Math.floor(currentAnimTime * this.animFrames);
 
 		let drawSource : HTMLImageElement | OffscreenCanvas = direction === Direction.enum.map.EAST ? this.slime : this.mirroredSlime;
 
-		ctx.drawImage(drawSource, frameIndex * 32, 64, 32, 32, tox - size/2, toy - size/2, size, size);
+		ctx.drawImage(drawSource, frameIndex * 32, 64, 32, 32, pos[0] - size/2, pos[1] - size/2, size, size);
 	}
 
 }

@@ -62,7 +62,7 @@ const MenuPhase = ({visuals}: props) => {
 	}
 
 	const startClothEditor = () => {
-		setMenu(() => <div style={{height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}><ClothEditor cozyPack={visuals.cozy} /></div>);
+		setMenu(() => <div style={{height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}><ClothEditor visuals={visuals} /></div>);
 	}
 
 	return (

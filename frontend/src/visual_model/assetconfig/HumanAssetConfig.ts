@@ -239,7 +239,7 @@ export class DirectedFrametime extends PrimitiveFrametime {
 
 }
 
-export class Activity {
+export class HumanActivity {
 
 	readonly ordinal: number;
 	readonly id: string;
@@ -251,36 +251,36 @@ export class Activity {
 	private constructor(id: string, label: string, frametimes: PrimitiveFrametime) {
 		this.id = id;
 		this.label = label;
-		this.ordinal = Activity.nextOrdinal++;
+		this.ordinal = HumanActivity.nextOrdinal++;
 		this.frametimes = frametimes;
 		this.frameCount = frametimes.frameCount;
 	}
 
 	static readonly enum = {
 		map: {
-			AXE: new Activity("axe", "favágás", new DirectionlessFrametime([100, 100, 250, 60, 100])),
-			BLOCK: new Activity("block", "védekezés", new DirectionlessFrametime([])),
-			CARRY: new Activity("carry", "cipekedés", new DirectionlessFrametime(new Array(8).fill(100))),
-			DIE: new Activity("die", "halott", new DirectionlessFrametime([500, 500])),
-			FISH: new Activity("fish", "horgászás", new DirectedFrametime([
+			AXE: new HumanActivity("axe", "favágás", new DirectionlessFrametime([100, 100, 250, 60, 100])),
+			BLOCK: new HumanActivity("block", "védekezés", new DirectionlessFrametime([])),
+			CARRY: new HumanActivity("carry", "cipekedés", new DirectionlessFrametime(new Array(8).fill(100))),
+			DIE: new HumanActivity("die", "halott", new DirectionlessFrametime([500, 500])),
+			FISH: new HumanActivity("fish", "horgászás", new DirectedFrametime([
 				[100, 250, 60, 100, 100],
 				[100, 250, 60, 100, 100],
 				[100, 100, 250, 60, 100],
 				[100, 100, 250, 60, 100]
 			])),
-			HOE: new Activity("hoe", "kapálás", new DirectionlessFrametime([200, 150, 200, 200, 200])),
-			HURT: new Activity("hurt", "megsérült", new DirectionlessFrametime([])),
-			JUMP: new Activity("jump", "ugrálás", new DirectionlessFrametime([100, 200, 100, 120, 100])),
-			PICKAXE: new Activity("pickaxe", "bányászás", new DirectionlessFrametime([100, 100, 250, 60, 100])),
-			SWORD: new Activity("sword", "kardozás", new DirectionlessFrametime([100, 200, 80, 100])),
-			WALK: new Activity("walk", "sétálás", new DirectionlessFrametime(new Array(8).fill(100))),
-			WATER: new Activity("water", "öntözés", new DirectionlessFrametime([300, 600]))
+			HOE: new HumanActivity("hoe", "kapálás", new DirectionlessFrametime([200, 150, 200, 200, 200])),
+			HURT: new HumanActivity("hurt", "megsérült", new DirectionlessFrametime([])),
+			JUMP: new HumanActivity("jump", "ugrálás", new DirectionlessFrametime([100, 200, 100, 120, 100])),
+			PICKAXE: new HumanActivity("pickaxe", "bányászás", new DirectionlessFrametime([100, 100, 250, 60, 100])),
+			SWORD: new HumanActivity("sword", "kardozás", new DirectionlessFrametime([100, 200, 80, 100])),
+			WALK: new HumanActivity("walk", "sétálás", new DirectionlessFrametime(new Array(8).fill(100))),
+			WATER: new HumanActivity("water", "öntözés", new DirectionlessFrametime([300, 600]))
 		},
-		values: new Array<Activity>()
+		values: new Array<HumanActivity>()
 	}
 
 	static {
-		Activity.enum.values = Object.values(Activity.enum.map);
+		HumanActivity.enum.values = Object.values(HumanActivity.enum.map);
 	}
 
 }

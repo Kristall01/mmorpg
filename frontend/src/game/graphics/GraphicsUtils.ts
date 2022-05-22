@@ -116,9 +116,10 @@ export const Positioning = {
 
 export type t = keyof typeof Positioning;
 
-export const drawText = (ctx: RenderContext, canvasPosition: Position, text: string, vertical: t = "middle", horizontal: t = "middle", padding: any = [5,5,5,5]) => {
+export const drawText = (ctx: RenderContext, canvasPosition: Position, text: string, vertical: t = "middle", horizontal: t = "middle", paddingRaw: [number,number,number,number]|number = [5,5,5,5]): Position => {
 	ctx.font = '30px Roboto';
 
+	let padding = typeof paddingRaw === "number" ? [paddingRaw,paddingRaw,paddingRaw,paddingRaw] : paddingRaw;
 	let fragments = parseText(text);
 
 	let vModifier = Positioning[vertical];
@@ -185,6 +186,7 @@ export const drawText = (ctx: RenderContext, canvasPosition: Position, text: str
 		ctx.fillText(fragment.text, startPos + tw, xy[1] + padding[0]);
 	}
 
+	return [fullWidth, fullHeight];
 	//ORIGINAL
 
 	/* let metrics = ctx.measureText(text);

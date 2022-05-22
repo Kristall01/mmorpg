@@ -1,16 +1,17 @@
 import { ModelContext } from "game/GameView";
 import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
 import CozyPack from "game/graphics/texture/CozyPack";
+import VisualResources from "game/VisualResources";
 import { createRef, useContext } from "react";
 import HumanEntity from "visual_model/entity/HumanEntity";
 import EntityType from "visual_model/EntityType";
 import ClothEditor from "./ClothEditor";
 
 export type ClothEditorLayerProps = {
-	cozy: CozyPack
+	visuals: VisualResources
 }
 
-const ClothEditorLayer = ({cozy}: ClothEditorLayerProps) => {
+const ClothEditorLayer = ({visuals}: ClothEditorLayerProps) => {
 
 	const mainRef = createRef<HTMLDivElement>();
 
@@ -36,7 +37,7 @@ const ClothEditorLayer = ({cozy}: ClothEditorLayerProps) => {
 
 	return (
 		<div ref={mainRef} onKeyDown={handleKeyDown} tabIndex={-1} className="cloth-editor-layer">
-			<ClothEditor onClose={closeWindow} baseClothes={clothes} onApply={c => logicModel.applyClothes(c)} cozyPack={cozy} />
+			<ClothEditor onClose={closeWindow} baseClothes={clothes} onApply={c => logicModel.applyClothes(c)} visuals={visuals} />
 		</div>
 	)
 

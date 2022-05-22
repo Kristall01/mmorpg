@@ -80,7 +80,7 @@ export default class GameView extends React.Component<props, {}> {
 
 	render(): React.ReactNode {
 		let escapeMenu = this.visualModel.menuOpen ? <EscapeMenu /> : null;
-		let clothEditor = this.visualModel.clothEditorOpen ? <ClothEditorLayer cozy={this.visuals.cozy} /> : null;
+		let clothEditor = this.visualModel.clothEditorOpen ? <ClothEditorLayer visuals={this.visuals} /> : null;
 
 		let content = (
 			<div

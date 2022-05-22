@@ -1,14 +1,13 @@
-import { Activity } from "./assetconfig/HumanAssetConfig";
 import { Status } from "./Paths";
 
-export interface ActivitySnapshot {
-	activity: Activity,
+export interface ActivitySnapshot<T> {
+	activity: T,
 	animationTime: number
 }
 
-type ActivityFunction = (time: number) => ActivitySnapshot;
+type ActivityFunction<T> = (time: number) => ActivitySnapshot<T>;
 
-export function createWalkFunction(statusFn: () => Status, currentTime: number = 0): ActivityFunction {
+export function createWalkFunction<T>(activityMap: {WALK: T}, statusFn: () => Status, currentTime: number = 0): ActivityFunction<T> {
 	const startTime = performance.now()-currentTime;
 	return (rendertime: number) => {
 		let animTime: number;
@@ -19,13 +18,13 @@ export function createWalkFunction(statusFn: () => Status, currentTime: number =
 			animTime = 0;
 		}
 		return {
-			activity: Activity.enum.map.WALK,
+			activity: activityMap.WALK,
 			animationTime: animTime
 		}
 	}
 }
 
-export function createSwordFunction(): ActivityFunction {
+export function createSwordFunction<T>(activityMap: {SWORD: T,WALK:T}): ActivityFunction<T> {
 	//480 = sword swing animation time
 	const startTime = performance.now();
 
@@ -34,28 +33,27 @@ export function createSwordFunction(): ActivityFunction {
 	let multiplier = baseAnimTime/speedAnimTime;
 
 	return (rendertime: number) => {
-
 		let diff = (rendertime - startTime);
 		if(diff < speedAnimTime) {
 			return {
-				activity: Activity.enum.map.SWORD,
+				activity: activityMap.SWORD,
 				animationTime: diff*multiplier
 			}
 		}
 		else {
 			return {
-				activity: Activity.enum.map.SWORD,
+				activity: activityMap.WALK,
 				animationTime: 0
 			}
 		}
 	}
 }
 
-export const idleFunction = () => {
-	return {
-		activity: Activity.enum.map.WALK,
+export const createIdleFunction = <T>(activityMap: {WALK: T}): ActivityFunction<T> => {
+	return () =>({
+		activity: activityMap.WALK,
 		animationTime: 0
-	}
+	});
 }
 
 
