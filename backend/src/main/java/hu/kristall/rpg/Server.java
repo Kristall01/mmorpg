@@ -58,7 +58,7 @@ public class Server extends SynchronizedObject<Server> {
 			if(savefile != null) {
 				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
 					SavedLevel level = levelEntry.getValue();
-					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder);
+					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder, level.entitySpawners);
 					final List<SavedPortal> portals = level.portals;
 					asyncWorld.sync(world -> {
 						for (SavedPortal portal : portals) {

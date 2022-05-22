@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -77,7 +78,7 @@ public class Main {
 			Synchronizer<Server> asyncServer = Server.createServer("/", null, 8008);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("asd",2,2,new String[]{"A","B","C","D"}, new FreePathFinder());
+				Synchronizer<World> asyncWorld = worldsManager.createWorld("asd",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
 				try {
 					asyncWorld.syncCompute(world -> world.getWidth() == 1 && world.getHeight() == 1);
 				}
@@ -101,8 +102,8 @@ public class Main {
 			final Synchronizer<Server> asyncServer = Server.createServer("/", null, 8009);
 			asyncServer.sync(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder());
-				final Synchronizer<World> asyncW1 = worldsManager.createWorld("w1",2,2,new String[]{"A","B","C","D"}, new FreePathFinder());
+				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
+				final Synchronizer<World> asyncW1 = worldsManager.createWorld("w1",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
 				try {
 					Future<Player> playerFuture = srv.createPlayer(new PlayerConnection() {
 						private Player player;
@@ -150,7 +151,7 @@ public class Main {
 						}
 					});
 				}
-				catch (Server.PlayerNameAlreadyOnlineException e) {
+				catch (Server.JoinDeniedException e) {
 					worldChangeFutureResult.completeExceptionally(e);
 				}
 			});

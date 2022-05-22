@@ -1,6 +1,7 @@
 package hu.kristall.rpg;
 
 import hu.kristall.rpg.sync.Synchronizer;
+import hu.kristall.rpg.world.EntitySpawner;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.path.plan.PathFinder;
 
@@ -18,12 +19,12 @@ public class WorldsManager {
 		this.server = server;
 	}
 	
-	public Synchronizer<World> createWorld(String name, int width, int height, String[] layers, PathFinder pathFinder) {
+	public Synchronizer<World> createWorld(String name, int width, int height, String[] layers, PathFinder pathFinder, List<EntitySpawner> entitySpawners) {
 		if(worlds.containsKey(name)) {
 			throw new IllegalStateException(server.getLang().getMessage("worldmanager.create.name-taken"));
 		}
 		boolean defaultWorld = this.defaultWorld == null;
-		World world = new World(server.getSynchronizer(), name, width, height, layers, pathFinder);
+		World world = new World(server.getSynchronizer(), name, width, height, layers, pathFinder, entitySpawners);
 		Synchronizer<World> worldSyncer = world.getSynchronizer();
 		this.worlds.put(name, worldSyncer);
 		if(defaultWorld) {
