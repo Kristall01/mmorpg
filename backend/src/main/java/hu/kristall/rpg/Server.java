@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 public class Server extends SynchronizedObject<Server> {
 	
@@ -35,6 +36,7 @@ public class Server extends SynchronizedObject<Server> {
 	private final Object stoppingLock = new Object();
 	private Logger logger = LoggerFactory.getLogger("server");
 	private PlayerPersistence playerPersistence;
+	private Pattern usernamePattern = Pattern.compile("^[a-zA-Z\\dáÁéÉíÍóÓöÖőŐúÚüÜűŰ].*$");
 	
 	private Server(String servePath, Savefile savefile, int port) throws IOException {
 		super("server");
@@ -161,9 +163,23 @@ public class Server extends SynchronizedObject<Server> {
 		return worldsManager;
 	}
 	
-	public Future<Player> createPlayer(PlayerConnection conn, String name, boolean autoJoin) throws PlayerNameAlreadyOnlineException{
+	public Future<Player> createPlayer(PlayerConnection conn, String rawName, boolean autoJoin) throws JoinDeniedException {
+		String joinDenyReason = null;
+		final String name = rawName.trim();
 		if(takeNames.contains(name)) {
-			throw new PlayerNameAlreadyOnlineException();
+			joinDenyReason = "join.name-taken";
+		}
+		else if(name.length() < 3) {
+			joinDenyReason = "join.name-min-3";
+		}
+		else if(name.length() > 16) {
+			joinDenyReason = "join.name-max-16";
+		}
+		else if(!usernamePattern.matcher(name).find()) {
+			joinDenyReason = "join.name-regex-invalid";
+		}
+		if(joinDenyReason != null) {
+			throw new JoinDeniedException(lang.getMessage(joinDenyReason));
 		}
 		takeNames.add(name);
 		CompletableFuture<Player> c = new CompletableFuture<>();
@@ -267,6 +283,12 @@ public class Server extends SynchronizedObject<Server> {
 	/**
 	 * This exception is thrown when there is an authenticated connection with the given username
 	 */
-	public static class PlayerNameAlreadyOnlineException extends Exception{}
+	public static class JoinDeniedException extends Exception {
+		
+		public JoinDeniedException(String message) {
+			super(message);
+		}
+		
+	}
 	
 }
