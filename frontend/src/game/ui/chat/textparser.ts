@@ -10,6 +10,7 @@ export class Color {
 		this.name = name;
 	}
 
+	/*
 	static readonly enum = {
 		map: {
 			BLACK: new Color("0", "#000000", "black"),
@@ -28,6 +29,30 @@ export class Color {
 			LIGHT_PURPLE: new Color("d", "#ff55ff", "light purple"),
 			YELLOW: new Color("e", "#ffff55", "yellow"),
 			WHITE: new Color("f", "#ffffff", "white")
+		},
+		keymap: new Map<string, Color>(),
+		values: new Array<Color>()
+	}
+	*/
+
+	static readonly enum = {
+		map: {
+			BLACK: new Color("0", "#000000", "black"),
+			DARK_BLUE: new Color("1", "#1e00a7", "dark blue"),
+			DARK_GREEN: new Color("2", "#32a700", "dark green"),
+			DARK_AQUA: new Color("3", "#3ca7a7", "dark aqua"),
+			DARK_RED: new Color("4", "#a70b00", "dark red"),
+			DARK_PURPLE: new Color("5", "#a700a7", "dark purple"),
+			GOLD: new Color("6", "#f5a601", "gold"),
+			GRAY: new Color("7", "#a7a7a7", "gray"),
+			DARK_GRAY: new Color("8", "#545454", "dark gray"),
+			BLUE: new Color("9", "#5555ff", "blue"),
+			GREEN: new Color("a", "#54fb54", "green"),
+			AQUA: new Color("b", "#5efbfb", "aqua"),
+			RED: new Color("c", "#f35455", "red"),
+			LIGHT_PURPLE: new Color("d", "#f654fb", "light purple"),
+			YELLOW: new Color("e", "#ffff55", "#fbfb54"),
+			WHITE: new Color("f", "#fbfbfb", "white")
 		},
 		keymap: new Map<string, Color>(),
 		values: new Array<Color>()
