@@ -13,6 +13,7 @@ import UpdateBroadcaster from "./UpdateBroadcaster";
 import ItemStack from "./ItemStack";
 import SlimeEntity from "./entity/SlimeEntity";
 import SkeletonEntity from "./entity/SkeletonEntity";
+import OgreEntity from "./entity/OgreEntity";
 
 export type WorldEvent = "item" | "inventory-update" | "entity-change";
 
@@ -126,6 +127,10 @@ class World extends UpdateBroadcaster<WorldEvent> {
 			case entityEnum.SKELETON: {
 				e = new SkeletonEntity(id, pos, speed, hp, maxHp);
 				break;
+			}
+			case entityEnum.OGRE: {
+				e = new OgreEntity(id, pos, speed, hp, maxHp);
+				break
 			}
 			default: {
 				e = new UnknownEntity(id, pos, speed, facing, hp, maxHp);

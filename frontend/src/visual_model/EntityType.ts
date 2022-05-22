@@ -30,6 +30,7 @@ export class EntityType {
 			UNKNOWN: new EntityType(0.25),
 			SLIME: new EntityType(0.75),
 			SKELETON: new EntityType(0.5),
+			OGRE: new EntityType(0.5),
 		},
 		values: new Array<EntityType>()
 	}

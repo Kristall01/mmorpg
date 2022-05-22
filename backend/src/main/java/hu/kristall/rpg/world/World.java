@@ -128,6 +128,10 @@ public class World extends SynchronizedObject<World> {
 				createdEntity = new EntitySkeleton(this, getNextEntityID(), pos);
 				break;
 			}
+			case OGRE: {
+				createdEntity = new EntityOgre(this, getNextEntityID(), pos);
+				break;
+			}
 		}
 		if(createdEntity == null) {
 			return null;

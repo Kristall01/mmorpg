@@ -17,6 +17,13 @@ export const createRendererFor = (e: Entity<any>, visuals: VisualResources): (wo
 				visuals.skeletonRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*3, activity.animationTime, activity.activity);
 			}
 		}
+		case entityTypes.OGRE: {
+			return (world: WorldRenderer, config: RenderConfig) => {
+				let activity = e.activity(config.rendertime);
+				let cachedStatus = e.cachedStatus;
+				visuals.ogreRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*3, activity.animationTime, activity.activity);
+			}
+		}
 		case entityTypes.SLIME: {
 			return (world: WorldRenderer, config: RenderConfig) => {
 				let activity = e.activity(config.rendertime);
