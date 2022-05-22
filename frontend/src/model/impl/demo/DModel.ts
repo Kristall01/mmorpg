@@ -60,7 +60,7 @@ class DModel extends LogicModel {
 				this.broadcastEvent({type: ModelEventType.END, data: "A név legfeljebb 16 karakterből állhat."});
 				return;
 			}
-			if(!username.match('^[a-zA-Z0-9áÁéÉíÍóÓöÖőŐúÚüÜüŰ].*$')) {
+			if(!username.match('^[a-zA-Z0-9áÁéÉíÍóÓöÖőŐúÚüÜűŰ].*$')) {
 				this.broadcastEvent({type: ModelEventType.END, data: "A név csak számokból és a magyar ABC betűiből állhat."});
 				return;
 			}
