@@ -1,35 +1,29 @@
 import { useContext } from "react"
 
 import MenuContext from "MenuContext";
-import GameScene from "phases/game/GameScene";
+import GamePhase from "phases/game/GamePhase";
 import DModel from "model/impl/demo/DModel";
 import NetworkModel from "model/impl/ws/NetworkModel";
-import CozyPack from "game/graphics/texture/CozyPack";
-import ImageStore from "game/ImageStore";
 import VisualResources from "game/VisualResources";
 import ButtonMenu, { WrappedButton } from "shared/buttonmenu/ButtonMenu";
-import { Button } from "react-bootstrap";
 import { LandingPhase } from "phases/landing/LandingPhase";
 import ClothEditor from "game/ui/clotheditor/ClothEditor";
+import InputScreen, { InputMap } from "shared/inputscreen/InputScreen";
 
 interface props {
 	visuals: VisualResources
 }
 
-const MenuScene = ({visuals}: props) => {
+const MenuPhase = ({visuals}: props) => {
 
 	let setMenu = useContext(MenuContext);
 
 	const startDemo = () => {
-		let name = prompt("Add meg a neved");
-		if(name === null) {
-			return;
-		}
-		if(name.length < 3) {
-			alert("A névnek legalább 3 karakternek kell lennie.");
-			return;
-		}
-		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new DModel(a, name!)} />)
+		let m: InputMap = new Map<string, string>();
+		m.set("username", "felhasználónév");
+		setMenu(() => <InputScreen buttonProps={{text: "kapcsolódás", icon: "fa-solid fa-arrow-right-to-bracket"}} submitHandler={(result) => {
+			setMenu(() => <GamePhase visuals={visuals} modelGenerator={(a) => new DModel(a, result.get("username")!)} />)
+		}} title="teszt mód" map={m} returnMenu={() => <MenuPhase visuals={visuals} />} />);
 	}
 
 	const getRecommendedAddress = (): string | undefined => {
@@ -54,15 +48,13 @@ const MenuScene = ({visuals}: props) => {
 	}
 
 	const startNetworkModel = () => {
-		let name = prompt("Add meg a neved");
-		if(name === null) {
-			return;
-		}
-		let address = prompt("szerver címe: ", getRecommendedAddress());
-		if(address === null) {
-			return;
-		}
-		setMenu(() => <GameScene visuals={visuals} modelGenerator={(a) => new NetworkModel(a, address!, name!)} />)
+		let m: InputMap = new Map<string, string>();
+		m.set("username", "felhasználónév");
+		m.set("address", {defaultValue: getRecommendedAddress(), label: "szerver címe"});
+
+		setMenu(() => <InputScreen buttonProps={{text: "kapcsolódás", icon: "fa-solid fa-arrow-right-to-bracket"}} submitHandler={(result) => {
+			setMenu(() => <GamePhase visuals={visuals} modelGenerator={(a) => new NetworkModel(a, result.get("address")!, result.get("username")!)} />)
+		}} title="Online mód" map={m} returnMenu={() => <MenuPhase visuals={visuals} />} />);
 	}
 
 	const menuBack = () => {
@@ -70,7 +62,7 @@ const MenuScene = ({visuals}: props) => {
 	}
 
 	const startClothEditor = () => {
-		setMenu(() => <div style={{height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}><ClothEditor cozyPack={visuals.cozy} /></div>);
+		setMenu(() => <div style={{height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}><ClothEditor visuals={visuals} /></div>);
 	}
 
 	return (
@@ -86,4 +78,4 @@ const MenuScene = ({visuals}: props) => {
 	)
 }
 
-export default MenuScene;
+export default MenuPhase;

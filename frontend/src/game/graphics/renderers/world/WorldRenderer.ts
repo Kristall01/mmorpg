@@ -1,5 +1,5 @@
 import { drawText, RenderContext } from "game/graphics/GraphicsUtils";
-import Renderable, { StatelessRenderable } from "game/graphics/Renderable";
+import Renderable from "game/graphics/Renderable";
 import CozyPack from "game/graphics/texture/CozyPack";
 import EmptyTexture from "game/graphics/texture/EmptyTexture";
 import Texture from "game/graphics/texture/Texture";
@@ -7,14 +7,13 @@ import TexturePack from "game/graphics/texture/TexturePack";
 import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
 import SubManager from "SubManager";
-import { DEFAULT_MAX_VERSION } from "tls";
+import Entity from "visual_model/Entity";
 import { radiusDistance } from "visual_model/Paths";
-import Portal from "visual_model/Portal";
 import VisualModel, { Position } from "visual_model/VisualModel";
 import World, { WorldEvent } from "visual_model/World";
-import { renderEntity } from "./EntityRenderer";
+import { createRendererFor } from "./entities/EntityRenderer";
 import FloatingItemResource from "./FloatingItemResource";
-import { renderLabel, renderLabels } from "./LabelsRenderer";
+import { renderLabels } from "./LabelsRenderer";
 
 export interface RenderConfig {
 	camX: number
@@ -25,6 +24,11 @@ export interface RenderConfig {
 	camFocusX: number
 	camFocusY: number
 	rendertime: number
+}
+
+interface EntityRenderable {
+	render: (world: WorldRenderer, renderConfig: RenderConfig) => void
+	entity: Entity<any>
 }
 
 class WorldRenderer implements Renderable {
@@ -41,6 +45,7 @@ class WorldRenderer implements Renderable {
 	private subs: SubManager = new SubManager();
 	public readonly visuals: VisualResources
 	public ctx: RenderContext = null!;
+	private entityRenderables: Map<number, EntityRenderable> = new Map();
 
 	constructor(world: World, visuals: VisualResources) {
 		this.portalIcon = visuals.images.get("portal.png").img;
@@ -49,7 +54,7 @@ class WorldRenderer implements Renderable {
 		this.world = world;
 		this.texturePack = visuals.textures;
 		this.cozyPack = visuals.cozy;
-		this.tileTextures = world.tileGrid.map(tileGrid => tileGrid.map( t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture()));
+		this.tileTextures = world.tileGrid.map(tileGrid => tileGrid.map(t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture()));
 		this.updateFloatingItemList();
 	}
 
@@ -69,9 +74,22 @@ class WorldRenderer implements Renderable {
 		}
 	}
 
+	private updateEntityList() {
+		this.entityRenderables.clear();
+		for(let entity of this.world.entities) {
+			this.entityRenderables.set(entity.id, {
+				render: createRendererFor(entity, this.visuals),
+				entity: entity
+			});
+		}
+	}
+
 	private handleEvents(e: WorldEvent) {
 		if(e === "item") {
 			this.updateFloatingItemList();
+		}
+		if(e === "entity-change") {
+			this.updateEntityList();
 		}
 	}
 
@@ -314,24 +332,24 @@ class WorldRenderer implements Renderable {
 		}
  */
 
-		let orderedEntities = Array.from(this.world.entities).sort((a,b) => {
-			return a.cachedStatus.position[1] - b.cachedStatus.position[1];
+ 		let orderedEntities = Array.from(this.entityRenderables).sort((a,b) => {
+			return a[1].entity.cachedStatus.position[1] - b[1].entity.cachedStatus.position[1];
 		});
 
 		for(let entity of orderedEntities) {
-			renderEntity(this, entity, this.renderConfig);
+			entity[1].render(this, this.renderConfig);
 		}
 
 		renderLabels(this, this.world, this.renderConfig);
 
 		let showPickupMessage = false;
 
-		let tile3 = tileSize / 3;
+		let tile3 = tileSize / 1.5;
 
 		for(let item of this.floatingItems.values()) {
 			let pos = this.translateXY(...item.item.pos);
 			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -1);
-			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 0.5)) {
+			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 1)) {
 				showPickupMessage = true;
 			}
 			if(item.item.item.name !== null) {
@@ -342,7 +360,7 @@ class WorldRenderer implements Renderable {
 		if(showPickupMessage) {
 //			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
 			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
-			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle", "middle",)
+			drawText(this.ctx, [width / 2, height*0.8], "nyomj §e§l[A]§r gombot a tárgyak felvételéhez", "middle", "middle",)
 		}
 
 		// for(let entity of this.model.world.entities) {

@@ -30,8 +30,8 @@ public class PacketInHandshakeAuth extends PacketInHandshake {
 						}
 					});
 				}
-				catch (Server.PlayerNameAlreadyOnlineException e) {
-					conn.close("Ez a név már foglalt.");
+				catch (Server.JoinDeniedException e) {
+					conn.close(e.getMessage());
 				}
 			});
 		}

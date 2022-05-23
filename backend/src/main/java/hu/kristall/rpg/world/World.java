@@ -34,7 +34,7 @@ public class World extends SynchronizedObject<World> {
 	private Map<GeneratedID<FloatingItem>, FloatingItem> floatingItems = new HashMap<>();
 	private PathFinder pathFinder;
 	
-	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder) {
+	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners) {
 		super("world-"+name);
 		this.pathFinder = pathFinder;
 		
@@ -53,7 +53,9 @@ public class World extends SynchronizedObject<World> {
 		this.bakedMapSerialize = List.of(tileGrid);
 		
 		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
-		spawnEntity(EntityType.SKELETON, new Position(10, 10));
+		for (EntitySpawner entitySpawner : entitySpawners) {
+			entitySpawner.registerTo(this);
+		}
 	}
 	
 	public Collection<FloatingItem> getItems() {
@@ -126,6 +128,10 @@ public class World extends SynchronizedObject<World> {
 			}
 			case SKELETON: {
 				createdEntity = new EntitySkeleton(this, getNextEntityID(), pos);
+				break;
+			}
+			case OGRE: {
+				createdEntity = new EntityOgre(this, getNextEntityID(), pos);
 				break;
 			}
 		}

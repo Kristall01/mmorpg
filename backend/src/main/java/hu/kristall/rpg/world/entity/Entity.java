@@ -150,6 +150,9 @@ public abstract class Entity {
 	}
 	
 	public void setSpeed(double newSpeed) {
+		if(newSpeed <= 0) {
+			throw new IllegalArgumentException("speed cannot be negative");
+		}
 		this.speed = newSpeed;
 		this.world.broadcastPacket(new PacketOutEntityspeed(this));
 		this.move(getLastPath().getTarget());

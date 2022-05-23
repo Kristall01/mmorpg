@@ -66,4 +66,5 @@ public enum Material {
 	SWORD_5,
 	SWORD_6,
 	SWORD_7,
+	BONE,
 }

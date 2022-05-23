@@ -1,7 +1,6 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
 import ImageStore from "game/ImageStore";
-import SkeletonActivity from "visual_model/assetconfig/SkeletonAssetConfig";
-import SkeletonEntity from "visual_model/entity/SkeletonEntity";
+import OgreActivity from "visual_model/assetconfig/OgreAssetConfig";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 import EntityRenderer, { EntityLike } from "./EntityRenderer";
@@ -14,36 +13,36 @@ rowMap.set(directions.EAST.ordinal, 0);
 rowMap.set(directions.NORTH.ordinal, 3);
 rowMap.set(directions.SOUTH.ordinal, 6);
 
-export default class SkeletonRenderer extends EntityRenderer {
+export default class OgreRenderer extends EntityRenderer {
 
-	private skeletonImg: HTMLImageElement
+	private ogreImg: HTMLImageElement
 	private mirroredImage: OffscreenCanvas;
 
 	constructor(images: ImageStore) {
 		super();
-		let mirrorWidth = Math.max(...SkeletonActivity.enum.values.map(val => val.frameCount))*spriteDimension;
-		let mirrorHeight = SkeletonActivity.enum.values.length*spriteDimension;
+		let mirrorWidth = Math.max(...OgreActivity.enum.values.map(val => val.frameCount))*spriteDimension;
+		let mirrorHeight = OgreActivity.enum.values.length*spriteDimension;
 
-		let skeletonImg = images.get("skeleton.png").img;
-		this.skeletonImg = skeletonImg;
+		let ogreImg = images.get("ogre.png").img;
+		this.ogreImg = ogreImg;
 		let mirroredCanvas = new OffscreenCanvas(mirrorWidth, mirrorHeight);
 		let mirroredCtx = mirroredCanvas.getContext("2d")!;
-		mirroredCtx.translate(skeletonImg.width, 0);
+		mirroredCtx.translate(ogreImg.width, 0);
 		mirroredCtx.scale(-1, 1);
 
-		let maxFrameCount = Math.max(...SkeletonActivity.enum.values.map(v => v.frameCount));
+		let maxFrameCount = Math.max(...OgreActivity.enum.values.map(v => v.frameCount));
 
-		for(let activity of SkeletonActivity.enum.values) {
+		for(let activity of OgreActivity.enum.values) {
 			for(let i = 0; i < activity.frameCount; ++i) {
 				let vals = [(activity.rowModifier)*spriteDimension, spriteDimension, spriteDimension];
-				mirroredCtx.drawImage(this.skeletonImg, i * spriteDimension, vals[0], vals[1], vals[2], (maxFrameCount-i-1) * spriteDimension, vals[0], vals[1], vals[2]);
+				mirroredCtx.drawImage(this.ogreImg, i * spriteDimension, vals[0], vals[1], vals[2], (maxFrameCount-i-1) * spriteDimension, vals[0], vals[1], vals[2]);
 			}
 		}
 		this.mirroredImage = mirroredCanvas;
 	}
 
-	drawTo(ctx: RenderContext, direction: Direction, pos: Position, skeleton: EntityLike, size: number, activityTime: number, activity: SkeletonActivity) {
-		super.renderEntity(ctx, skeleton, pos, size);
+	drawTo(ctx: RenderContext, direction: Direction, pos: Position, ogre: EntityLike, size: number, activityTime: number, activity: OgreActivity) {
+		super.renderEntity(ctx, ogre, pos, size);
 
 		let row: number;
 		let drawSource: HTMLImageElement | OffscreenCanvas;
@@ -53,7 +52,7 @@ export default class SkeletonRenderer extends EntityRenderer {
 			drawSource = this.mirroredImage;
 		}
 		else {
-			drawSource = this.skeletonImg;
+			drawSource = this.ogreImg;
 			row = rowMap.get(direction.ordinal)!;
 		}
 

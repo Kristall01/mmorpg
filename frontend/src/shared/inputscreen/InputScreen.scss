@@ -1,0 +1,14 @@
+.input-screen {
+
+	.input-element, input {
+		text-align: initial;
+		font-size: 18px;
+	}
+
+	.btnrow {
+		display: flex;
+		justify-content: space-between;
+		gap: 50px;
+	}
+
+}

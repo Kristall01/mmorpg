@@ -42,7 +42,12 @@ public class CommandSpeed extends SimpleCommand {
 					sender.sendMessage("§cHiba: §4Nincs entitásod");
 					return;
 				}
-				entity.setSpeed(newSpeed);
+				try {
+					entity.setSpeed(newSpeed);
+				}
+				catch (IllegalArgumentException ex) {
+					sender.sendTranslatedMessage("command.speed.invalid-argument");
+				}
 				sender.sendMessage("§abeállítva");
 			});
 		}

@@ -1,8 +1,6 @@
-import ImageStore, { loadImage } from "game/ImageStore";
-import AnimatedGlobalColumnTexture from "./AnimatedGlobalColumnTexture";
+import ImageStore from "game/ImageStore";
 import EmptyTexture from "./EmptyTexture";
 import NullTexture from "./NullTexture";
-import StaticTexture from "./StaticTexture";
 import Texture, { ofType } from "./Texture";
 
 class TexturePack {

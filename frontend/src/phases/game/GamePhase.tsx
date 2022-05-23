@@ -1,14 +1,12 @@
-import CozyPack from "game/graphics/texture/CozyPack";
 import GameView from "game/GameView";
 import MenuContext from "MenuContext";
 import {IEventReciever, ModelEvent, ModelEventType} from "model/Definitions";
 import LogicModel from "model/LogicModel";
-import MenuScene from "phases/menu/MenuScene";
+import MenuPhase from "phases/menu/MenuPhase";
 import { Component, Context, createContext, useState } from "react";
 import VisualModel from "visual_model/VisualModel";
 
-import "./GameScene.scss";
-import ImageStore from "game/ImageStore";
+import "./GamePhase.scss";
 import VisualResources from "game/VisualResources";
 import { Button } from "react-bootstrap";
 
@@ -23,7 +21,7 @@ type state = {
 	ended: boolean
 }
 
-class GameScene extends Component<props, state>  {
+class GamePhase extends Component<props, state>  {
 
 	private model: LogicModel | null = null
 
@@ -56,7 +54,7 @@ class GameScene extends Component<props, state>  {
 					this.change(event.data, true);
 				}
 				else {
-					this.context(<MenuScene visuals={this.props.visuals} />);
+					this.context(<MenuPhase visuals={this.props.visuals} />);
 				}
 			}
 		}
@@ -76,7 +74,7 @@ class GameScene extends Component<props, state>  {
 
 	render() {
 		let buttonElement = this.state.ended ? (
-			<Button className="button" variant="primary" onClick={() => this.context(<MenuScene visuals={this.props.visuals} />)}>
+			<Button className="button" variant="primary" onClick={() => this.context(<MenuPhase visuals={this.props.visuals} />)}>
 				<div className="gapper">
 					<i className="fa-solid fa-left"></i>
 					<span>Vissza a menübe</span>
@@ -96,4 +94,4 @@ class GameScene extends Component<props, state>  {
 
 }
 
-export default GameScene;
+export default GamePhase;

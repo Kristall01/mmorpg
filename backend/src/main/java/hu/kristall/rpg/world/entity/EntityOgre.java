@@ -2,21 +2,11 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.packet.out.PacketOutAttack;
-import hu.kristall.rpg.world.Item;
-import hu.kristall.rpg.world.Material;
 import hu.kristall.rpg.world.World;
 
-public class EntitySkeleton extends AIEntity {
-	
-	public EntitySkeleton(World world, int entityID, Position startPosition) {
-		super(world, EntityType.SKELETON, entityID, 2.5, 100, 100, startPosition, 1000);
-	}
-	
-	@Override
-	public void kill() {
-		Position pos = getPosition();
-		getWorld().spawnItem(new Item(Material.BONE), getWorld().getRandomPositionNear(pos, 0.5, 1));
-		super.kill();
+public class EntityOgre extends AIEntity {
+	public EntityOgre(World world, int entityID, Position startPosition) {
+		super(world, EntityType.OGRE, entityID, 2, 100, 100, startPosition, 1000);
 	}
 	
 	@Override
@@ -32,8 +22,8 @@ public class EntitySkeleton extends AIEntity {
 		}
 		Position targetPosition = target.getPosition();
 		this.move(targetPosition);
- 		if(Position.distance(targetPosition, this.getPosition()) < 1) {
-			 this.attack(target, 2);
+		if(Position.distance(targetPosition, this.getPosition()) < 1) {
+			this.attack(target, 2);
 		}
 	}
 	
@@ -43,4 +33,5 @@ public class EntitySkeleton extends AIEntity {
 		getWorld().broadcastPacket(new PacketOutAttack(this, entity.getPosition()));
 		return d;
 	}
+	
 }

@@ -1,5 +1,4 @@
 import Entity from "./Entity";
-import { PositionFn } from "./Paths";
 
 export class LabelType {
 
@@ -29,10 +28,10 @@ export class WorldLabel {
 
 	readonly text: string;
 	readonly type: LabelType;
-	readonly entity: Entity;
+	readonly entity: Entity<any>;
 	readonly startTime: number;
 
-	constructor(text: string, type: LabelType, entity: Entity, startTime?: number) {
+	constructor(text: string, type: LabelType, entity: Entity<any>, startTime?: number) {
 		this.text = text;
 		this.type = type;
 		this.entity = entity;

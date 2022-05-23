@@ -41,9 +41,29 @@ $gap: 10px;
 		flex-direction: column;
 		gap: 10px;
 
+		.close {
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			width: 30px;
+			height: 30px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			background-color: rgba(0,0,0,0.1);
+			user-select: none;
+			border-radius: 5px;
+
+			&:hover {
+				background-color: rgba(0,0,0,0.2);
+				cursor: pointer;
+			}
+		}
+
 		.graphics {
 			display: flex;
 			flex: 1;
+			position: relative;
 		}
 
 		.control {

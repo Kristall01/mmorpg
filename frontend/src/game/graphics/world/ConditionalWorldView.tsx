@@ -1,15 +1,8 @@
-import ImageStore from "game/ImageStore";
 import VisualResources from "game/VisualResources";
 import LogicModel from "model/LogicModel";
-import React, { Component } from "react";
+import { Component } from "react";
 import VisualModel, { UpdateTypes } from "visual_model/VisualModel";
 import World from "visual_model/World";
-import GraphicsComponent from "../component/GraphicsComponent";
-import Renderable from "../Renderable";
-import EmptyRenderer from "../renderers/empty/EmptyRenderer";
-import WorldRenderer from "../renderers/world/WorldRenderer";
-import CozyPack from "../texture/CozyPack";
-import TexturePack from "../texture/TexturePack";
 import WorldView from "./WorldView";
 import "./WorldView.scss";
 

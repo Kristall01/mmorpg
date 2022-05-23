@@ -1,8 +1,6 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
 import ImageStore from "game/ImageStore";
-import { sortAndDeduplicateDiagnostics } from "typescript";
-import { enumValueOf } from "utils";
-import { Activity, Cloth, ClothColor, PrimitiveFrametime, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
+import { HumanActivity, Cloth, ClothColor, PrimitiveFrametime, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 
@@ -154,7 +152,7 @@ class ColoredCozyCloth implements CozyCloth {
 
 	private clothTextures: Sprite[];
 
-	constructor(key: Activity, cloth: Cloth, images: ImageStore) {
+	constructor(key: HumanActivity, cloth: Cloth, images: ImageStore) {
 		let baseSprite = new Sprite(images.get(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
 		let colorValues = ClothColor.enum.values;
 		this.clothTextures = new Array(colorValues.length);
@@ -174,7 +172,7 @@ class ColorlessCozyCloth implements CozyCloth {
 
 	private clothTexture: Sprite;
 
-	constructor(key: Activity, cloth: Cloth, images: ImageStore) {
+	constructor(key: HumanActivity, cloth: Cloth, images: ImageStore) {
 		this.clothTexture = new Sprite(images.get(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
 	}
 
@@ -190,7 +188,7 @@ export class CozyActivity {
 	private skinTones: Sprite[]
 	private clothes: CozyCloth[]
 
-	constructor(key: Activity, images: ImageStore) {
+	constructor(key: HumanActivity, images: ImageStore) {
 		this.skinTones = new Array<Sprite>(8);
 		for(let i = 0; i < 8; ++i) {
 			this.skinTones[i] = new Sprite(images.get(`char${i}_${key.id}.png`).img, key.frametimes);
@@ -225,7 +223,7 @@ export default class CozyPack {
 	public constructor(images: ImageStore) {
 		this.images = images;
 
-		let objectValues = Activity.enum.values;
+		let objectValues = HumanActivity.enum.values;
 		this.activities = new Array(objectValues.length);
 		for(let i = 0; i < objectValues.length; ++i) {
 			this.activities[i] = new CozyActivity(objectValues[i], images);
@@ -243,7 +241,7 @@ export default class CozyPack {
 		return a;
 	}
 
-	getCozyActivity(act: Activity) {
+	getCozyActivity(act: HumanActivity) {
 		return this.activities[act.ordinal];
 	}
 

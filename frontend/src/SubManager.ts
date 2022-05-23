@@ -1,4 +1,3 @@
-import { Component } from "react";
 import UpdateBroadcaster from "visual_model/UpdateBroadcaster";
 
 interface Subscription {
