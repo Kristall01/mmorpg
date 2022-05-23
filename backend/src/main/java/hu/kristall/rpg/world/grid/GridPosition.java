@@ -30,6 +30,14 @@ public class GridPosition {
 		return Objects.hash(x, y);
 	}
 	
+	@Override
+	public String toString() {
+		return "GridPosition{" +
+			"x=" + x +
+			", y=" + y +
+			'}';
+	}
+	
 	public static Double rads(GridPosition p0, GridPosition p1) {
 		if(p0.equals(p1)) {
 			return null;
