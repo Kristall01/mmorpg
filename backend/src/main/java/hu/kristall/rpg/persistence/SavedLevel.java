@@ -3,6 +3,8 @@ package hu.kristall.rpg.persistence;
 import com.google.gson.*;
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.Utils;
+import hu.kristall.rpg.world.EntitySpawner;
+import hu.kristall.rpg.world.entity.EntityType;
 import hu.kristall.rpg.world.grid.SearchGrid;
 import hu.kristall.rpg.world.path.plan.AStarPathFinder;
 import hu.kristall.rpg.world.path.plan.FreePathFinder;
@@ -11,6 +13,7 @@ import hu.kristall.rpg.world.path.plan.ReducedPathFinder;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SavedLevel {
@@ -18,16 +21,16 @@ public class SavedLevel {
 	public String name;
 	public final int width, height;
 	public final String[] layers;
-	public final List<SavedMonsterspawn> monsterspawns;
+	public final List<EntitySpawner> entitySpawners;
 	public final List<SavedPortal> portals;
 	public PathFinder pathFinder;
 	
-	public SavedLevel(String name, int width, int height, String[] layers, List<SavedMonsterspawn> monsterspawns, List<SavedPortal> portals, PathFinder pathFinder) {
+	public SavedLevel(String name, int width, int height, String[] layers, List<EntitySpawner> entitySpawners, List<SavedPortal> portals, PathFinder pathFinder) {
 		this.name = name;
 		this.width = width;
 		this.height = height;
 		this.layers = layers;
-		this.monsterspawns = List.copyOf(monsterspawns);
+		this.entitySpawners = Collections.unmodifiableList(entitySpawners);
 		this.portals = List.copyOf(portals);
 		this.pathFinder = pathFinder;
 	}
@@ -66,7 +69,18 @@ public class SavedLevel {
 				else {
 					pathFinder = new FreePathFinder();
 				}
-				return new SavedLevel(null,width, height, layers.toArray(new String[0]),  new ArrayList<>(), portals, pathFinder);
+				JsonArray spawners = base.get("spawners").getAsJsonArray();
+				List<EntitySpawner> entitySpawners = new ArrayList<>();
+				for (JsonElement spawnerElement : spawners) {
+					JsonObject spawner = spawnerElement.getAsJsonObject();
+					String entityType = spawner.get("entityType").getAsString();
+					int count = spawner.get("count").getAsInt();
+					long respawnTimer = spawner.get("respawnTimer").getAsLong();
+					Position topLeft = Utils.gson().fromJson(spawner.get("topLeft"), Position.class);
+					Position bottomRight = Utils.gson().fromJson(spawner.get("bottomRight"), Position.class);
+					entitySpawners.add(new EntitySpawner(count,respawnTimer, EntityType.valueOf(entityType), topLeft, bottomRight));
+				}
+				return new SavedLevel(null,width, height, layers.toArray(new String[0]), entitySpawners, portals, pathFinder);
 			}
 			catch (Throwable err) {
 				err.printStackTrace();

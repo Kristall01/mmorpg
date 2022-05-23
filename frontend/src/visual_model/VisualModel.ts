@@ -1,9 +1,6 @@
-import { convertToHtmlText } from "game/ui/chat/textconverter";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
-import { ThemeConsumer } from "react-bootstrap/esm/ThemeProvider";
 import Entity from "./Entity";
-import ItemStack from "./ItemStack";
 import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
 import World from "./World";
@@ -170,8 +167,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		return this._maxFPS;
 	}
 
-	showLabelFor(text: string, labelType: LabelType, entity: Entity) {
-		let pos = entity.cachedCanvasPosition;
+	showLabelFor(text: string, labelType: LabelType, entity: Entity<any>) {
 		//drawDamageLabel(view.ctx, [pos[0], top+(eHeight*0.75)], (renderConfig.rendertime % 1000)/750, "20");
 		this.world?.addLabel(new WorldLabel(text, labelType, entity));
 /* 		let eHeight = entity.type.height*1.25 * renderConfig.tileSize;

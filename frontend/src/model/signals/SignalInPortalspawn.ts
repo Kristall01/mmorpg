@@ -1,6 +1,6 @@
 import { SignalIn } from "model/Definitions";
 import Portal from "visual_model/Portal";
-import VisualModel, { Position } from "visual_model/VisualModel";
+import VisualModel from "visual_model/VisualModel";
 
 export default class SignalInPortalspawn implements SignalIn {
 

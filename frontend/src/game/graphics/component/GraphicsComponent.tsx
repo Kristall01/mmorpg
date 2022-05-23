@@ -1,9 +1,7 @@
 import { Component } from "react";
-import "./GraphicsComponent.scss";
-import VisualModel from "visual_model/VisualModel";
-import RenderScheduler from "../RenderScheduler";
-import LayerMixer from "../RenderableCombinator";
 import Renderable from "../Renderable";
+import RenderScheduler from "../RenderScheduler";
+import "./GraphicsComponent.scss";
 
 type props = {
 	renderable: Renderable,

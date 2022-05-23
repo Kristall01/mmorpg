@@ -11,7 +11,7 @@ export default class SignalInSpawnItem implements SignalIn {
 	}
 
 	execute(model: VisualModel): void {
-		let e = model.world?.spawnItem(this.item);
+		model.world?.spawnItem(this.item);
 	}
 
 }

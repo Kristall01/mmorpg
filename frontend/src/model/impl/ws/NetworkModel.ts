@@ -1,5 +1,5 @@
 import { ColoredCloth } from "game/graphics/renderers/world/HumanRenderer";
-import {IEventReciever, ModelEvent, ModelEventType, SignalIn} from "model/Definitions";
+import {IEventReciever, ModelEventType, SignalIn} from "model/Definitions";
 import LogicModel from "model/LogicModel";
 import SignalAttack from "model/signals/SignalAttack";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
@@ -32,7 +32,7 @@ class NetworkModel extends LogicModel {
 
 	private packetMap: Map<string, (data:any) => void> = new Map();
 
-	private ws: WebSocket
+	private ws: WebSocket = null!
 	private pingUpdateTask: number | null = null
 	private pingPromiseAccept: (a:number) => void = null!;
 	private endSent = false
@@ -94,7 +94,16 @@ class NetworkModel extends LogicModel {
 
 		this.pingDelay = Date.now()*100000 - this.nowNanos(); //calculate using 0 ping and matching clock
 
-		this.ws = new WebSocket(connectionURL);
+		const connectErrorMessage = "kapcsolódási hiba: nem sikerült kapcsolódni a szerverhez";
+
+		try {
+			this.ws = new WebSocket(connectionURL);
+		}
+		catch(err) {
+			console.error(err);
+			this.endConnection(connectErrorMessage);
+			return;
+		}
 
 		this.ws.addEventListener("open", () => {
 			this.sendPacket("auth", {name: name});
@@ -105,7 +114,7 @@ class NetworkModel extends LogicModel {
 
 		this.ws.addEventListener("error", (e) => {
 			if(!this.connectionOpened) {
-				this.endConnection("kapcsolódási hiba: nem sikerült kapcsolódni a szerverhez");
+				this.endConnection(connectErrorMessage);
 			}
 			else {
 				this.endConnection("kapcsolati hiba: a websocket kapcsolat váratlanul megszakadt");
@@ -113,12 +122,15 @@ class NetworkModel extends LogicModel {
 		})
 
 		this.ws.addEventListener("message", (e) => {
-			let rawPacketData = e.data;
-			let type, data;
+			let rawPacketData: string = e.data;
+			let type: string, data;
 			try {
-				let parsedPacket = JSON.parse(rawPacketData);
-				type = parsedPacket.type;
-				data = parsedPacket.data;
+				let separatorIndex = rawPacketData.indexOf(';') ;
+				if(separatorIndex === -1) {
+					throw new Error("ilelgal packet format");
+				}
+				type = rawPacketData.substring(0, separatorIndex);
+				data = JSON.parse(rawPacketData.substring(separatorIndex+1));
 			}
 			catch(err) {
 				this.endConnection("kommunikációs hiba: a szerver hibás formátumú csomagot küldött");

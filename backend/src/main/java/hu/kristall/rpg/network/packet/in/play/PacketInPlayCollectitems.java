@@ -18,7 +18,7 @@ public class PacketInPlayCollectitems extends PacketInPlay {
 					//player is dead, went shaco ult, or something like that
 					return;
 				}
-				e.getEntity().pickupNearbyItems(0.5);
+				e.getEntity().pickupNearbyItems(1);
 			});
 		}
 		catch (Synchronizer.TaskRejectedException e) {

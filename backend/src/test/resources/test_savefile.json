@@ -13,7 +13,8 @@
 					"targetWorld": "level1"
 				}
 			],
-			"type": "free"
+			"type": "free",
+			"spawners": []
 		},
 		"level1": {
 			"height": 2,
@@ -33,7 +34,8 @@
 			"layers": [
 				"img0","img1","img2","img3"
 			],
-			"type": "free"
+			"type": "free",
+			"spawners": []
 		}
 	},
 	"default": "level0"

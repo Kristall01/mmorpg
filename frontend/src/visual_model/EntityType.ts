@@ -28,8 +28,9 @@ export class EntityType {
 		map: {
 			HUMAN: new EntityType(0.6),
 			UNKNOWN: new EntityType(0.25),
-			SLIME: new EntityType(0.25),
-			SKELETON: new EntityType(1.0),
+			SLIME: new EntityType(0.75),
+			SKELETON: new EntityType(0.5),
+			OGRE: new EntityType(0.5),
 		},
 		values: new Array<EntityType>()
 	}

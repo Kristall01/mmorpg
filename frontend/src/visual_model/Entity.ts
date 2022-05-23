@@ -1,10 +1,9 @@
-import { RenderContext } from "game/graphics/GraphicsUtils"
+import { ActivitySnapshot } from "./ActivityFunction"
 import { EntityType } from "./EntityType"
 import { ConstStatus, Direction, DirectionMode, EntityConstStatus, entityZigzagStatus, Status, StatusFn } from "./Paths"
-import UpdateBroadcaster from "./UpdateBroadcaster"
 import { Position } from "./VisualModel"
 
-export default abstract class Entity {
+export default abstract class Entity<T> {
 
 	id: number
 	type: EntityType
@@ -12,7 +11,6 @@ export default abstract class Entity {
 	nick: string | null = null
 	speed: number
 	cachedStatus: Status;
-	cachedCanvasPosition: Position = [0,0];
 	name: string | null = null;
 	private _hp: number
 	maxHp: number
@@ -63,6 +61,8 @@ export default abstract class Entity {
 	}
 
 	abstract attack(pos: Position): void;
+
+	abstract activity(rendertime: number): ActivitySnapshot<T>;
 
 	teleport(pos: Position, instant: boolean) {
 		let now = performance.now();

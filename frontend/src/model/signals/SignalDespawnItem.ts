@@ -1,5 +1,4 @@
 import { SignalIn } from "model/Definitions";
-import FloatingItem from "visual_model/FloatingItem";
 import VisualModel from "visual_model/VisualModel";
 
 export default class SignalDespawnItem implements SignalIn {

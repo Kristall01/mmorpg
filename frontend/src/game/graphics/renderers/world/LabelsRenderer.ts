@@ -1,5 +1,4 @@
 import { drawDamageLabel, drawHealLabel } from "game/graphics/GraphicsUtils";
-import WorldView from "game/graphics/world/WorldView";
 import { LabelType, WorldLabel } from "visual_model/Label";
 import { Position } from "visual_model/VisualModel";
 import World from "visual_model/World";
@@ -16,7 +15,7 @@ export const renderLabels = (view: WorldRenderer, world: World, config: RenderCo
 
 export const renderLabel = (view: WorldRenderer, label: WorldLabel, config: RenderConfig) => {
 	let t = config.rendertime;
-	let pos = label.entity.cachedCanvasPosition;
+	let pos = view.translateXY(...label.entity.cachedStatus.position);
 	let eHeight = label.entity.type.height*1.25 * config.tileSize;
 	let top = pos[1] - eHeight;
 	let drawPos: Position = [pos[0], top+(eHeight*0.5)];

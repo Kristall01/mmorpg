@@ -1,34 +1,34 @@
 import GraphicsComponent from 'game/graphics/component/GraphicsComponent';
-import { renderHuman } from 'game/graphics/renderers/world/EntityRenderer';
 import { ColoredCloth } from 'game/graphics/renderers/world/HumanRenderer';
-import CozyPack, { CozyActivity } from 'game/graphics/texture/CozyPack';
+import CozyPack from 'game/graphics/texture/CozyPack';
+import VisualResources from 'game/VisualResources';
 import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
 import { enumValueOf } from 'utils';
-import { Activity, Cloth, ClothColor } from 'visual_model/assetconfig/HumanAssetConfig';
+import { HumanActivity, Cloth, ClothColor } from 'visual_model/assetconfig/HumanAssetConfig';
 import { Direction } from 'visual_model/Paths';
-import { runInThisContext } from 'vm';
 import './ClothEditor.scss';
 import ClothRenderer from './ClothRenderer';
 import OpeningSection from './OpeningSection';
 
 export type ClothEditorProps = {
-	cozyPack: CozyPack,
+	visuals: VisualResources,
 	baseClothes?: ColoredCloth[]
 	onApply?: (clothes: ColoredCloth[]) => void,
+	onClose?: () => void,
 }
 
 const clothMapping = {
 	TOP: "felsők",
 	BOTTOM: "alsók",
 	SHOES: "cipők",
-	ALL: "együttesek"
+	ALL: "jelmezek"
 }
 
 interface ClothEditorState {
 	play: boolean,
 	facing: number,
-	activity: Activity
+	activity: HumanActivity
 }
 
 class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
@@ -38,13 +38,13 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 	constructor(props: ClothEditorProps) {
 		super(props);
 
-		this.clothRenderer = new ClothRenderer(props.cozyPack);
+		this.clothRenderer = new ClothRenderer(props.visuals);
 		this.clothRenderer.skin = 0;
 
 		this.state = {
 			play: false,
 			facing: 0,
-			activity: Activity.enum.map.WALK
+			activity: HumanActivity.enum.map.WALK
 		}
 		let baseClothes = this.props.baseClothes;
 		if(baseClothes !== undefined) {
@@ -72,12 +72,12 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 	}
 
 	handleAnimChange(e: React.ChangeEvent<HTMLSelectElement>) {
-		let ac = enumValueOf(Activity.enum.map, e.target.value);
+		let ac = enumValueOf(HumanActivity.enum.map, e.target.value);
 		if(ac === null) {
 			e.preventDefault();
 			return;
 		}
-		this.clothRenderer.activity = this.props.cozyPack.getCozyActivity(ac);
+		this.clothRenderer.activity = this.props.visuals.cozy.getCozyActivity(ac);
 	}
 
 	handleColorChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -97,6 +97,10 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 	}
 
 	render() {
+		let closeBtn: React.ReactNode;
+		if(this.props.onClose !== undefined) {
+			closeBtn = <div title='ablak bezárása' onClick={this.props.onClose} className='close'><i className="fa-solid fa-x" /></div>
+		}
 		return (
 			<div className="cloth-editor-component">
 				<div className="left section">
@@ -108,7 +112,7 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 										{Cloth.enum.values.filter(f => f.position === s0).map((a,innerKey) => (
 											<div title={a.id} className='line' onClick={() => this.clothRenderer.setClothAt((s0 as any), a)} key={innerKey}>
 												<div className="text">
-													{a.id}
+													{a.label}
 												</div>
 											</div>
 										))}
@@ -123,6 +127,7 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 				</div>
 				<div className="right section">
 					<div className="graphics">
+						{closeBtn}
 						<GraphicsComponent maxFPS={30} showFpsCounter={false} renderable={this.clothRenderer} />
 					</div>
 					<div className="control">
@@ -130,10 +135,10 @@ class ClothEditor extends Component<ClothEditorProps, ClothEditorState> {
 						<Button size='sm' onClick={() => this.rotate()}>forgatás</Button>
 						{this.props.onApply ? <Button size='sm' onClick={() => this.exportClothes()}>alkalmaz</Button>:null}
 						<select defaultValue={this.state.activity.id.toUpperCase()} onChange={(e) => this.handleAnimChange(e)}>
-							{Object.entries(Activity.enum.map).map(([name, activity],b) => <option value={name} key={b}>{name}</option>)}
+							{Object.entries(HumanActivity.enum.map).map(([name, activity],b) => <option value={name} key={b}>{activity.label}</option>)}
 						</select>
 						<select defaultValue="BLACK" onChange={(e) => this.handleColorChange(e)}>
-							{Object.entries(ClothColor.enum.map).map(([name, color],b) => <option value={name} key={b}>{name}</option>)}
+							{Object.entries(ClothColor.enum.map).map(([name, color],b) => <option value={name} key={b}>{color.label}</option>)}
 						</select>
 					</div>
 				</div>

@@ -6,7 +6,7 @@ import TexturePack from 'game/graphics/texture/TexturePack';
 import React, {createRef } from 'react';
 import VisualModel, {UpdateTypes} from 'visual_model/VisualModel';
 import World, { WorldEvent } from 'visual_model/World';
-import { convertToHtml, convertToHtmlText } from '../chat/textconverter';
+import { convertToHtml } from '../chat/textconverter';
 import './InventoryMenu.scss';
 
 export type InventoryMenuProps = {

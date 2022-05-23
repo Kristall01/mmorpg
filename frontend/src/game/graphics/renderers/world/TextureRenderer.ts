@@ -1,9 +1,5 @@
-import { drawText, RenderContext } from "game/graphics/GraphicsUtils";
 import { StatelessRenderable } from "game/graphics/Renderable";
 import Texture from "game/graphics/texture/Texture";
-import Item from "visual_model/Item";
-import { Position } from "visual_model/VisualModel";
-import FloatingItemResource from "./FloatingItemResource";
 
 export default class ItemRenderer extends StatelessRenderable {
 
