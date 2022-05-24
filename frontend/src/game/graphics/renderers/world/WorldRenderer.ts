@@ -290,7 +290,6 @@ class WorldRenderer implements Renderable {
 
 		mostLeftRender = Math.floor(mostLeftRender);
 		mostTopRender = Math.floor(mostTopRender);
-
 		for(let tileLayerIndex = 0; tileLayerIndex < this.tileTextures.length; ++tileLayerIndex) {
 			for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
 				for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
@@ -306,6 +305,15 @@ class WorldRenderer implements Renderable {
 					}
 					t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 				}
+			}
+		}
+		if(this.model.drawGrid) {
+			this.ctx.fillStyle = "#000";
+			for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
+				this.ctx.fillRect(Math.floor(tileRenderX), 0, 1, this.renderConfig.height);
+			}
+			for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
+				this.ctx.fillRect(0, Math.floor(tileRenderY), this.renderConfig.width, 1);
 			}
 		}
 		//this.ctx.fillStyle = "yellow";
@@ -361,6 +369,24 @@ class WorldRenderer implements Renderable {
 //			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
 			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
 			drawText(this.ctx, [width / 2, height*0.8], "nyomj §e§l[A]§r gombot a tárgyak felvételéhez", "middle", "middle",)
+		}
+
+		if(this.model.drawPath) {
+			for(let entity of this.world.entities) {
+				let pos = entity.path.positions;
+				if(pos != null) {
+					this.ctx.beginPath();
+					this.ctx.moveTo(...this.translateXY(...pos[0]));
+					let translatedPos = this.translateXY(...pos[0]);
+					this.ctx.fillRect(translatedPos[0]-10, translatedPos[1]-10, 20, 20);
+					for(let i = 1; i < pos.length; ++i) {
+						translatedPos = this.translateXY(...pos[i]);
+						this.ctx.lineTo(...translatedPos);
+						this.ctx.fillRect(translatedPos[0]-10, translatedPos[1]-10, 20, 20);
+					}
+					this.ctx.stroke();
+				}
+			}
 		}
 
 		// for(let entity of this.model.world.entities) {

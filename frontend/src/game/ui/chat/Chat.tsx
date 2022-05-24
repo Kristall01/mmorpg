@@ -31,12 +31,24 @@ const Chat = (): JSX.Element | null => {
 		setChatText(e.currentTarget.value);
 	}
 
+	const handleChatInput = (text: string) => {
+		visualModel.pushHistoryEntry(text);
+		if(text.startsWith("/dev")) {
+			handleLocalCommand(text.substring(4));
+		}
+		else {
+			logicModel.sendChatMessage(text);
+		}
+	}
+
 	const handleLocalCommand = (cmd: string) => {
 		if(cmd.length === 0) {
 			visualModel.addChatEntry("§6§l[DEV] §r/dev parancsok:");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev camleak");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev maxzoom");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev maxfps");
+			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev grid");
+			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev path");
 			return;
 		}
 		cmd = cmd.substring(1);
@@ -55,6 +67,16 @@ const Chat = (): JSX.Element | null => {
 				visualModel.addChatEntry("§6§l[DEV] §rMaxzoom átállítva");
 			}
 			catch(ex) {}
+			return;
+		}
+		if(split[0] === "grid") {
+			visualModel.drawGrid = !visualModel.drawGrid;
+			visualModel.addChatEntry("§6§l[DEV] §rgrid render átállítva");
+			return;
+		}
+		if(split[0] === "path") {
+			visualModel.drawPath = !visualModel.drawPath;
+			visualModel.addChatEntry("§6§l[DEV] §rpath render átállítva");
 			return;
 		}
 		if(split[0] === 'maxfps') {
@@ -83,13 +105,7 @@ const Chat = (): JSX.Element | null => {
 			let chattext = e.currentTarget.value;
 			chattext = chattext.trim();
 			if(chattext.length !== 0) {
-				visualModel.pushHistoryEntry(chatText);
-				if(chatText.startsWith("/dev")) {
-					handleLocalCommand(chatText.substring(4));
-				}
-				else {
-					logicModel.sendChatMessage(chattext);
-				}
+				handleChatInput(chatText);
 			}
 			setChatText("");
 			e.stopPropagation();
@@ -125,8 +141,12 @@ const Chat = (): JSX.Element | null => {
 		if(!visualModel.chatOpen) {
 			setHistoryIndex(-1);
 		}
+		for(let command of visualModel.commandQueue) {
+			handleChatInput(command);
+		}
+		visualModel.commandQueue = [];
 		window.scrollTo(0,document.body.scrollHeight);
-	}, [visualModel.focus, visualModel.chatlog, visualModel.chatOpen])
+	}, [visualModel.focus, visualModel.chatlog, visualModel.chatOpen, visualModel.commandQueue])
 
 /* 	{visualModel.chatlog.map((e,v) => <div key={v} dangerouslySetInnerHTML={{__html: e}}></div>)}
 	<div ref={dummyDiv}></div>

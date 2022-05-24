@@ -1,13 +1,13 @@
 import { ActivitySnapshot } from "./ActivityFunction"
 import { EntityType } from "./EntityType"
-import { ConstStatus, Direction, DirectionMode, EntityConstStatus, entityZigzagStatus, Status, StatusFn } from "./Paths"
+import { ConstStatus, Direction, DirectionMode, EntityConstStatus, entityZigzagStatus, Path, Status, StatusFn } from "./Paths"
 import { Position } from "./VisualModel"
 
 export default abstract class Entity<T> {
 
 	id: number
 	type: EntityType
-	statusFn: StatusFn = null!
+	path: Path = null!
 	nick: string | null = null
 	speed: number
 	cachedStatus: Status;
@@ -20,8 +20,8 @@ export default abstract class Entity<T> {
 	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number, directionMode: DirectionMode) {
 		this.id = id;
 		this.type = type;
-		this.statusFn = ConstStatus(loc, facing);
-		this.cachedStatus = this.statusFn(performance.now());
+		this.path = {statusFn: ConstStatus(loc, facing), positions: null};
+		this.cachedStatus = this.path.statusFn(performance.now());
 		this.speed = speed;
 		this._hp = hp;
 		this.maxHp = maxHp;
@@ -29,7 +29,7 @@ export default abstract class Entity<T> {
 	}
 
 	calculateStatus(rendertime: number) {
-		let pos = this.statusFn(rendertime);
+		let pos = this.path.statusFn(rendertime);
 		this.cachedStatus = pos;
 	}
 
@@ -39,7 +39,10 @@ export default abstract class Entity<T> {
 
 	walkBy(startTime: number, points: Position[]) {
 		let now = performance.now();
-		this.statusFn = entityZigzagStatus(this.directionMode, this.statusFn(now).position, startTime, points, this.speed);
+		this.path = {
+			statusFn: entityZigzagStatus(this.directionMode, this.path.statusFn(now).position, startTime, points, this.speed),
+			positions: points
+		};
 	}
 
 	get hp() {
@@ -67,11 +70,18 @@ export default abstract class Entity<T> {
 	teleport(pos: Position, instant: boolean) {
 		let now = performance.now();
 		if(instant) {
-			this.statusFn = ConstStatus(pos, this.statusFn(now).facing);
+			this.path = {
+				statusFn: ConstStatus(pos, this.path.statusFn(now).facing),
+				positions: null
+			}
 		}
 		else {
-			let status = this.statusFn(now)
-			this.statusFn = EntityConstStatus(this.directionMode, status.position, pos, status.facing);
+			let status = this.path.statusFn(now)
+			this.path = {
+				statusFn: EntityConstStatus(this.directionMode, status.position, pos, status.facing),
+				positions: null
+			}
+
 		}
 	}
 

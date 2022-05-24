@@ -15,7 +15,10 @@ export default class OgreEntity extends Entity<OgreActivity> {
 
 	attack(pos: Position): void {
 		let currentPos = this.cachedStatus.position;
-		this.statusFn = facingFunction(calculatedDirection(this.directionMode, pos[0]-currentPos[0], pos[1]-currentPos[1]), this.statusFn);
+		this.path = {
+			statusFn: facingFunction(calculatedDirection(this.directionMode, pos[0]-currentPos[0], pos[1]-currentPos[1]), this.path.statusFn),
+			positions: null
+		}
 		this.activityFn = createSwordFunction<OgreActivity>(OgreActivity.enum.map);
 	}
 

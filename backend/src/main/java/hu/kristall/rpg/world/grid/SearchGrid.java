@@ -1,6 +1,7 @@
 package hu.kristall.rpg.world.grid;
 
 import hu.kristall.rpg.Position;
+import hu.kristall.rpg.lineofsight.RayCaster;
 import hu.kristall.rpg.world.path.Path;
 
 import java.util.*;
@@ -99,6 +100,19 @@ public class SearchGrid {
 		return true;
 	}
 	
+	private void wallChecker(GridPosition p) {
+		if(getNode(p).isWall()) {
+			throw new RuntimeException();
+		}
+	}
+	
+	public boolean isWall(GridPosition pos) {
+		if(pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
+			return false;
+		}
+		return getNode(pos).isWall();
+	}
+	
 	private List<GridPosition> search(GridPosition start, GridPosition target) {
 		if(start.equals(target)) {
 			return List.of(start, target);
@@ -121,16 +135,25 @@ public class SearchGrid {
 				LinkedList<GridPosition> positionChain = new LinkedList<>();
 				SearchNode reverseLink = node;
 				while (reverseLink != null) {
-					positionChain.add(reverseLink.getPos());
+					positionChain.addFirst(reverseLink.getPos());
 					reverseLink = reverseLink.getParent();
 				}
-				GridPosition[] gridPositions = new GridPosition[positionChain.size()];
-				Iterator<GridPosition> it = positionChain.descendingIterator();
-				int i = -1;
-				while(it.hasNext()) {
-					gridPositions[++i] = it.next();
+				positionChain.addFirst(start);
+				positionChain.add(target);
+				LinkedList<Integer> removeCandidates = new LinkedList<>();
+				int fromIndex = 0;
+				for(int i = 1; i < positionChain.size()-1; ++i) {
+					if(RayCaster.hasLineOfSight(positionChain.get(fromIndex).toPosition(), positionChain.get(i+1).toPosition(), this::wallChecker)) {
+						removeCandidates.addFirst(i);
+					}
+					else {
+						fromIndex = i;
+					}
 				}
-				return List.of(gridPositions);
+				for (Integer candidate : removeCandidates) {
+					positionChain.remove((int)candidate);
+				}
+				return positionChain;
 			}
 			node.setClosed(true);
 			GridPosition nodePos = node.getPos();

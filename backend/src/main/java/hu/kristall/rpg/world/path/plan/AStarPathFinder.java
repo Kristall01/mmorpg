@@ -9,7 +9,7 @@ import java.util.List;
 
 public class AStarPathFinder implements PathFinder {
 	
-	private SearchGrid grid;
+	public SearchGrid grid;
 	
 	public AStarPathFinder(SearchGrid grid) {
 		this.grid = grid;

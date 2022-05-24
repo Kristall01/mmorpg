@@ -21,6 +21,7 @@ import SignalLabelFor from "model/signals/SignalLabel";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
 import SignalRenameEntity from "model/signals/SignalRenameEntity";
 import SignalSetinventory from "model/signals/SignalSetinventory";
+import SignalSudo from "model/signals/SignalSudo";
 import FloatingItem from "visual_model/FloatingItem";
 import Item from "visual_model/Item";
 import ItemStack from "visual_model/ItemStack";
@@ -88,6 +89,7 @@ class NetworkModel extends LogicModel {
 		});
 		this.addPacketSignal("teleport", ({x,y,entityID, instant}) => new SignalEntityTeleport(x,y,entityID,instant));
 		this.addPacketSignal("attack", ({x,y,entityID}) => new SignalAttack(entityID, x,y));
+		this.addPacketSignal("sudo", ({text}) => new SignalSudo(text));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
