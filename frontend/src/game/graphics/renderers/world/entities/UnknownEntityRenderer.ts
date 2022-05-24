@@ -8,7 +8,7 @@ export default class UnknownEntityRenderer extends EntityRenderer {
 		super.renderEntity(ctx, e, pos, tileSize);
 		ctx.fillStyle = "red";
 		let halfTile = tileSize/2;
-		ctx.fillRect(pos[0]-halfTile, pos[1], tileSize, tileSize);
+		ctx.fillRect(pos[0]-halfTile, pos[1]-halfTile, tileSize, tileSize);
 	}
 
 }
