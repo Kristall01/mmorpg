@@ -31,6 +31,9 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private chatHistory: string[] = [];
 	private _inventoryOpen: boolean = false;
 	private _clothEditorOpen: boolean = false;
+	public drawGrid: boolean = false;
+	public drawPath: boolean = false;
+	public commandQueue: Array<string> = [];
 
 	constructor() {
 		super();
@@ -104,6 +107,11 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	addChatEntry(text: string) {
 		this.chatlog = [...this.chatlog, text];
 		this.triggerUpdate("chatlog");
+	}
+
+	queueSudoCommand(text: string) {
+		this.commandQueue = [...this.commandQueue, text];
+		this.triggerUpdate("sudo-command");
 	}
 
 	clearChat() {

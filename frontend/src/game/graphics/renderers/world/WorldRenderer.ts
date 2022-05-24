@@ -363,6 +363,24 @@ class WorldRenderer implements Renderable {
 			drawText(this.ctx, [width / 2, height*0.8], "nyomj §e§l[A]§r gombot a tárgyak felvételéhez", "middle", "middle",)
 		}
 
+		if(this.model.drawPath) {
+			for(let entity of this.world.entities) {
+				let pos = entity.path.positions;
+				if(pos != null) {
+					this.ctx.beginPath();
+					this.ctx.moveTo(...this.translateXY(...pos[0]));
+					let translatedPos = this.translateXY(...pos[0]);
+					this.ctx.fillRect(translatedPos[0]-10, translatedPos[1]-10, 20, 20);
+					for(let i = 1; i < pos.length; ++i) {
+						translatedPos = this.translateXY(...pos[i]);
+						this.ctx.lineTo(...translatedPos);
+						this.ctx.fillRect(translatedPos[0]-10, translatedPos[1]-10, 20, 20);
+					}
+					this.ctx.stroke();
+				}
+			}
+		}
+
 		// for(let entity of this.model.world.entities) {
 		// for(let entity of this.world.entities) {
 		// 	entity.render(this.renderConfig, this, this.ctx);
