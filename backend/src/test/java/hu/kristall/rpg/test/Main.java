@@ -26,13 +26,13 @@ public class Main {
 	public void testSavefile() {
 		Savefile savefile = null;
 		try (Reader inputStream = new FileReader("src/test/resources/test_savefile.json")) {
-			savefile = Utils.gson().fromJson(inputStream, Savefile.class);
+			savefile = hu.kristall.rpg.Utils.gson().fromJson(inputStream, Savefile.class);
 		}
 		catch (IOException e) {
 			fail(e);
 		}
 		try {
-			Synchronizer<Server> asyncServer = Server.createServer("/", savefile, 8007);
+			Synchronizer<Server> asyncServer = Server.createServer(savefile, 8007, null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> level0 = worldsManager.getWorld("level0");
@@ -75,7 +75,7 @@ public class Main {
 	@Test
 	public void testWorldCreation() {
 		try {
-			Synchronizer<Server> asyncServer = Server.createServer("/", null, 8008);
+			Synchronizer<Server> asyncServer = Utils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> asyncWorld = worldsManager.createWorld("asd",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
@@ -99,7 +99,7 @@ public class Main {
 	public void testPlayerWorldChange() {
 		try {
 			CompletableFuture<Boolean> worldChangeFutureResult = new CompletableFuture<>();
-			final Synchronizer<Server> asyncServer = Server.createServer("/", null, 8009);
+			final Synchronizer<Server> asyncServer = Utils.createTestServer(null);
 			asyncServer.sync(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
