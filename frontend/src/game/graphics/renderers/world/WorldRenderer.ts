@@ -290,7 +290,6 @@ class WorldRenderer implements Renderable {
 
 		mostLeftRender = Math.floor(mostLeftRender);
 		mostTopRender = Math.floor(mostTopRender);
-
 		for(let tileLayerIndex = 0; tileLayerIndex < this.tileTextures.length; ++tileLayerIndex) {
 			for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
 				for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
@@ -306,6 +305,15 @@ class WorldRenderer implements Renderable {
 					}
 					t.drawTo(renderTime, this.ctx, [tileRenderX, tileRenderY], tileSize);
 				}
+			}
+		}
+		if(this.model.drawGrid) {
+			this.ctx.fillStyle = "#000";
+			for(let x = mostleftX, tileRenderX = mostLeftRender; x < mostrightX; ++x, tileRenderX += tileSize) {
+				this.ctx.fillRect(Math.floor(tileRenderX), 0, 1, this.renderConfig.height);
+			}
+			for(let y = mostTopY, tileRenderY = mostTopRender; y < mostBotY; ++y, tileRenderY += tileSize) {
+				this.ctx.fillRect(0, Math.floor(tileRenderY), this.renderConfig.width, 1);
 			}
 		}
 		//this.ctx.fillStyle = "yellow";

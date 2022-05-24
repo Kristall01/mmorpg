@@ -47,6 +47,7 @@ const Chat = (): JSX.Element | null => {
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev camleak");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev maxzoom");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev maxfps");
+			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev grid");
 			visualModel.addChatEntry("§6§l[DEV] §7 - §r/dev path");
 			return;
 		}
@@ -66,6 +67,11 @@ const Chat = (): JSX.Element | null => {
 				visualModel.addChatEntry("§6§l[DEV] §rMaxzoom átállítva");
 			}
 			catch(ex) {}
+			return;
+		}
+		if(split[0] === "grid") {
+			visualModel.drawGrid = !visualModel.drawGrid;
+			visualModel.addChatEntry("§6§l[DEV] §rgrid render átállítva");
 			return;
 		}
 		if(split[0] === "path") {
