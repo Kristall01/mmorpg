@@ -12,7 +12,7 @@ export type Position = [number,number];
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open";
+export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open" | "sudo-command";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
