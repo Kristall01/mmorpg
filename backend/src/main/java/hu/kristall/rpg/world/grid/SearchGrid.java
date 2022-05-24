@@ -100,12 +100,6 @@ public class SearchGrid {
 		return true;
 	}
 	
-	private void wallChecker(GridPosition p) {
-		if(getNode(p).isWall()) {
-			throw new RuntimeException();
-		}
-	}
-	
 	public boolean isWall(GridPosition pos) {
 		if(pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
 			return false;
@@ -137,21 +131,6 @@ public class SearchGrid {
 				while (reverseLink != null) {
 					positionChain.addFirst(reverseLink.getPos());
 					reverseLink = reverseLink.getParent();
-				}
-				positionChain.addFirst(start);
-				positionChain.add(target);
-				LinkedList<Integer> removeCandidates = new LinkedList<>();
-				int fromIndex = 0;
-				for(int i = 1; i < positionChain.size()-1; ++i) {
-					if(RayCaster.hasLineOfSight(positionChain.get(fromIndex).toPosition(), positionChain.get(i+1).toPosition(), this::wallChecker)) {
-						removeCandidates.addFirst(i);
-					}
-					else {
-						fromIndex = i;
-					}
-				}
-				for (Integer candidate : removeCandidates) {
-					positionChain.remove((int)candidate);
 				}
 				return positionChain;
 			}
