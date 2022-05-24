@@ -1,21 +1,13 @@
 package hu.kristall.rpg.lineofsight;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import hu.kristall.rpg.Position;
-import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.world.grid.GridPosition;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class RayCaster {
 	
-	private static final double precision = Math.pow(2,-16);
+	private static final double precision = Math.pow(2,-20);
 	
 	private static boolean doubleEquals(double a, double b) {
 		return Math.abs(a-b) < precision;
@@ -96,7 +88,7 @@ public class RayCaster {
 				return true;
 			}
 			if(fromXgrid == toXgrid) {
-				int direction = (int) (Math.signum(fromYgrid - toYgrid));
+				int direction = (int) (Math.signum(toYgrid - fromYgrid));
 				int y = fromYgrid;
 				for (; y != toYgrid; y += direction) {
 					blocked.accept(new GridPosition(fromXgrid, y));
@@ -143,7 +135,7 @@ public class RayCaster {
 		}
 	}
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		BlockDetector bd = new BlockDetector(List.of(
 		));
 		Position
@@ -181,11 +173,11 @@ public class RayCaster {
 		obj.addProperty("result", hasSight);
 		
 		try {
-			Files.writeString(new File("/hdd/projects/mmorpg/backend/raycaster/data.json").toPath(), Utils.gson().toJson(obj));
+			Files.writeString(new File("").toPath(), Utils.gson().toJson(obj));
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
+	}*/
 	
 }

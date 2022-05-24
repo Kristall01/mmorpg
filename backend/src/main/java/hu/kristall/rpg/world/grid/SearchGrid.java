@@ -106,6 +106,13 @@ public class SearchGrid {
 		}
 	}
 	
+	public boolean isWall(GridPosition pos) {
+		if(pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
+			return false;
+		}
+		return getNode(pos).isWall();
+	}
+	
 	private List<GridPosition> search(GridPosition start, GridPosition target) {
 		if(start.equals(target)) {
 			return List.of(start, target);
@@ -126,16 +133,17 @@ public class SearchGrid {
 			node.setOpen(false);
 			if(node.getPos().equals(target)) {
 				LinkedList<GridPosition> positionChain = new LinkedList<>();
-				SearchNode reverseLink = node.getParent();
+				SearchNode reverseLink = node;
 				while (reverseLink != null) {
 					positionChain.addFirst(reverseLink.getPos());
 					reverseLink = reverseLink.getParent();
 				}
+				positionChain.addFirst(start);
 				positionChain.add(target);
 				LinkedList<Integer> removeCandidates = new LinkedList<>();
 				int fromIndex = 0;
 				for(int i = 1; i < positionChain.size()-1; ++i) {
-					if(RayCaster.hasLineOfSight(positionChain.get(fromIndex).toPosition().add(0.5, 0.5), positionChain.get(i+1).toPosition().add(0.5,0.5), this::wallChecker)) {
+					if(RayCaster.hasLineOfSight(positionChain.get(fromIndex).toPosition(), positionChain.get(i+1).toPosition(), this::wallChecker)) {
 						removeCandidates.addFirst(i);
 					}
 					else {
