@@ -1,14 +1,18 @@
 #!/bin/sh
+bold=$(tput bold)
+normal=$(tput sgr0)
+
 print_usage() {
-	echo "Usage: sh $0 [options] {frontend|backend|all}"
+	echo "Usage: sh $0 [options] {build target}"
 	echo "         (to start building the specific build target)"
 	echo "   or  sh $0 --help"
 	echo "         (to print this help dialog)"
 	echo ""
-	echo " where options include:"
-	echo ""
-	echo "    --docker  makes build process run in a docker container"
-	echo ""
+	echo "Build targets:"
+	echo "\t${bold}frontend   ${normal}build frontend component and copies files to 'artifacts/frontend' directory"
+	echo "\t${bold}backend    ${normal}build backend component and copy jar to 'artifacts/backend.jar' file"
+	echo "\t${bold}all        ${normal}executes both 'frontend' and 'backend' build targets, frontend first, backend second"
+	echo "\t${bold}combined   ${normal}executes 'all' build targets, then copies 'artifacts/frontend' contend to 'artifacts/backend.jar'"
 }
 if [ $# -eq 0 ]
 then
@@ -16,17 +20,16 @@ then
 	exit
 fi
 
-docker=false
 target=none
 
 for var in "$@"
 do
 	case $var in
-		--docker)
-			docker=true
-		;;
 		all)
 			target="all"
+		;;
+		combined)
+			target="combined"
 		;;
 		frontend)
 			target="frontend"
@@ -50,36 +53,29 @@ then
 	exit
 fi
 
-if [ $docker = true ]
+if [ $target = "all" ] || [ $target = "combined" ] || [ $target = "frontend" ]
 then
-	if [ $target = "all" ] || [ $target = "frontend" ]
-	then
-		docker container run --rm -it -w /repo -v $(pwd):/repo node:16 /bin/sh ./build.sh frontend
-	fi
-	if [ $target = "all" ] || [ $target = "backend" ]
-	then
-		docker container run --rm -it -w /repo -v $(pwd):/repo openjdk:11 /bin/sh ./build.sh backend
-	fi
-else
-	if [ $target = "all" ] || [ $target = "frontend" ]
-	then
-		printf "\033[32mbuilding frontend...\n\033[0m"
-		cd frontend
-		npm install
-		npm run build
-		mkdir -p ../artifacts
-		rm -rf ../artifacts/frontend
-		cp -r build ../artifacts/frontend
-		cd ..
-	fi
-	if [ $target = "all" ] || [ $target = "backend" ]
-	then
-		printf "\033[32mbuilding backend...\n\033[0m"
-		cd backend
-		/bin/sh ./gradlew build
-		mkdir -p ../artifacts
-		rm -rf ../artifacts/backend.jar
-		cp build/libs/server.jar ../artifacts/backend.jar
-		cd ..
-	fi
+	printf "\033[32mbuilding frontend...\n\033[0m"
+	cd frontend
+	npm install
+	npm run build
+	mkdir -p ../artifacts
+	rm -rf ../artifacts/frontend
+	cp -r build ../artifacts/frontend
+	cd ..
+fi
+if [ $target = "all" ] || [ $target = "combined" ] || [ $target = "backend" ]
+then
+	printf "\033[32mbuilding backend...\n\033[0m"
+	cd backend
+	/bin/sh ./gradlew build
+	mkdir -p ../artifacts
+	rm -rf ../artifacts/backend.jar
+	cp build/libs/server.jar ../artifacts/backend.jar
+	cd ..
+fi
+
+if [ $target = "combined" ]
+then
+	java -jar tools/zipmerger.jar artifacts/frontend artifacts/backend.jar frontend
 fi
