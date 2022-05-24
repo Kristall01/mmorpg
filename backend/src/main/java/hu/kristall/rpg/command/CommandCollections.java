@@ -19,6 +19,7 @@ public class CommandCollections {
 		map.registerCommand(new CommandWorld(map));
 		map.registerCommand(new CommandClothes(map));
 		map.registerCommand(new CommandDmg(map));
+		map.registerCommand(new CommandSudo(map));
 		
 		CommandHandler inventory = map.registerSubHandler( "inventory", "inventory commands");
 			inventory.registerCommand(new CommandInventoryListitems(inventory));

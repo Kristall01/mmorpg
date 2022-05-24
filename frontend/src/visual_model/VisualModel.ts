@@ -12,7 +12,7 @@ export type Position = [number,number];
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open";
+export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open" | "sudo-command";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -31,6 +31,9 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private chatHistory: string[] = [];
 	private _inventoryOpen: boolean = false;
 	private _clothEditorOpen: boolean = false;
+	public drawGrid: boolean = false;
+	public drawPath: boolean = false;
+	public commandQueue: Array<string> = [];
 
 	constructor() {
 		super();
@@ -104,6 +107,11 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	addChatEntry(text: string) {
 		this.chatlog = [...this.chatlog, text];
 		this.triggerUpdate("chatlog");
+	}
+
+	queueSudoCommand(text: string) {
+		this.commandQueue = [...this.commandQueue, text];
+		this.triggerUpdate("sudo-command");
 	}
 
 	clearChat() {

@@ -46,6 +46,17 @@ export const createRendererFor = (e: Entity<any>, visuals: VisualResources): (wo
 				} */
 			}
 		}
+		case entityTypes.DUMMY: {
+			return (world: WorldRenderer, config: RenderConfig) => {
+				visuals.unknownEntityRenderer.renderEntity(world.ctx, e, world.translateXY(...e.cachedStatus.position), config.tileSize);
+			
+/* 				let cozyActivity = world.visuals.cozy.getCozyActivity(activity);
+				cozyActivity.human(human.skin).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
+				for(let clothes of human.clothes) {
+					cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
+				} */
+			}
+		}
 		default: {
 			return (world: WorldRenderer, config: RenderConfig) => {
 				let cachedStatus = e.cachedStatus;
