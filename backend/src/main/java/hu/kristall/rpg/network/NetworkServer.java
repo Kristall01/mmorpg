@@ -1,6 +1,7 @@
 package hu.kristall.rpg.network;
 
 import hu.kristall.rpg.Server;
+import hu.kristall.rpg.network.config.HostConfigurator;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.Synchronizer;
 import io.javalin.Javalin;
@@ -19,12 +20,12 @@ public class NetworkServer {
 	private boolean wsAdded = false;
 	private AtomicBoolean stopping = new AtomicBoolean(false);
 	
-	public NetworkServer(Server server, String servePath, int port) {
+	public NetworkServer(Server server, int port, HostConfigurator hostConfigurator) {
 		this.asyncServer = server.getSynchronizer();
 		Javalin httpServer = Javalin.create(c -> {
 			c.showJavalinBanner = false;
-			if(servePath != null) {
-				c.addStaticFiles(servePath, Location.EXTERNAL);
+			if(hostConfigurator != null) {
+				c.addStaticFiles(hostConfigurator);
 			}
 		});
 		this.javalinServer = httpServer;
