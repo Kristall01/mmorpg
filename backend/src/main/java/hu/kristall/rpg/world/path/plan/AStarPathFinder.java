@@ -9,7 +9,7 @@ import java.util.List;
 
 public class AStarPathFinder implements PathFinder {
 	
-	public SearchGrid grid;
+	private SearchGrid grid;
 	
 	public AStarPathFinder(SearchGrid grid) {
 		this.grid = grid;
@@ -21,6 +21,7 @@ public class AStarPathFinder implements PathFinder {
 		if(positions == null) {
 			return null;
 		}
+		
 		return new Path(positions.get(positions.size()-1), positions, new ZigzagPosition(positions, startTimeNanos, cellsPerSec), startTimeNanos);
 	}
 	

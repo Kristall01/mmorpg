@@ -140,6 +140,10 @@ public class Server extends SynchronizedObject<Server> {
 		});
 	}
 	
+	public Collection<Player> getPlayers() {
+		return new ArrayList<>(players.values());
+	}
+	
 	public static Synchronizer<Server> createServer(Savefile save, int port, HostConfigurator hostConfigurator) throws IOException {
 		Server s = new Server(save, port, hostConfigurator);
 		return s.getSynchronizer();
