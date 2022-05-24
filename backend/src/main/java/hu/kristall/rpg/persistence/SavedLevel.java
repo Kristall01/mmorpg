@@ -6,10 +6,7 @@ import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.world.EntitySpawner;
 import hu.kristall.rpg.world.entity.EntityType;
 import hu.kristall.rpg.world.grid.SearchGrid;
-import hu.kristall.rpg.world.path.plan.AStarPathFinder;
-import hu.kristall.rpg.world.path.plan.FreePathFinder;
-import hu.kristall.rpg.world.path.plan.PathFinder;
-import hu.kristall.rpg.world.path.plan.ReducedPathFinder;
+import hu.kristall.rpg.world.path.plan.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -57,14 +54,18 @@ public class SavedLevel {
 				else if(pathType.equals("reduced")) {
 					pathFinder = new ReducedPathFinder(Utils.gson().fromJson(base.get("min"), Position.class), Utils.gson().fromJson(base.get("max"), Position.class));
 				}
-				else if(pathType.equals("astar")) {
-					int wallsSize = width*height;
+				else if(pathType.equals("astar") || pathType.equals("thetastar")) {
 					JsonArray arr = base.get("walls").getAsJsonArray();
 					boolean[][] walls = new boolean[height][width];
 					for (int i = 0; i < arr.size(); i++) {
 						walls[i/width][i%width] = arr.get(i).getAsBoolean();
 					}
-					pathFinder = new AStarPathFinder(new SearchGrid(walls, width, height));
+					if(pathType.equals("astar")) {
+						pathFinder = new AStarPathFinder(new SearchGrid(walls, width, height));
+					}
+					else {
+						pathFinder = new ThetaStarPathFinder(new SearchGrid(walls, width, height));
+					}
 				}
 				else {
 					pathFinder = new FreePathFinder();
