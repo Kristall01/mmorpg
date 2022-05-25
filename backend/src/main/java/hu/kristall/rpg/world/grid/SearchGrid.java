@@ -1,7 +1,6 @@
 package hu.kristall.rpg.world.grid;
 
 import hu.kristall.rpg.Position;
-import hu.kristall.rpg.lineofsight.RayCaster;
 import hu.kristall.rpg.world.path.Path;
 
 import java.util.*;
@@ -55,8 +54,14 @@ public class SearchGrid {
 	}
 	
 	public List<Position> search(Position start, Position to) {
-		GridPosition gridStart = findClosestValidPoint(Path.fixPosition(min, start, max).toGridPosition());
-		GridPosition gridTo = findClosestValidPoint(Path.fixPosition(min, to, max).toGridPosition());
+		start = Path.fixPosition(min,start,max);
+		to = Path.fixPosition(min,to,max);
+		
+		GridPosition
+			gridStartBase =  start.toGridPosition(),
+			gridToBase =  to.toGridPosition();
+		GridPosition gridStart = findClosestValidPoint(gridStartBase);
+		GridPosition gridTo = findClosestValidPoint(gridToBase);
 		Collection<GridPosition> gridPositions = search(gridStart, gridTo);
 		if(gridPositions == null) {
 			return null;
@@ -65,6 +70,12 @@ public class SearchGrid {
 		int i = -1;
 		for (GridPosition gridPosition : gridPositions) {
 			p[++i] = gridPosition.toPosition();
+		}
+		if(!isWall(gridStartBase)) {
+			p[0] = start;
+		}
+		if(!isWall(gridToBase)) {
+			p[p.length - 1] = to;
 		}
 		return List.of(p);
 	}
@@ -102,7 +113,7 @@ public class SearchGrid {
 	
 	public boolean isWall(GridPosition pos) {
 		if(pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
-			return false;
+			return true;
 		}
 		return getNode(pos).isWall();
 	}
