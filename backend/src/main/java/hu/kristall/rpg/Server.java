@@ -5,6 +5,7 @@ import hu.kristall.rpg.command.CommandMap;
 import hu.kristall.rpg.lang.Lang;
 import hu.kristall.rpg.network.NetworkServer;
 import hu.kristall.rpg.network.PlayerConnection;
+import hu.kristall.rpg.network.config.HostConfigurator;
 import hu.kristall.rpg.persistence.*;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.SynchronizedObject;
@@ -37,16 +38,17 @@ public class Server extends SynchronizedObject<Server> {
 	private Logger logger = LoggerFactory.getLogger("server");
 	private PlayerPersistence playerPersistence;
 	private Pattern usernamePattern = Pattern.compile("^[a-zA-Z\\dáÁéÉíÍóÓöÖőŐúÚüÜűŰ].*$");
+	public final int port;
 	
-	private Server(String servePath, Savefile savefile, int port) throws IOException {
+	private Server(Savefile savefile, int port, HostConfigurator hostConfigurator) throws IOException {
 		super("server");
-		
+		this.port = port;
 		
 		changeSyncer(new AsyncServer(this));
 		this.playerPersistence = new PlayerPersistence(new File(System.getProperty("user.dir"), "playerdata"));
 		try {
 			lang.loadConfigFromJar("lang.cfg");
-			this.networkServer = new NetworkServer(this, servePath, port);
+			this.networkServer = new NetworkServer(this, port, hostConfigurator);
 			
 			
 			commandMap = CommandCollections.base(this);
@@ -140,8 +142,12 @@ public class Server extends SynchronizedObject<Server> {
 		});
 	}
 	
-	public static Synchronizer<Server> createServer(String servePath, Savefile save, int port) throws IOException {
-		Server s = new Server(servePath, save, port);
+	public Collection<Player> getPlayers() {
+		return new ArrayList<>(players.values());
+	}
+	
+	public static Synchronizer<Server> createServer(Savefile save, int port, HostConfigurator hostConfigurator) throws IOException {
+		Server s = new Server(save, port, hostConfigurator);
 		return s.getSynchronizer();
 	}
 	

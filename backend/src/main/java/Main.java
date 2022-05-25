@@ -3,8 +3,13 @@ import hu.kristall.rpg.Server;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.console.FilteredConsolePrinter;
 import hu.kristall.rpg.console.InputReader;
+import hu.kristall.rpg.network.config.ClasspathConfigurator;
+import hu.kristall.rpg.network.config.FilesystemHostConfigurator;
+import hu.kristall.rpg.network.config.HostConfigurator;
 import hu.kristall.rpg.persistence.Savefile;
 import hu.kristall.rpg.sync.Synchronizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -89,7 +94,24 @@ public class Main {
 			System.setOut(new FilteredConsolePrinter(System.out, ChatColor::translateColorCodes));
 			System.setErr(new FilteredConsolePrinter(System.err, ChatColor::translateColorCodes));
 		}
+		HostConfigurator hostConfigurator = null;
+		Logger logger = LoggerFactory.getLogger("main");
 		String servePath = System.getenv("serve");
+		if(servePath != null) {
+			hostConfigurator = new FilesystemHostConfigurator(servePath);
+			logger.info("frontend hosztolás bekapcsolva a '"+servePath+"' mappából.");
+		}
+		else {
+			try {
+				InputStream frontendResource = Main.class.getResourceAsStream("frontend");
+				if(frontendResource != null) {
+					frontendResource.close();
+					hostConfigurator = new ClasspathConfigurator("/frontend");
+					logger.info("frontend hosztolás bekapcsolva a jar '/frontend' mappából.");
+				}
+			}
+			catch (IOException ignored) {}
+		}
 		String sourcePath = System.getenv("savefile");
 		Savefile savefile;
 		InputStream in = sourcePath != null ? new FileInputStream(sourcePath) : Main.class.getResourceAsStream("/savefile.json");
@@ -97,7 +119,7 @@ public class Main {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			savefile = Utils.gson().fromJson(reader, Savefile.class);
 		}
-		Synchronizer<Server> s = Server.createServer(servePath, savefile, 8080);
+		Synchronizer<Server> s = Server.createServer(savefile, 8080, hostConfigurator);
 		InputReader reader = new InputReader(s);
 		
 	}

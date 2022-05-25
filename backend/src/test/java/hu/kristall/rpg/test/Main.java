@@ -1,6 +1,9 @@
 package hu.kristall.rpg.test;
 
-import hu.kristall.rpg.*;
+import hu.kristall.rpg.Player;
+import hu.kristall.rpg.Server;
+import hu.kristall.rpg.WorldPosition;
+import hu.kristall.rpg.WorldsManager;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOut;
 import hu.kristall.rpg.persistence.Savefile;
@@ -13,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.Socket;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -26,13 +30,13 @@ public class Main {
 	public void testSavefile() {
 		Savefile savefile = null;
 		try (Reader inputStream = new FileReader("src/test/resources/test_savefile.json")) {
-			savefile = Utils.gson().fromJson(inputStream, Savefile.class);
+			savefile = hu.kristall.rpg.Utils.gson().fromJson(inputStream, Savefile.class);
 		}
 		catch (IOException e) {
 			fail(e);
 		}
 		try {
-			Synchronizer<Server> asyncServer = Server.createServer("/", savefile, 8007);
+			Synchronizer<Server> asyncServer = Server.createServer(savefile, 8007, null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> level0 = worldsManager.getWorld("level0");
@@ -73,25 +77,28 @@ public class Main {
 	}
 	
 	@Test
-	public void testWorldCreation() {
+	public void testServerPortCapture() {
 		try {
-			Synchronizer<Server> asyncServer = Server.createServer("/", null, 8008);
-			Future<Boolean> f = asyncServer.syncCompute(srv -> {
-				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("asd",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
-				try {
-					asyncWorld.syncCompute(world -> world.getWidth() == 1 && world.getHeight() == 1);
-				}
-				catch (Synchronizer.TaskRejectedException e) {
-					return false;
-				}
-				return worldsManager.getWorld("asd") != null;
-			});
-			assertTrue(f.get());
-			asyncServer.sync(Server::shutdown);
+			final Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
+			int port = asyncServer.syncCompute(srv -> srv.port).get();
+			Throwable failedThrowable = null;
+			try {
+				Socket s = new Socket("localhost", port);
+				s.close();
+			}
+			catch (Throwable t) {
+				failedThrowable = t;
+			}
+			finally {
+				asyncServer.sync(Server::shutdown);
+			}
+			if(failedThrowable != null) {
+				fail(failedThrowable);
+			}
+			
 		}
-		catch (Throwable e) {
-			fail(e);
+		catch (Throwable t) {
+			fail(t);
 		}
 	}
 	
@@ -99,7 +106,7 @@ public class Main {
 	public void testPlayerWorldChange() {
 		try {
 			CompletableFuture<Boolean> worldChangeFutureResult = new CompletableFuture<>();
-			final Synchronizer<Server> asyncServer = Server.createServer("/", null, 8009);
+			final Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			asyncServer.sync(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
