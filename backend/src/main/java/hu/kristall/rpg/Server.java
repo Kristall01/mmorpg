@@ -37,7 +37,7 @@ public class Server extends SynchronizedObject<Server> {
 	private final Object stoppingLock = new Object();
 	private Logger logger = LoggerFactory.getLogger("server");
 	private PlayerPersistence playerPersistence;
-	private Pattern usernamePattern = Pattern.compile("^[a-zA-Z\\dáÁéÉíÍóÓöÖőŐúÚüÜűŰ].*$");
+	private Pattern usernamePattern = Pattern.compile("^[a-zA-Z\\dáÁéÉíÍóÓöÖőŐúÚüÜűŰ]*$");
 	public final int port;
 	
 	private Server(Savefile savefile, int port, HostConfigurator hostConfigurator) throws IOException {
