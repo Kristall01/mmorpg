@@ -38,9 +38,11 @@ public class Server extends SynchronizedObject<Server> {
 	private Logger logger = LoggerFactory.getLogger("server");
 	private PlayerPersistence playerPersistence;
 	private Pattern usernamePattern = Pattern.compile("^[a-zA-Z\\dáÁéÉíÍóÓöÖőŐúÚüÜűŰ].*$");
+	public final int port;
 	
 	private Server(Savefile savefile, int port, HostConfigurator hostConfigurator) throws IOException {
 		super("server");
+		this.port = port;
 		
 		changeSyncer(new AsyncServer(this));
 		this.playerPersistence = new PlayerPersistence(new File(System.getProperty("user.dir"), "playerdata"));

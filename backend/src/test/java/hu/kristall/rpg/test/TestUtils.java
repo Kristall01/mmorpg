@@ -6,7 +6,7 @@ import hu.kristall.rpg.sync.Synchronizer;
 
 import java.io.IOException;
 
-public class Utils {
+public class TestUtils {
 
 	private static int nextPort = 8000;
 	private static final Object portLock = new Object();

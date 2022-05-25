@@ -33,6 +33,8 @@ public class World extends SynchronizedObject<World> {
 	private List<Portal> portals = new ArrayList<>();
 	private Map<GeneratedID<FloatingItem>, FloatingItem> floatingItems = new HashMap<>();
 	private PathFinder pathFinder;
+	private Position bottomRightPosition;
+	private Position topLeftPosition = new Position(0,0);
 	
 	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners) {
 		super("world-"+name);
@@ -45,6 +47,8 @@ public class World extends SynchronizedObject<World> {
 		
 		this.width = width;
 		this.height = height;
+		
+		bottomRightPosition = new Position(width, height);
 		
 		if(tileGrid == null) {
 			tileGrid = new String[width*height];
@@ -88,7 +92,7 @@ public class World extends SynchronizedObject<World> {
 		double randDistance = Utils.random.nextDouble()*(maxDistance-minDistance)+minDistance;
 		double xVector = (Utils.random.nextDouble()*2-1)*randDistance;
 		double yVector = (Utils.random.nextDouble()*2-1)*randDistance;
-		return fixValidate(pos.add(xVector, yVector));
+		return Path.fixPosition(topLeftPosition, pos.add(xVector, yVector), bottomRightPosition);
 	}
 	
 	public int getWidth() {
@@ -308,23 +312,6 @@ public class World extends SynchronizedObject<World> {
 	
 	public Path idlePath(Position pos) {
 		return new Path(pos, List.of(pos), new ConstantPosition(pos), System.nanoTime());
-	}
-	
-	public Position fixValidate(Position to) {
-		double targetX = to.getX(), targetY = to.getY();
-		if(targetX < 0) {
-			targetX = 0;
-		}
-		else if(targetX > width) {
-			targetX = width;
-		}
-		if(targetY < 0) {
-			targetY = 0;
-		}
-		else if(targetY > height) {
-			targetY = height;
-		}
-		return new Position(targetX,targetY);
 	}
 	
 }

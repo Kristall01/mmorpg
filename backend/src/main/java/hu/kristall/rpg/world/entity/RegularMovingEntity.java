@@ -27,7 +27,6 @@ public abstract class RegularMovingEntity extends Entity {
 	}
 	
 	public void move(Position to) {
-		to = getWorld().fixValidate(to);
 		long now = System.nanoTime();
 		Path p = this.getWorld().findPath(getPosition(), to, getSpeed(), now);
 		if(p == null) {

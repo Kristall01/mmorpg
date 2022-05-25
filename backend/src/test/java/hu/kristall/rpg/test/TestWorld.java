@@ -24,7 +24,7 @@ public class TestWorld {
 	@Test
 	public void testWorldCreation() {
 		try {
-			Synchronizer<Server> asyncServer = Utils.createTestServer(null);
+			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
@@ -41,7 +41,7 @@ public class TestWorld {
 	@Test
 	public void testWorldEntitySpawn() {
 		try {
-			Synchronizer<Server> asyncServer = Utils.createTestServer(null);
+			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
@@ -67,7 +67,7 @@ public class TestWorld {
 	@Test
 	public void testWorldEntityTeleport() {
 		try {
-			Synchronizer<Server> asyncServer = Utils.createTestServer(null);
+			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
@@ -94,7 +94,7 @@ public class TestWorld {
 	@Test
 	public void testWorldEntityWalkFree() {
 		try {
-			Synchronizer<Server> asyncServer = Utils.createTestServer(null);
+			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
@@ -123,7 +123,7 @@ public class TestWorld {
 	@Test
 	public void testWorldEntityHpChange() {
 		try {
-			Synchronizer<Server> asyncServer = Utils.createTestServer(null);
+			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
@@ -151,7 +151,7 @@ public class TestWorld {
 	@Test
 	public void testWorldEntityDeath() {
 		try {
-			Synchronizer<Server> asyncServer = Utils.createTestServer(null);
+			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
 				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
