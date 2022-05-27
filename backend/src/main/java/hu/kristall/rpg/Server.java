@@ -10,6 +10,7 @@ import hu.kristall.rpg.persistence.*;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
+import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.Portal;
 import hu.kristall.rpg.world.World;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class Server extends SynchronizedObject<Server> {
@@ -38,6 +40,7 @@ public class Server extends SynchronizedObject<Server> {
 	private Logger logger = LoggerFactory.getLogger("server");
 	private PlayerPersistence playerPersistence;
 	private Pattern usernamePattern = Pattern.compile("^[a-zA-Z\\dáÁéÉíÍóÓöÖőŐúÚüÜűŰ]*$");
+	private ItemMap itemMap;
 	public final int port;
 	
 	private Server(Savefile savefile, int port, HostConfigurator hostConfigurator) throws IOException {
@@ -58,6 +61,7 @@ public class Server extends SynchronizedObject<Server> {
 			
 			
 			if(savefile != null) {
+				itemMap = savefile.itemMap;
 				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
 					SavedLevel level = levelEntry.getValue();
 					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder, level.entitySpawners);
@@ -84,6 +88,10 @@ public class Server extends SynchronizedObject<Server> {
 			logger.error(lang.getMessage("bootstrap.failed"), t);
 			this.shutdown();
 		}
+	}
+	
+	public ItemMap getItemMap() {
+		return itemMap;
 	}
 	
 	@Override

@@ -3,27 +3,31 @@ package hu.kristall.rpg.world;
 import hu.kristall.rpg.ThreadCloneable;
 import hu.kristall.rpg.persistence.SavedItem;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Item implements ThreadCloneable<SavedItem> {
 	
-	private Material type;
-	private String name;
+	private Material material;
+	private String type;
+	private List<String> description;
 	
-	public Item(Material type, String name) {
+	public Item(String type, Material material, List<String> description) {
 		this.type = type;
-		this.name = name;
+		this.description = description;
+		this.material = material;
 	}
 	
-	public Item(Material type) {
-		this.type = type;
+	public Item(String type, Material material) {
+		this(type, material, new ArrayList<>());
 	}
 	
-	public String getName() {
-		return name;
+	public Material getMaterial() {
+		return material;
 	}
 	
-	public Material getType() {
+	public String getType() {
 		return type;
 	}
 	
@@ -32,17 +36,17 @@ public class Item implements ThreadCloneable<SavedItem> {
 		if(this == o) return true;
 		if(!(o instanceof Item)) return false;
 		Item item = (Item) o;
-		return getType().equals(item.getType()) && Objects.equals(getName(), item.getName());
+		return type.equals(item.type);
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(getType(), getName());
+		return Objects.hash(type);
 	}
 	
 	@Override
 	public SavedItem structuredClone() {
-		return new SavedItem(type.name(), this.name);
+		return new SavedItem(material.name(), type, this.description);
 	}
 	
 }

@@ -70,7 +70,7 @@ class WorldRenderer implements Renderable {
 	private updateFloatingItemList() {
 		this.floatingItems.clear();
 		for(let item of this.world.items) {
-			this.floatingItems.set(item.id, {item: item, texture: this.visuals.textures.getTexture(item.item.type, "item") || new EmptyTexture()});
+			this.floatingItems.set(item.id, {item: item, texture: this.visuals.textures.getTexture(item.item.material, "item") || new EmptyTexture()});
 		}
 	}
 
@@ -356,12 +356,12 @@ class WorldRenderer implements Renderable {
 
 		for(let item of this.floatingItems.values()) {
 			let pos = this.translateXY(...item.item.pos);
-			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -1);
+			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -0.5);
 			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 1)) {
 				showPickupMessage = true;
 			}
-			if(item.item.item.name !== null) {
-				drawText(this.ctx, [pos[0], pos[1] - tile3*1.1], item.item.item.name, "end", "middle");
+			if(item.item.item.description.length !== 0) {
+				drawText(this.ctx, [pos[0], pos[1] - tile3*1.1], item.item.item.description[0], "end", "middle");
 			}
 		}
 

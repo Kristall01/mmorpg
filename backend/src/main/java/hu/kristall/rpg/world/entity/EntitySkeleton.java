@@ -5,17 +5,21 @@ import hu.kristall.rpg.network.packet.out.PacketOutAttack;
 import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.Material;
 import hu.kristall.rpg.world.World;
+import hu.kristall.rpg.world.item.ItemGenerator;
 
 public class EntitySkeleton extends AIEntity {
 	
+	private ItemGenerator boneGenerator;
+	
 	public EntitySkeleton(World world, int entityID, Position startPosition) {
 		super(world, EntityType.SKELETON, entityID, 2.5, 100, 100, startPosition, 1000);
+		boneGenerator = world.getItemMap().getItem("skeleton_bone");
 	}
 	
 	@Override
 	public void kill() {
 		Position pos = getPosition();
-		getWorld().spawnItem(new Item(Material.BONE), getWorld().getRandomPositionNear(pos, 0.5, 1));
+		getWorld().spawnItem(boneGenerator.get(), getWorld().getRandomPositionNear(pos, 0.5, 1));
 		super.kill();
 	}
 	

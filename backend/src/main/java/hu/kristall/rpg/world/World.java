@@ -35,9 +35,11 @@ public class World extends SynchronizedObject<World> {
 	private PathFinder pathFinder;
 	private Position bottomRightPosition;
 	private Position topLeftPosition = new Position(0,0);
+	private ItemMap itemMap;
 	
-	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners) {
+	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners, ItemMap itemMap) {
 		super("world-"+name);
+		this.itemMap = itemMap;
 		this.pathFinder = pathFinder;
 		
 		this.logger = LoggerFactory.getLogger("world-"+name);
@@ -60,6 +62,10 @@ public class World extends SynchronizedObject<World> {
 		for (EntitySpawner entitySpawner : entitySpawners) {
 			entitySpawner.registerTo(this);
 		}
+	}
+	
+	public ItemMap getItemMap() {
+		return itemMap;
 	}
 	
 	public Collection<FloatingItem> getItems() {
@@ -217,12 +223,20 @@ public class World extends SynchronizedObject<World> {
 	}
 	
 	public FloatingItem spawnItem(Item item, Position pos) {
+		if(item == null) {
+			return null;
+		}
 		GeneratedID<FloatingItem> itemID = nextItemID.get();
 		FloatingItem floatingItem = new FloatingItem(this, itemID, pos, item);
 		floatingItems.put(itemID, floatingItem);
 		broadcastPacket(new PacketOutSpawnItem(floatingItem));
 		return floatingItem;
 	}
+	
+	public FloatingItem spawnItemNear(Item item, Position pos) {
+		return spawnItem(item, getRandomPositionNear(pos, 0,0.5));
+	}
+	
 	
 	public void cleanRemovedEntity(Entity e) {
 		if(e.isRemoved()) {

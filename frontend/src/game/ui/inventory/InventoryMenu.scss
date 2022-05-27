@@ -71,5 +71,24 @@ $filter: rgba(0,0,0,0.3);
 		}
 
 	}
+
+	.item-tooltip {
+		position: fixed;
+		z-index: 100;
+		padding: 5px 10px;
+		border-radius: 5px;
+
+		font-size: 14px;
+		color: white;
+		background-color: black;
+		font-weight: bold;
+		user-select: none;
+		
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		pointer-events: none;
+		transform: translate(10px, 10px);
+	}
 	
 }

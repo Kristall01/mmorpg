@@ -2,12 +2,12 @@ export type ItemEvent = "rename";
 
 export default class Item {
 
-	readonly type: string
-	readonly name: string | null = null;
+	readonly material: string
+	readonly description: Array<string>
 
-	constructor(type: string, name?: string) {
-		this.type = type;
-		this.name = name ?? null;
+	constructor(material: string, description: Array<string>) {
+		this.material = material;
+		this.description = description;
 	}
 
 }

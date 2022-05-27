@@ -63,10 +63,10 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 				m = Material.valueOf(savedItem.type);
 			}
 			catch (Exception ex) {
-				world.getLogger().warn("failed to load item of type '" + savedItem.type+'\'');
+				world.getLogger().warn("failed to load item of material '" + savedItem.type+'\'');
 				continue;
 			}
-			Item it = new Item(m, savedItem.name);
+			Item it = new Item(savedItem.type, m, savedItem.description);
 			Integer n = items.get(it);
 			if(n == null) {
 				n = stack.amount;
