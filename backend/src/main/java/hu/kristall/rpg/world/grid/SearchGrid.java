@@ -75,7 +75,22 @@ public class SearchGrid {
 			p[0] = start;
 		}
 		if(!isWall(gridToBase)) {
-			p[p.length - 1] = to;
+			double
+				x = to.getX(),
+				y = to.getY();
+			if(isWall(gridToBase.add(1,0))) {
+				x = Math.min(x, Math.floor(x) + (0.5));
+			}
+			if(isWall(gridToBase.add(-1,0))) {
+				x = Math.max(x, Math.floor(x) + (0.5));
+			}
+			if(isWall(gridToBase.add(0,1))) {
+				y = Math.min(y, Math.floor(y) + (0.5));
+			}
+			if(isWall(gridToBase.add(0,-1))) {
+				y = Math.max(y, Math.floor(y) + (0.5));
+			}
+			p[p.length - 1] = new Position(x,y);
 		}
 		return List.of(p);
 	}
