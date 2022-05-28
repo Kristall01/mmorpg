@@ -9,7 +9,7 @@ const ChatLine = ({line}: ChatLineProps) => {
 
 	let wordElements: ReactNode[] = [];
 
-	let words: TextFragment[] = parseText(line);
+	let words: TextFragment[] = parseText(line).fragments;
 
 	for(let i = 0; i < words.length; i++) {
 		let {color, flags, text} = words[i];

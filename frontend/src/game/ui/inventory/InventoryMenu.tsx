@@ -6,7 +6,7 @@ import TexturePack from 'game/graphics/texture/TexturePack';
 import React, {createRef, ReactNode } from 'react';
 import VisualModel, {Position, UpdateTypes} from 'visual_model/VisualModel';
 import World, { WorldEvent } from 'visual_model/World';
-import { convertToHtml } from '../chat/textconverter';
+import { parseTextHtml } from '../chat/textparser';
 import './InventoryMenu.scss';
 
 export type InventoryMenuProps = {
@@ -31,7 +31,7 @@ class InventoryMenu extends ConnectedComponent<UpdateTypes | WorldEvent, Invento
 
 		this.state = {
 			hoverElement: null,
-			hoverPosition: [0,0]
+			hoverPosition: null
 		}
 	}
 
@@ -105,9 +105,9 @@ class InventoryMenu extends ConnectedComponent<UpdateTypes | WorldEvent, Invento
 		let items = [];
 		let i = 0;
 		for(let item of this.props.world.getItems()) {
-			let titleElements: Array<React.ReactNode> = item.item.description.map((text,key) => {
+			let titleElements: Array<React.ReactNode> = item.item.description.map((fragments,key) => {
 				return (
-					<div key={key} className="title" dangerouslySetInnerHTML={{__html: convertToHtml(text).innerHTML}} />
+					<div key={key} className="title" dangerouslySetInnerHTML={{__html: parseTextHtml(fragments).innerHTML}} />
 				)
 			})
 			items.push(

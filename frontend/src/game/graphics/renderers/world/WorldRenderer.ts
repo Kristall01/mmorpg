@@ -4,6 +4,7 @@ import CozyPack from "game/graphics/texture/CozyPack";
 import EmptyTexture from "game/graphics/texture/EmptyTexture";
 import Texture from "game/graphics/texture/Texture";
 import TexturePack from "game/graphics/texture/TexturePack";
+import parseText from "game/ui/chat/textparser";
 import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
 import SubManager from "SubManager";
@@ -30,6 +31,8 @@ interface EntityRenderable {
 	render: (world: WorldRenderer, renderConfig: RenderConfig) => void
 	entity: Entity<any>
 }
+
+const itemPickupMessage = parseText("nyomj §e§l[A]§r gombot a tárgyak felvételéhez");
 
 class WorldRenderer implements Renderable {
 
@@ -368,7 +371,7 @@ class WorldRenderer implements Renderable {
 		if(showPickupMessage) {
 //			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
 			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
-			drawText(this.ctx, [width / 2, height*0.8], "nyomj §e§l[A]§r gombot a tárgyak felvételéhez", "middle", "middle",)
+			drawText(this.ctx, [width / 2, height*0.8], itemPickupMessage, "middle", "middle",)
 		}
 
 		if(this.model.drawPath) {

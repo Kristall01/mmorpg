@@ -1,6 +1,6 @@
 import { drawBar, drawText, RenderContext } from "game/graphics/GraphicsUtils";
+import { ParsedText } from "game/ui/chat/textparser";
 import VisualResources from "game/VisualResources";
-import { HumanActivity } from "visual_model/assetconfig/HumanAssetConfig";
 import Entity from "visual_model/Entity";
 import HumanEntity from "visual_model/entity/HumanEntity";
 import EntityType from "visual_model/EntityType";
@@ -71,7 +71,7 @@ export interface EntityLike {
 	maxHp: number
 	alive: boolean
 	type: EntityType
-	name: string | null
+	nameData: Array<ParsedText> | null
 }
 
 export default class EntityRenderer {
@@ -97,8 +97,12 @@ export default class EntityRenderer {
 			top -= barHeight+5;
 		}
 	
-		if(e.name !== null) {
-			top -= (drawText(ctx, [pos[0], top], e.name, "end", "middle")[1]+5);
+		let nameData = e.nameData;
+		if(nameData !== null) {
+			for(let i = nameData.length - 1; i >= 0; --i) {
+				top -= (drawText(ctx, [pos[0], top], nameData[i], "end", "middle")[1]);
+			}
+			top -= 5;
 		}
 	}
 

@@ -95,7 +95,12 @@ const styleMap = {
 	m: "crossed"
 }
 
-const parseText = (text: string): TextFragment[] => {
+export type ParsedText = {
+	original: string,
+	fragments: TextFragment[]
+}
+
+const parseText = (text: string): ParsedText => {
 	let fragments: TextFragment[] = []
 	let flagByte: boolean = false
 	let bufferedText = "";
@@ -148,15 +153,17 @@ const parseText = (text: string): TextFragment[] => {
 	if(bufferedText.length !== 0) {
 		fragments.push({color: currentColor, flags: options, text: bufferedText});
 	}
-	return fragments;
+	return {
+		fragments: fragments,
+		original: text
+	}
 }
 
 (window as any).parseText = parseText;
 
-export const parseTextHtml = (text: string): HTMLSpanElement => {
-	let fragments = parseText(text);
+export const parseTextHtml = (parsedText: ParsedText): HTMLSpanElement => {
 	let html = document.createElement("span");
-	for(let fragment of fragments) {
+	for(let fragment of parsedText.fragments) {
 		let color = fragment.color ?? Color.enum.map.WHITE;
 		let flags = fragment.flags;
 		let text = fragment.text;
