@@ -87,8 +87,13 @@ $filter: rgba(0,0,0,0.3);
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
-		pointer-events: none;
 		transform: translate(10px, 10px);
+
+		.title {
+			min-height: 20px;
+			display: flex;
+			align-items: center;
+		}
 	}
 	
 }
