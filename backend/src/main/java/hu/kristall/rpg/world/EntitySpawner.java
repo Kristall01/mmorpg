@@ -38,7 +38,7 @@ public class EntitySpawner {
 	}
 	
 	public void registerTo(World world) {
-		world.getTimer().schedule(() -> doRespawning(world), 0, respawnInterval);
+		world.getTimer().schedule((c) -> doRespawning(world), 0, respawnInterval);
 	}
 	
 }

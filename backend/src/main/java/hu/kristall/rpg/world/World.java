@@ -58,7 +58,7 @@ public class World extends SynchronizedObject<World> {
 		}
 		this.bakedMapSerialize = List.of(tileGrid);
 		
-		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
+		getTimer().scheduleAtFixedRate((c) -> this.checkPortals(), 0, 250);
 		for (EntitySpawner entitySpawner : entitySpawners) {
 			entitySpawner.registerTo(this);
 		}
