@@ -50,7 +50,7 @@ public class World extends SynchronizedObject<World> {
 		this.width = width;
 		this.height = height;
 		
-		bottomRightPosition = new Position(width, height);
+		bottomRightPosition = new Position(width-1, height-1);
 		
 		if(tileGrid == null) {
 			tileGrid = new String[width*height];
