@@ -2,15 +2,12 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.packet.out.PacketOutAttack;
-import hu.kristall.rpg.sync.Cancelable;
 import hu.kristall.rpg.world.World;
+import hu.kristall.rpg.world.entity.ai.AiEntity;
+import hu.kristall.rpg.world.entity.ai.PassiveWander;
 
-import java.util.function.Consumer;
-
-public class EntityMeleeMonster extends RegularMovingEntity {
+public class CombatEntity extends AiEntity {
 	
-	private Entity attackTarget;
-	private Cancelable targetFinderTask;
 	private double
 		targetLockDistance,
 		targetFollowDistance,
@@ -22,9 +19,7 @@ public class EntityMeleeMonster extends RegularMovingEntity {
 		lastAttack,
 		attackDelay;
 	
-	private Cancelable aiTask;
-	
-	public EntityMeleeMonster(World world, int entityID, Position startPosition, double attackRange, double targetLockDistance, double targetFollowDistance, double HP, double maxHP, double moveSpeed, double attackSpeed, double attackDamage, EntityType type) {
+	public CombatEntity(World world, int entityID, Position startPosition, double attackRange, double targetLockDistance, double targetFollowDistance, double HP, double maxHP, double moveSpeed, double attackSpeed, double attackDamage, EntityType type) {
 		super(world, type, entityID, moveSpeed, HP, maxHP, startPosition);
 		
 		this.targetLockDistance = targetLockDistance;
@@ -33,11 +28,38 @@ public class EntityMeleeMonster extends RegularMovingEntity {
 		this.attackDamage = attackDamage;
 		this.attackDelay = (long)(1000/attackSpeed);
 		
-		startPassive();
-		
+		changeAI(new PassiveWander(this));
 	}
-	private void startAgressive(Entity target) {
-		final EntityMeleeMonster m = this;
+	
+	public double getTargetLockDistance() {
+		return targetLockDistance;
+	}
+	
+	public double getTargetFollowDistance() {
+		return targetFollowDistance;
+	}
+	
+	public double getAttackDamage() {
+		return attackDamage;
+	}
+	
+	public double getAttackRange() {
+		return attackRange;
+	}
+	
+	public long getAttackDelay() {
+		return attackDelay;
+	}
+	
+	@Override
+	public double attack(Entity entity, double damage) {
+		double d = super.attack(entity, damage);
+		getWorld().broadcastPacket(new PacketOutAttack(this, entity.getPosition()));
+		return d;
+	}
+	
+	/*private void startAgressive(Entity target) {
+		final CombatEntity m = this;
 		Consumer<Cancelable> c = new Consumer<Cancelable>() {
 			Cancelable autoAttackTask;
 			
@@ -82,13 +104,14 @@ public class EntityMeleeMonster extends RegularMovingEntity {
 						//start combat
 						return;
 					}
-				}*/
+				}*//*
 			}
 		};
 		this.aiTask = this.getWorld().getTimer().schedule(c, 0, 100);
-	}
-	private void startPassive() {
-		final EntityMeleeMonster m = this;
+	}*/
+	
+	/*private void startPassive() {
+		final CombatEntity m = this;
 		Consumer<Cancelable> c = new Consumer<Cancelable>() {
 			
 			long idleUntil = 0;
@@ -121,7 +144,7 @@ public class EntityMeleeMonster extends RegularMovingEntity {
 			}
 		};
 		this.aiTask = this.getWorld().getTimer().schedule(c, 0, 500);
-	}
+	}*/
 	
 	
 	/*
@@ -196,12 +219,5 @@ public class EntityMeleeMonster extends RegularMovingEntity {
 			cancelAttacking();
 		}
 	}*/
-	
-	@Override
-	public double attack(Entity entity, double damage) {
-		double d = super.attack(entity, damage);
-		getWorld().broadcastPacket(new PacketOutAttack(this, entity.getPosition()));
-		return d;
-	}
 	
 }
