@@ -14,15 +14,19 @@ public class AiEntity extends RegularMovingEntity {
 	}
 	
 	public void changeAI(AiTask task) {
+		cancelTask();
+		this.task = task;
+	}
+	
+	private void cancelTask() {
 		if(this.task != null) {
 			this.task.cancel();
 		}
-		this.task = task;
 	}
 	
 	@Override
 	public void kill() {
-		task.cancel();
+		cancelTask();
 		super.kill();
 	}
 }
