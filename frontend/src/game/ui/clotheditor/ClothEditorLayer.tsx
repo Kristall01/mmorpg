@@ -36,7 +36,7 @@ const ClothEditorLayer = ({visuals}: ClothEditorLayerProps) => {
 	}
 
 	return (
-		<div ref={mainRef} onKeyDown={handleKeyDown} tabIndex={-1} className="cloth-editor-layer">
+		<div onContextMenu={e => e.preventDefault()} ref={mainRef} onKeyDown={handleKeyDown} tabIndex={-1} className="cloth-editor-layer">
 			<ClothEditor onClose={closeWindow} baseClothes={clothes} onApply={c => logicModel.applyClothes(c)} visuals={visuals} />
 		</div>
 	)
