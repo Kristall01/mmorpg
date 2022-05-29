@@ -2,6 +2,7 @@ package hu.kristall.rpg.world.entity;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.packet.out.PacketOutAttack;
+import hu.kristall.rpg.network.packet.out.PacketOutSound;
 import hu.kristall.rpg.world.World;
 import hu.kristall.rpg.world.entity.ai.AiEntity;
 import hu.kristall.rpg.world.entity.ai.PassiveWander;
@@ -55,6 +56,7 @@ public class CombatEntity extends AiEntity {
 	public double attack(Entity entity, double damage) {
 		double d = super.attack(entity, damage);
 		getWorld().broadcastPacket(new PacketOutAttack(this, entity.getPosition()));
+		getWorld().broadcastPacket(new PacketOutSound("sword"));
 		return d;
 	}
 	

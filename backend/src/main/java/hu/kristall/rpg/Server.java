@@ -10,7 +10,6 @@ import hu.kristall.rpg.persistence.*;
 import hu.kristall.rpg.sync.AsyncExecutor;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
-import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.Portal;
 import hu.kristall.rpg.world.World;
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class Server extends SynchronizedObject<Server> {
@@ -86,6 +84,7 @@ public class Server extends SynchronizedObject<Server> {
 		}
 		catch (Throwable t) {
 			logger.error(lang.getMessage("bootstrap.failed"), t);
+			System.exit(1);
 			this.shutdown();
 		}
 	}
