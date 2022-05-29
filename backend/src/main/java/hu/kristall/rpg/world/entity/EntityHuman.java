@@ -8,6 +8,7 @@ import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutAttack;
 import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
 import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
+import hu.kristall.rpg.network.packet.out.PacketOutSound;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
 import hu.kristall.rpg.persistence.SavedItem;
 import hu.kristall.rpg.persistence.SavedItemStack;
@@ -168,6 +169,7 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 		if(this.channel(400_000_000)) {
 			return;
 		}
+		getWorld().broadcastPacket(new PacketOutSound("sword"));
 		moveTarget = null;
 		this.stop();
 		getWorld().broadcastPacket(new PacketOutAttack(this, p));
