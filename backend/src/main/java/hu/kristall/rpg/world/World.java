@@ -144,6 +144,9 @@ public class World extends SynchronizedObject<World> {
 				createdEntity = new EntityOgre(this, getNextEntityID(), pos);
 				break;
 			}
+			case SPECTRE: {
+				createdEntity = new EntitySpectre(this, getNextEntityID(), pos);
+			}
 		}
 		if(createdEntity == null) {
 			return null;
