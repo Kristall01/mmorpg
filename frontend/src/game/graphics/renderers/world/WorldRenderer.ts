@@ -4,6 +4,7 @@ import CozyPack from "game/graphics/texture/CozyPack";
 import EmptyTexture from "game/graphics/texture/EmptyTexture";
 import Texture from "game/graphics/texture/Texture";
 import TexturePack from "game/graphics/texture/TexturePack";
+import parseText from "game/ui/chat/textparser";
 import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
 import SubManager from "SubManager";
@@ -29,7 +30,11 @@ export interface RenderConfig {
 interface EntityRenderable {
 	render: (world: WorldRenderer, renderConfig: RenderConfig) => void
 	entity: Entity<any>
+	baseCanvasPosition: Position,
+	magnify: number,
 }
+
+const itemPickupMessage = parseText("nyomj §e§l[A]§r gombot a tárgyak felvételéhez");
 
 class WorldRenderer implements Renderable {
 
@@ -48,7 +53,7 @@ class WorldRenderer implements Renderable {
 	private entityRenderables: Map<number, EntityRenderable> = new Map();
 
 	constructor(world: World, visuals: VisualResources) {
-		this.portalIcon = visuals.images.get("portal.png").img;
+		this.portalIcon = visuals.images.getImage("portal.png").img;
 		this.visuals = visuals;
 		this.model = world.model;
 		this.world = world;
@@ -56,6 +61,7 @@ class WorldRenderer implements Renderable {
 		this.cozyPack = visuals.cozy;
 		this.tileTextures = world.tileGrid.map(tileGrid => tileGrid.map(t => visuals.textures.getTexture(t, "tile") || visuals.textures.getDefaultTexture()));
 		this.updateFloatingItemList();
+		this.updateEntityList();
 	}
 
 	unmount(): void {
@@ -70,16 +76,19 @@ class WorldRenderer implements Renderable {
 	private updateFloatingItemList() {
 		this.floatingItems.clear();
 		for(let item of this.world.items) {
-			this.floatingItems.set(item.id, {item: item, texture: this.visuals.textures.getTexture(item.item.type, "item") || new EmptyTexture()});
+			this.floatingItems.set(item.id, {item: item, texture: this.visuals.textures.getTexture(item.item.material, "item") || new EmptyTexture()});
 		}
 	}
 
 	private updateEntityList() {
 		this.entityRenderables.clear();
 		for(let entity of this.world.entities) {
+			let {fn, magnify} = createRendererFor(entity, this.visuals);
 			this.entityRenderables.set(entity.id, {
-				render: createRendererFor(entity, this.visuals),
-				entity: entity
+				render: fn,
+				entity: entity,
+				baseCanvasPosition: [0,0],
+				magnify
 			});
 		}
 	}
@@ -272,11 +281,15 @@ class WorldRenderer implements Renderable {
 			return;
 		}
 
-		for(let e of this.world.entities) {
-			e.calculateStatus(renderTime);
+		for(let e of this.entityRenderables.values()) {
+			e.entity.calculateStatus(renderTime);
 		}
 
 		this.calculateRenderConfig(renderTime, width, height);
+
+		for(let e of this.entityRenderables.values()) {
+			e.baseCanvasPosition = this.translateXY(...e.entity.cachedStatus.position);
+		}
 
 		let {camX, camY, tileSize, camFocusX, camFocusY} = this.renderConfig;
 
@@ -340,12 +353,12 @@ class WorldRenderer implements Renderable {
 		}
  */
 
- 		let orderedEntities = Array.from(this.entityRenderables).sort((a,b) => {
-			return a[1].entity.cachedStatus.position[1] - b[1].entity.cachedStatus.position[1];
+ 		let orderedEntities = Array.from(this.entityRenderables.values()).sort((a,b) => {
+			return (a.baseCanvasPosition[1] + a.magnify*tileSize/2) - (b.baseCanvasPosition[1] + b.magnify * tileSize/2);
 		});
 
 		for(let entity of orderedEntities) {
-			entity[1].render(this, this.renderConfig);
+			entity.render(this, this.renderConfig);
 		}
 
 		renderLabels(this, this.world, this.renderConfig);
@@ -356,19 +369,21 @@ class WorldRenderer implements Renderable {
 
 		for(let item of this.floatingItems.values()) {
 			let pos = this.translateXY(...item.item.pos);
-			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -1);
+			item.texture.drawTo(renderTime, this.ctx, pos, tile3, tile3, -0.5, -0.5);
 			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 1)) {
 				showPickupMessage = true;
 			}
-			if(item.item.item.name !== null) {
-				drawText(this.ctx, [pos[0], pos[1] - tile3*1.1], item.item.item.name, "end", "middle");
+
+			if(item.item.item.description.length !== 0 && item.item.item.flags.renderTitle) {
+				let itemRenderTopLevel = pos[1] - tile3/1.5-5;
+				drawText(this.ctx, [pos[0], itemRenderTopLevel], item.item.item.description[0], "end", "middle");
 			}
 		}
 
 		if(showPickupMessage) {
 //			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
 			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
-			drawText(this.ctx, [width / 2, height*0.8], "nyomj §e§l[A]§r gombot a tárgyak felvételéhez", "middle", "middle",)
+			drawText(this.ctx, [width / 2, height*0.8], itemPickupMessage, "middle", "middle",)
 		}
 
 		if(this.model.drawPath) {

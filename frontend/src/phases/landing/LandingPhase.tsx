@@ -17,7 +17,7 @@ export const LandingPhase = () => {
 					<div className="smalltext">készítette Dudás Dominik</div>
 				</div>
 				<div className="btngroup">
-					<WrappedButton icon="fa-solid fa-file-lines" onClick={() => alert("Hamarosan...")} text="dokumentáció megnyitása" />
+					<WrappedButton icon="fa-solid fa-file-lines" href="https://rpg.ddominik.dev/document.pdf" text="dokumentáció megnyitása" />
 					<WrappedButton icon="fa-solid fa-play" text="játék indítása" onClick={() => setMenu(() => <LoadingPhase nextPhase={v => <MenuPhase visuals={v}/>} />)} />
 					<WrappedButton icon="fa-brands fa-github" text="git repo" href="https://github.com/Kristall01/mmorpg" />
 				</div>

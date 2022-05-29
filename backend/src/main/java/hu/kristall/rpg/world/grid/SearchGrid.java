@@ -1,7 +1,6 @@
 package hu.kristall.rpg.world.grid;
 
 import hu.kristall.rpg.Position;
-import hu.kristall.rpg.lineofsight.RayCaster;
 import hu.kristall.rpg.world.path.Path;
 
 import java.util.*;
@@ -16,8 +15,8 @@ public class SearchGrid {
 	public SearchGrid(boolean[][] walls, int width, int height) {
 		this.width = width;
 		this.height = height;
-		min = new Position(0,0);
-		max = new Position(width,height);
+		min = new Position(0.5,0.5);
+		max = new Position(width-0.5,height-0.5);
 		
 		nodes = new SearchNode[height*width];
 		for(int i = 0; i < nodes.length; ++i) {
@@ -31,7 +30,7 @@ public class SearchGrid {
 		return nodes[pos.y*width + pos.x];
 	}
 	
-	public GridPosition findClosestValidPoint(GridPosition pos) {
+	private GridPosition findClosestValidPoint(GridPosition pos) {
 		if(!getNode(pos).isWall()) {
 			return pos;
 		}
@@ -55,8 +54,16 @@ public class SearchGrid {
 	}
 	
 	public List<Position> search(Position start, Position to) {
-		GridPosition gridStart = findClosestValidPoint(Path.fixPosition(min, start, max).toGridPosition());
-		GridPosition gridTo = findClosestValidPoint(Path.fixPosition(min, to, max).toGridPosition());
+		//fixed
+		start = Path.fixPosition(min,start,max);
+		//fixed
+		to = Path.fixPosition(min,to,max);
+		
+		GridPosition
+			gridStartBase =  start.toGridPosition(),
+			gridToBase =  to.toGridPosition();
+		GridPosition gridStart = findClosestValidPoint(gridStartBase);
+		GridPosition gridTo = findClosestValidPoint(gridToBase);
 		Collection<GridPosition> gridPositions = search(gridStart, gridTo);
 		if(gridPositions == null) {
 			return null;
@@ -65,6 +72,27 @@ public class SearchGrid {
 		int i = -1;
 		for (GridPosition gridPosition : gridPositions) {
 			p[++i] = gridPosition.toPosition();
+		}
+		if(!isWall(gridStartBase)) {
+			p[0] = start;
+		}
+		if(!isWall(gridToBase)) {
+			double
+				x = to.getX(),
+				y = to.getY();
+			if(isWall(gridToBase.add(1,0))) {
+				x = Math.min(x, Math.floor(x) + (0.5));
+			}
+			if(isWall(gridToBase.add(-1,0))) {
+				x = Math.max(x, Math.floor(x) + (0.5));
+			}
+			if(isWall(gridToBase.add(0,1))) {
+				y = Math.min(y, Math.floor(y) + (0.5));
+			}
+			if(isWall(gridToBase.add(0,-1))) {
+				y = Math.max(y, Math.floor(y) + (0.5));
+			}
+			p[p.length - 1] = new Position(x,y);
 		}
 		return List.of(p);
 	}
@@ -102,7 +130,7 @@ public class SearchGrid {
 	
 	public boolean isWall(GridPosition pos) {
 		if(pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) {
-			return false;
+			return true;
 		}
 		return getNode(pos).isWall();
 	}

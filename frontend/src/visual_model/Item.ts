@@ -1,13 +1,21 @@
+import parseText, { ParsedText, TextFragment } from "game/ui/chat/textparser";
+
 export type ItemEvent = "rename";
+
+export type ItemFlags = {
+	renderTitle: boolean;
+}
 
 export default class Item {
 
-	readonly type: string
-	readonly name: string | null = null;
+	readonly material: string
+	readonly description: Array<ParsedText>
+	readonly flags: ItemFlags;
 
-	constructor(type: string, name?: string) {
-		this.type = type;
-		this.name = name ?? null;
+	constructor(material: string, description: Array<string>, flags: ItemFlags) {
+		this.material = material;
+		this.description = description.map(parseText);
+		this.flags = flags;
 	}
 
 }

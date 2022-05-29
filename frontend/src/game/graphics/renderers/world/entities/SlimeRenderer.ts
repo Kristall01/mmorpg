@@ -1,5 +1,5 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import ImageStore from "game/ImageStore";
+import ResourceStore from "game/ResourceStore";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
 import EntityRenderer, { EntityLike } from "./EntityRenderer";
@@ -11,9 +11,9 @@ export default class SlimeRenderer extends EntityRenderer{
 	readonly fullAnimTime = 1000;
 	readonly animFrames = 7;
 
-	constructor(images: ImageStore) {
+	constructor(images: ResourceStore) {
 		super();
-		let slimeImg = images.get("slime.png").img;
+		let slimeImg = images.getImage("slime.png").img;
 		this.slime = slimeImg;
 		let mirroredCanvas = new OffscreenCanvas(slimeImg.width, slimeImg.height);
 		let mirroredCtx = mirroredCanvas.getContext("2d")!;

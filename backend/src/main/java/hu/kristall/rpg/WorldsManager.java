@@ -24,7 +24,7 @@ public class WorldsManager {
 			throw new IllegalStateException(server.getLang().getMessage("worldmanager.create.name-taken"));
 		}
 		boolean defaultWorld = this.defaultWorld == null;
-		World world = new World(server.getSynchronizer(), name, width, height, layers, pathFinder, entitySpawners);
+		World world = new World(server.getSynchronizer(), name, width, height, layers, pathFinder, entitySpawners, server.getItemMap());
 		Synchronizer<World> worldSyncer = world.getSynchronizer();
 		this.worlds.put(name, worldSyncer);
 		if(defaultWorld) {

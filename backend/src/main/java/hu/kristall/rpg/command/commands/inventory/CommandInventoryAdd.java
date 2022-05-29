@@ -7,6 +7,8 @@ import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.Material;
 
+import java.util.function.Supplier;
+
 public class CommandInventoryAdd extends SimpleCommand {
 	
 	public CommandInventoryAdd(CommandParent parent) {
@@ -18,16 +20,18 @@ public class CommandInventoryAdd extends SimpleCommand {
 		if(!CommandCheckers.checkArgCount(sender, args, 1)) {
 			return;
 		}
-		Material m;
-		try {
-			m = Material.valueOf(args[0]);
-		}
-		catch (IllegalArgumentException ex) {
-			sender.sendTranslatedMessage("command.inventory-add.no-such-item");
-			return;
-		}
 		CommandCheckers.checkWorldPlayerEntity(sender, e -> {
-			e.getInventory().addItem(new Item(m), 1);
+			Supplier<Item> itemSupplier = sender.getServer().getItemMap().getItem(args[0]);
+			if(itemSupplier == null) {
+				sender.sendTranslatedMessage("error.item-not-found");
+				return;
+			}
+			Item i = itemSupplier.get();
+			if(i == null) {
+				sender.sendTranslatedMessage("error.item-not-available");
+				return;
+			}
+			e.getInventory().addItem(i, 1);
 		});
 	}
 }

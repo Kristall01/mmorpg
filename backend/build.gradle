@@ -21,8 +21,7 @@ dependencies {
 
     implementation 'org.jline:jline-reader:3.20.0'
     implementation 'org.jline:jline-terminal:3.20.0'
-
-    implementation 'commons-cli:commons-cli:1.5.0'
+    implementation 'org.jline:jline-terminal-jansi:3.20.0'
 }
 
 test {

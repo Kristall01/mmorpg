@@ -9,7 +9,7 @@ public abstract class AutoRemove {
 	private Cancelable removeTask;
 	
 	public AutoRemove(ISyncTimer timer, long removeDelay) {
-		this.removeTask = timer.schedule(this::remove, removeDelay);
+		this.removeTask = timer.schedule(c -> this.remove(), removeDelay);
 	}
 	
 	public boolean isRemoved() {
