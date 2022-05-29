@@ -363,8 +363,10 @@ class WorldRenderer implements Renderable {
 			if(!showPickupMessage && (this.world.followedEntity !== null && radiusDistance(item.item.pos, this.world.followedEntity.cachedStatus.position) < 1)) {
 				showPickupMessage = true;
 			}
-			if(item.item.item.description.length !== 0) {
-				drawText(this.ctx, [pos[0], pos[1] - tile3*1.1], item.item.item.description[0], "end", "middle");
+
+			if(item.item.item.description.length !== 0 && item.item.item.flags.renderTitle) {
+				let itemRenderTopLevel = pos[1] - tile3/1.5-5;
+				drawText(this.ctx, [pos[0], itemRenderTopLevel], item.item.item.description[0], "end", "middle");
 			}
 		}
 

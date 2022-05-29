@@ -15,8 +15,8 @@ public class SearchGrid {
 	public SearchGrid(boolean[][] walls, int width, int height) {
 		this.width = width;
 		this.height = height;
-		min = new Position(0,0);
-		max = new Position(width-1,height-1);
+		min = new Position(0.5,0.5);
+		max = new Position(width-0.5,height-0.5);
 		
 		nodes = new SearchNode[height*width];
 		for(int i = 0; i < nodes.length; ++i) {

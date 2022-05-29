@@ -2,8 +2,9 @@ package hu.kristall.rpg.persistence;
 
 import com.google.gson.*;
 import hu.kristall.rpg.ItemMap;
-import hu.kristall.rpg.world.Item;
+import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.world.Material;
+import hu.kristall.rpg.world.item.ItemFlags;
 import hu.kristall.rpg.world.item.SimpleItemGenerator;
 
 import java.lang.reflect.Type;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class Savefile {
 	
@@ -59,7 +59,15 @@ public class Savefile {
 						description = new ArrayList<>();
 					}
 					Material m = Material.valueOf(material);
-					builder.registerItem(itemType, new SimpleItemGenerator(itemType, m, description));
+					ItemFlags flags;
+					JsonElement jsonFlagsJson = itemJson.get("flags");
+					if(jsonFlagsJson != null) {
+						flags = Utils.gson().fromJson(jsonFlagsJson, ItemFlags.class);
+					}
+					else {
+						flags = new ItemFlags();
+					}
+					builder.registerItem(itemType, new SimpleItemGenerator(itemType, m, description, flags));
 				}
 				return new Savefile(levels, defaultLevel, builder.bake());
 			}

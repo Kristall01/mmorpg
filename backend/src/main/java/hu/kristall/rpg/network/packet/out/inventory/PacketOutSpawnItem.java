@@ -2,7 +2,6 @@ package hu.kristall.rpg.network.packet.out.inventory;
 
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.packet.out.PacketOut;
-import hu.kristall.rpg.persistence.SavedItem;
 import hu.kristall.rpg.world.FloatingItem;
 import hu.kristall.rpg.world.Item;
 

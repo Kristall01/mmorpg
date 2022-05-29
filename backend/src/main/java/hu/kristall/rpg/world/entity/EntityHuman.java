@@ -60,13 +60,13 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 			SavedItem savedItem = stack.item;
 			Material m = null;
 			try {
-				m = Material.valueOf(savedItem.type);
+				m = Material.valueOf(savedItem.material);
 			}
 			catch (Exception ex) {
 				world.getLogger().warn("failed to load item of material '" + savedItem.type+'\'');
 				continue;
 			}
-			Item it = new Item(savedItem.type, m, savedItem.description);
+			Item it = new Item(savedItem.type, m, savedItem.description, savedItem.flags);
 			Integer n = items.get(it);
 			if(n == null) {
 				n = stack.amount;
@@ -218,7 +218,7 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 			this.attack(attackTargets[i], 5);
 		}
 		
-		getWorld().getTimer().schedule(() -> {
+		getWorld().getTimer().schedule(c -> {
 			//this runs on world thread
 			if(!owner.hasQuit() && moveTarget != null && owner.hasEntity() && owner.getEntity().equals(thisHuman)) {
 				thisHuman.move(moveTarget);

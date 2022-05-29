@@ -10,16 +10,18 @@ public class SimpleItemGenerator implements ItemGenerator {
 	private String type;
 	private Material material;
 	private List<String> description;
+	private ItemFlags flags;
 	
-	public SimpleItemGenerator(String type, Material material, List<String> description) {
+	public SimpleItemGenerator(String type, Material material, List<String> description, ItemFlags flags) {
 		this.type = type;
 		this.material = material;
 		this.description = description;
+		this.flags = flags;
 	}
 	
 	@Override
 	public Item get() {
-		return new Item(type, material, description);
+		return new Item(type, material, description, flags);
 	}
 	
 }

@@ -76,13 +76,13 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("entityDeath", ({id}) => new SignalEntityDeath(id));
 		this.addPacketSignal("died", () => new SignalDied());
 		this.addPacketSignal("portal-spawn", ({X, Y, radius}) => new SignalInPortalspawn(X, Y, radius));
-		this.addPacketSignal("spawn-item", ({x,y,id,item}) => new SignalInSpawnItem(new FloatingItem(id, [x,y], new Item(item.material, item.description))));
+		this.addPacketSignal("spawn-item", ({x,y,id,item}) => new SignalInSpawnItem(new FloatingItem(id, [x,y], new Item(item.material, item.description, item.flags))));
 		this.addPacketSignal("despawn-item", ({id}) => new SignalDespawnItem(id));
 		this.addPacketSignal("setinventory", ({items}) => {
 			let itemStacks: Array<ItemStack> = [];
 			for(let {amount, item} of items) {
-				let {description, material} = item;
-				itemStacks.push({amount, item: new Item(material, description)})
+				let {description, material, flags} = item;
+				itemStacks.push({amount, item: new Item(material, description, flags)})
 			}
 
 			return new SignalSetinventory(itemStacks);

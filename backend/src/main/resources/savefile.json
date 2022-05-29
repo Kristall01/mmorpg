@@ -7315,7 +7315,7 @@
 			"spawners": [
 				{
 					"entityType": "SKELETON",
-					"count": 5,
+					"count": 1,
 					"respawnTimer": 200,
 					"topLeft": [
 						3,
@@ -7335,7 +7335,10 @@
 			"material": "KEY_IRON",
 			"description": [
 				"§akapu kulcs"
-			]
+			],
+			"flags": {
+				"renderTitle": true
+			}
 		},
 		"skeleton_bone": {
 			"material": "BONE",

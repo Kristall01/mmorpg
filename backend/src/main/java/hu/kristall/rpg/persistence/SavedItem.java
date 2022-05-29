@@ -1,9 +1,7 @@
 package hu.kristall.rpg.persistence;
 
-import com.google.gson.*;
+import hu.kristall.rpg.world.item.ItemFlags;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -13,11 +11,13 @@ public class SavedItem {
 	public final String material;
 	public final String type;
 	public final List<String> description;
+	public final ItemFlags flags;
 	
-	public SavedItem(String material, String type, List<String> description) {
+	public SavedItem(String material, String type, List<String> description, ItemFlags flags) {
 		this.type = type;
 		this.material = material;
 		this.description = Collections.unmodifiableList(description);
+		this.flags = flags;
 	}
 	
 	@Override
