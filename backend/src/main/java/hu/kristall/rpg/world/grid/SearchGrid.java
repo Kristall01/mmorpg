@@ -27,9 +27,6 @@ public class SearchGrid {
 	}
 	
 	private SearchNode getNode(GridPosition pos) {
-		if((pos.y*width + pos.x) > nodes.length) {
-			System.out.println("error");
-		}
 		return nodes[pos.y*width + pos.x];
 	}
 	
