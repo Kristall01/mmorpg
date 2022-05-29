@@ -7,7 +7,7 @@ import hu.kristall.rpg.command.senders.CommandSender;
 public class CommandThreads extends AuthorizedCommand {
 	
 	public CommandThreads(CommandParent parent) {
-		super("*", parent, "threads", null, "print running threads");
+		super("*", parent, "threads", null, "szálak listázása");
 	}
 	
 	@Override

@@ -10,7 +10,7 @@ import hu.kristall.rpg.world.entity.EntityType;
 public class CommandWorldDummy extends SimpleCommand {
 	
 	public CommandWorldDummy(CommandParent parent) {
-		super(parent, "dummy", "[circle <N>]", "spawns (N) dummy at your location");
+		super(parent, "dummy", "[circle <N>]", "bábu leraks a pizíciódra");
 	}
 	
 	@Override

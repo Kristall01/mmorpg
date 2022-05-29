@@ -10,7 +10,7 @@ import hu.kristall.rpg.world.World;
 
 public class CommandWorld extends SimpleCommand {
 	public CommandWorld(CommandParent parent) {
-		super(parent, "changeworld", "<world name> [player]", "change world");
+		super(parent, "changeworld", "<world name>", "világ váltása");
 	}
 	
 	@Override

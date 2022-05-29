@@ -10,7 +10,7 @@ import hu.kristall.rpg.world.entity.Entity;
 
 public class CommandSpeed extends SimpleCommand {
 	public CommandSpeed(CommandParent parent) {
-		super(parent, "speed", "<speed>", "change own entity's speed");
+		super(parent, "speed", "<speed>", "sebesség átállítás");
 	}
 	
 	@Override

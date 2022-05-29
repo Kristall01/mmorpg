@@ -8,14 +8,13 @@ import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.network.packet.out.PacketOutChat;
 import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.Material;
-import hu.kristall.rpg.world.item.ItemGenerator;
 
 import java.util.function.Supplier;
 
 public class CommandWorldSpawnitem extends SimpleCommand {
 	
 	public CommandWorldSpawnitem(CommandParent parent) {
-		super(parent, "spawnitem", "<item>", "spawns an item to your position");
+		super(parent, "spawnitem", "<item>", "tárgy lerakása a helyedre");
 	}
 	
 	@Override
