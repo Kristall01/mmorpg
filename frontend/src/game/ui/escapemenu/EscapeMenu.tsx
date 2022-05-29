@@ -1,5 +1,6 @@
 import { ModelContext } from 'game/GameView';
 import React, { createRef, useContext, useEffect, useState } from 'react';
+import { WrappedButton } from 'shared/buttonmenu/ButtonMenu';
 import BrickButton from './BrickButton';
 import './EscapeMenu.scss';
 
@@ -38,10 +39,10 @@ const EscapeMenu = ({}) => {
 	}, [visualModel.maxFPS, visualModel.focus]);
 	let fpsText = fps === 0 ? "automatikus" : fps;
 	return (
-		<div ref={mainRef} tabIndex={-1} onKeyDown={onKeyDown} className="escape-menu-component">
+		<div ref={mainRef} onContextMenu={e => e.preventDefault()} tabIndex={-1} onKeyDown={onKeyDown} className="escape-menu-component">
 			<div className="menu">
 				<div className="row">
-					<BrickButton text='Kapcsolat bontása' onClick={() => {logicModel.disconnect()}}/>
+					<WrappedButton text='Kapcsolat bontása' onClick={() => {logicModel.disconnect()}}/>
 				</div>
 				<div className="row" />
 				<div className="row fpseditor">
