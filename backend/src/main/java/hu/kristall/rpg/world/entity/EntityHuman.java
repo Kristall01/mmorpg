@@ -28,11 +28,13 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 	private Position moveTarget;
 	
 	private long channel = 0;
+	private boolean NPC;
 	
-	private EntityHuman(World world, int entityID, Position startPosition, double hp, ClothPack clothes, Map<Item, Integer> items) {
+	private EntityHuman(World world, int entityID, Position startPosition, double hp, ClothPack clothes, Map<Item, Integer> items, boolean NPC) {
 		super(world, EntityType.HUMAN, entityID, 2.0, hp, 100, startPosition);
 		this.inventory = new Inventory(this, items);
 		this.clothes = clothes;
+		this.NPC = NPC;
 	}
 	
 	private boolean channel(long time) {
@@ -45,7 +47,7 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 	}
 	
 	public EntityHuman(World world, int entityID, Position startPosition) {
-		this(world, entityID, startPosition, 100, ClothPack.suit, new HashMap<>());
+		this(world, entityID, startPosition, 100, ClothPack.suit, new HashMap<>(), true);
 	}
 	
 	public static EntityHuman ofData(World world, int entityID, Position pos, Object data) {
@@ -77,7 +79,11 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 			}
 			items.put(it, n);
 		}
-		return new EntityHuman(world, entityID, pos, savedPlayer.hp, savedPlayer.clothes, items);
+		return new EntityHuman(world, entityID, pos, savedPlayer.hp, savedPlayer.clothes, items, false);
+	}
+	
+	public boolean isNPC() {
+		return NPC;
 	}
 	
 	public WorldPlayer getWorldPlayer() {
@@ -162,6 +168,15 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 			getWorldPlayer().getAsyncPlayer().connection.sendPacket(new PacketOutLabelFor(entity.getID(), LabelType.DAMAGE, Integer.toString((int)Math.round(amount))));
 		}
 		return amount;
+	}
+	
+	@Override
+	public double damage(double amount) {
+		if(isNPC()) {
+			getWorld().broadcastMessage("§aNPC §7»§r Heyho");
+			return 0;
+		}
+		return super.damage(amount);
 	}
 	
 	//0.5 sec

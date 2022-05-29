@@ -7329,7 +7329,7 @@
 			"spawners": [
 				{
 					"entityType": "SKELETON",
-					"count": 1,
+					"count": 5,
 					"respawnTimer": 200,
 					"topLeft": [
 						3,

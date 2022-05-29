@@ -62,6 +62,10 @@ public class World extends SynchronizedObject<World> {
 		for (EntitySpawner entitySpawner : entitySpawners) {
 			entitySpawner.registerTo(this);
 		}
+		if(name.equals("spawn")) {
+			EntityHuman human = (EntityHuman) this.spawnEntity(EntityType.HUMAN, new Position(width/2, height/2));
+			human.setName("Enzan\n§a§lNPC");
+		}
 	}
 	
 	public ItemMap getItemMap() {

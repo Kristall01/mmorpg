@@ -4,6 +4,7 @@ import hu.kristall.rpg.Position;
 import hu.kristall.rpg.sync.Cancelable;
 import hu.kristall.rpg.world.entity.CombatEntity;
 import hu.kristall.rpg.world.entity.Entity;
+import hu.kristall.rpg.world.entity.EntityHuman;
 import hu.kristall.rpg.world.entity.EntityType;
 
 public class PassiveWander implements AiTask {
@@ -23,7 +24,7 @@ public class PassiveWander implements AiTask {
 	private void tick(Cancelable c) {
 		Position myPosition = actor.getPosition();
 		for (Entity entity : actor.getWorld().getEntities()) {
-			if(!(entity.isRemoved() || entity.type() != EntityType.HUMAN || Position.distance(myPosition, entity.getPosition()) > actor.getTargetLockDistance())) {
+			if(!entity.isRemoved() && entity.type() == EntityType.HUMAN && !((EntityHuman)entity).isNPC() && Position.distance(myPosition, entity.getPosition()) < actor.getTargetLockDistance()) {
 				task.cancel();
 				actor.changeAI(new AggressiveAttackmove(actor, entity));
 				//start combat
