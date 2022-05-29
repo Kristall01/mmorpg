@@ -6,7 +6,7 @@ import UnknownEntityRenderer from "./graphics/renderers/world/entities/UnknownEn
 import HumanRenderer from "./graphics/renderers/world/HumanRenderer";
 import CozyPack from "./graphics/texture/CozyPack";
 import TexturePack from "./graphics/texture/TexturePack";
-import ImageStore from "./ImageStore";
+import ImageStore from "./ResourceStore";
 
 export default class VisualResources {
 
@@ -39,8 +39,10 @@ export default class VisualResources {
 			return this.instance;
 		}
 		let images = new ImageStore();
-		let zipFiles = ["imagestore.zip", "items.zip", "sprout/sprout.zip", "mystic/mystic.zip","bq.zip","items2/items2.zip"];
-		await Promise.all(zipFiles.map(async f => images.loadZip(f)));
+		let imageZipFiles = ["imagestore.zip", "items.zip", "sprout/sprout.zip", "mystic/mystic.zip","bq.zip","items2/items2.zip"];
+		let soundZipFiles = ["sound.zip"];
+		await Promise.all(imageZipFiles.map(async f => images.loadImageZip(f)));
+		await Promise.all(soundZipFiles.map(async f => images.loadSoundZip(f)));
 
 		let cozy = new CozyPack(images);
 		let textures = new TexturePack(images);
@@ -50,8 +52,9 @@ export default class VisualResources {
 		let ogreRenderer = new OgreRenderer(images);
 		let spectreRenderer = new SpectreRenderer(images);
 
-		let textureJsons = ["texturepack.json","items.json","sprout/sprout_index.json","items2/items2.json"];
+		let textureJsons = ["items.json","sprout/sprout_index.json","items2/items2.json"];
 		await Promise.all(textureJsons.map(async t => textures.loadPack(t)));
+
 		let resources = new VisualResources(images, cozy, textures, slimeRenderer, skeletonRenderer, humanRenderer, ogreRenderer, spectreRenderer);
 		this.instance = resources;
 		return resources;

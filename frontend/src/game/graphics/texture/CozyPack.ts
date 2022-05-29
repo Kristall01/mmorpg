@@ -1,5 +1,5 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import ImageStore from "game/ImageStore";
+import ResourceStore from "game/ResourceStore";
 import { HumanActivity, Cloth, ClothColor, PrimitiveFrametime, Skintone } from "visual_model/assetconfig/HumanAssetConfig";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
@@ -152,8 +152,8 @@ class ColoredCozyCloth implements CozyCloth {
 
 	private clothTextures: Sprite[];
 
-	constructor(key: HumanActivity, cloth: Cloth, images: ImageStore) {
-		let baseSprite = new Sprite(images.get(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
+	constructor(key: HumanActivity, cloth: Cloth, images: ResourceStore) {
+		let baseSprite = new Sprite(images.getImage(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
 		let colorValues = ClothColor.enum.values;
 		this.clothTextures = new Array(colorValues.length);
 		for(let i = 0; i < colorValues.length; ++i) {
@@ -172,8 +172,8 @@ class ColorlessCozyCloth implements CozyCloth {
 
 	private clothTexture: Sprite;
 
-	constructor(key: HumanActivity, cloth: Cloth, images: ImageStore) {
-		this.clothTexture = new Sprite(images.get(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
+	constructor(key: HumanActivity, cloth: Cloth, images: ResourceStore) {
+		this.clothTexture = new Sprite(images.getImage(`${cloth.id.toLocaleLowerCase()}_${key.id}.png`).img, key.frametimes);
 	}
 
 	ofColor(color: ClothColor): Sprite {
@@ -188,10 +188,10 @@ export class CozyActivity {
 	private skinTones: Sprite[]
 	private clothes: CozyCloth[]
 
-	constructor(key: HumanActivity, images: ImageStore) {
+	constructor(key: HumanActivity, images: ResourceStore) {
 		this.skinTones = new Array<Sprite>(8);
 		for(let i = 0; i < 8; ++i) {
-			this.skinTones[i] = new Sprite(images.get(`char${i}_${key.id}.png`).img, key.frametimes);
+			this.skinTones[i] = new Sprite(images.getImage(`char${i}_${key.id}.png`).img, key.frametimes);
 		}
 		let clothEnum = Cloth.enum.values;
 		this.clothes = new Array<CozyCloth>(clothEnum.length);
@@ -218,9 +218,9 @@ export class CozyActivity {
 export default class CozyPack {
 
 	private activities: CozyActivity[];
-	private images: ImageStore;
+	private images: ResourceStore;
 
-	public constructor(images: ImageStore) {
+	public constructor(images: ResourceStore) {
 		this.images = images;
 
 		let objectValues = HumanActivity.enum.values;
@@ -233,7 +233,7 @@ export default class CozyPack {
 //		this.clothes = this.attach(Cloth.enum.values, (images, id) => new CozyCloth());
 	}
 
-	private attach<T extends {id: string}, U>(e: Array<T>, f: (imgages: ImageStore, id: string) => U): Array<U> {
+	private attach<T extends {id: string}, U>(e: Array<T>, f: (imgages: ResourceStore, id: string) => U): Array<U> {
 		let a = new Array(e.length);
 		for(let i = 0; i < a.length; ++i) {
 			a[i] = f(this.images, e[i].id);

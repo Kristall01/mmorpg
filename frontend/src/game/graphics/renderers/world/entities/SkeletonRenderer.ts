@@ -1,5 +1,5 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import ImageStore from "game/ImageStore";
+import ResourceStore from "game/ResourceStore";
 import SkeletonActivity from "visual_model/assetconfig/SkeletonAssetConfig";
 import SkeletonEntity from "visual_model/entity/SkeletonEntity";
 import { Direction } from "visual_model/Paths";
@@ -19,12 +19,12 @@ export default class SkeletonRenderer extends EntityRenderer {
 	private skeletonImg: HTMLImageElement
 	private mirroredImage: OffscreenCanvas;
 
-	constructor(images: ImageStore) {
+	constructor(images: ResourceStore) {
 		super();
 		let mirrorWidth = Math.max(...SkeletonActivity.enum.values.map(val => val.frameCount))*spriteDimension;
 		let mirrorHeight = SkeletonActivity.enum.values.length*spriteDimension;
 
-		let skeletonImg = images.get("skeleton.png").img;
+		let skeletonImg = images.getImage("skeleton.png").img;
 		this.skeletonImg = skeletonImg;
 		let mirroredCanvas = new OffscreenCanvas(mirrorWidth, mirrorHeight);
 		let mirroredCtx = mirroredCanvas.getContext("2d")!;

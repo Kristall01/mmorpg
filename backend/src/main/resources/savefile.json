@@ -1821,7 +1821,21 @@
 				true,
 				true
 			],
-			"spawners": []
+			"spawners": [
+				{
+					"entityType": "SPECTRE",
+					"count": 1,
+					"respawnTimer": 5000,
+					"topLeft": [
+						5,
+						5
+					],
+					"bottomRight": [
+						15,
+						15
+					]
+				}
+			]
 		},
 		"w0-astar": {
 			"height": 20,

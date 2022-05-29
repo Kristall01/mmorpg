@@ -34,7 +34,7 @@ class GamePhase extends Component<props, state>  {
 
 		this.state = {
 			text: "Kapcsolódás...",
-			model: new VisualModel(),
+			model: new VisualModel(props.visuals),
 			ended: false
 		}
 	}

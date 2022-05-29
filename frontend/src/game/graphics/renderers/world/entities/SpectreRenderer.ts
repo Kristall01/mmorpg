@@ -1,5 +1,5 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import ImageStore from "game/ImageStore";
+import ResourceStore from "game/ResourceStore";
 import SpectreActivity from "visual_model/assetconfig/SpectreAssetConfig";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
@@ -18,12 +18,12 @@ export default class SpectreRenderer extends EntityRenderer {
 	private opectreImg: HTMLImageElement
 	private mirroredImage: OffscreenCanvas;
 
-	constructor(images: ImageStore) {
+	constructor(images: ResourceStore) {
 		super();
 		let mirrorWidth = Math.max(...SpectreActivity.enum.values.map(val => val.frameCount))*spriteDimension;
 		let mirrorHeight = SpectreActivity.enum.values.length*spriteDimension;
 
-		let opectreImg = images.get("spectre.png").img;
+		let opectreImg = images.getImage("spectre.png").img;
 		this.opectreImg = opectreImg;
 		let mirroredCanvas = new OffscreenCanvas(mirrorWidth, mirrorHeight);
 		let mirroredCtx = mirroredCanvas.getContext("2d")!;

@@ -1,5 +1,5 @@
 import { RenderContext } from "game/graphics/GraphicsUtils";
-import ImageStore from "game/ImageStore";
+import ResourceStore from "game/ResourceStore";
 import OgreActivity from "visual_model/assetconfig/OgreAssetConfig";
 import { Direction } from "visual_model/Paths";
 import { Position } from "visual_model/VisualModel";
@@ -18,12 +18,12 @@ export default class OgreRenderer extends EntityRenderer {
 	private ogreImg: HTMLImageElement
 	private mirroredImage: OffscreenCanvas;
 
-	constructor(images: ImageStore) {
+	constructor(images: ResourceStore) {
 		super();
 		let mirrorWidth = Math.max(...OgreActivity.enum.values.map(val => val.frameCount))*spriteDimension;
 		let mirrorHeight = OgreActivity.enum.values.length*spriteDimension;
 
-		let ogreImg = images.get("ogre.png").img;
+		let ogreImg = images.getImage("ogre.png").img;
 		this.ogreImg = ogreImg;
 		let mirroredCanvas = new OffscreenCanvas(mirrorWidth, mirrorHeight);
 		let mirroredCtx = mirroredCanvas.getContext("2d")!;

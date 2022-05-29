@@ -1,3 +1,4 @@
+import VisualResources from "game/VisualResources";
 import Matrix from "Matrix";
 import { SignalIn } from "model/Definitions";
 import Entity from "./Entity";
@@ -12,7 +13,7 @@ export type Position = [number,number];
 
 type ZoomFn = (rendertime: number) => number;
 
-export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open" | "sudo-command";
+export type UpdateTypes = "world"| "chatlog" | "chat-open" | "zoom" | "maxfps" | "dead" | "menu-open" | "focus" | "inventory-open" | "clotheditor-open" | "sudo-command" | "volume";
 
 class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	
@@ -34,16 +35,28 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	public drawGrid: boolean = false;
 	public drawPath: boolean = false;
 	public commandQueue: Array<string> = [];
+	private _volume: number = 1;
+	private visuals: VisualResources
 
-	constructor() {
+	constructor(visualResources: VisualResources) {
 		super();
 		this.handleSignal = this.handleSignal.bind(this);
 		this.zoomFn = (rendertime: number) => this.zoomTarget
+		this.visuals = visualResources;
 	}
 
 	public joinWorld(spawnX: number, spawnY: number, width: number, height: number, tileGrid: Array<Matrix<string>>, camStart: Position) {
 		this._world = new World(this, width, height, tileGrid, camStart);
 		this.triggerUpdate("world");
+	}
+
+	public set volume(val: number) {
+		this._volume = val;
+		this.triggerUpdate("volume");
+	}
+
+	public get volume() {
+		return this._volume;
 	}
 
 	public get inventoryOpen() {
@@ -173,6 +186,12 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 
 	get maxFPS() {
 		return this._maxFPS;
+	}
+
+	playSound(name: string) {
+		if(this.volume !== 0) {
+			this.visuals.images.playAudio(name, this.volume);
+		}
 	}
 
 	showLabelFor(text: string, labelType: LabelType, entity: Entity<any>) {
