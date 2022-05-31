@@ -38,5 +38,6 @@
 			"spawners": []
 		}
 	},
-	"default": "level0"
+	"default": "level0",
+	"items": {}
 }

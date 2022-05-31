@@ -1,4 +1,4 @@
-import parseText, { TextFragment } from "game/ui/chat/textparser";
+import { ParsedText, TextFragment } from "game/ui/chat/textparser";
 import { Position } from "visual_model/VisualModel";
 
 export function resizeImage(img: CanvasImageSource, width: number, height: number): ImageData {
@@ -116,11 +116,11 @@ export const Positioning = {
 
 export type t = keyof typeof Positioning;
 
-export const drawText = (ctx: RenderContext, canvasPosition: Position, text: string, vertical: t = "middle", horizontal: t = "middle", paddingRaw: [number,number,number,number]|number = [5,5,5,5]): Position => {
+export const drawText = (ctx: RenderContext, canvasPosition: Position, parsedText: ParsedText, vertical: t = "middle", horizontal: t = "middle", paddingRaw: [number,number,number,number]|number = [5,5,5,5]): Position => {
+
 	ctx.font = '30px Roboto';
 
 	let padding = typeof paddingRaw === "number" ? [paddingRaw,paddingRaw,paddingRaw,paddingRaw] : paddingRaw;
-	let fragments = parseText(text);
 
 	let vModifier = Positioning[vertical];
 	let hModifier = Positioning[horizontal];
@@ -130,6 +130,8 @@ export const drawText = (ctx: RenderContext, canvasPosition: Position, text: str
 	let textWidth = 0; //padding[1] + padding[3]
 
 	let maxHeight = -1;
+
+	let fragments = parsedText.fragments;
 
 	let textAssets: Array<[TextFragment, string,number]> = new Array(fragments.length);
 	for(let i = 0; i < textAssets.length; ++i) {

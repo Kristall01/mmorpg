@@ -1,66 +1,106 @@
 import { drawBar, drawText, RenderContext } from "game/graphics/GraphicsUtils";
+import { ParsedText } from "game/ui/chat/textparser";
 import VisualResources from "game/VisualResources";
-import { HumanActivity } from "visual_model/assetconfig/HumanAssetConfig";
 import Entity from "visual_model/Entity";
 import HumanEntity from "visual_model/entity/HumanEntity";
 import EntityType from "visual_model/EntityType";
 import { Position } from "visual_model/VisualModel";
 import WorldRenderer, { RenderConfig } from "../WorldRenderer";
 
-export const createRendererFor = (e: Entity<any>, visuals: VisualResources): (world: WorldRenderer, renderConfig: RenderConfig) => void => {
+type a = {
+	fn: (world: WorldRenderer, renderConfig: RenderConfig) => void,
+	magnify: number
+}
+
+export const createRendererFor = (e: Entity<any>, visuals: VisualResources): a => {
 	const entityTypes = EntityType.enum.map;
 	switch(e.type) {
 		case entityTypes.SKELETON: {
-			return (world: WorldRenderer, config: RenderConfig) => {
-				let activity = e.activity(config.rendertime);
-				let cachedStatus = e.cachedStatus;
-				visuals.skeletonRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*3, activity.animationTime, activity.activity);
+			const magnify = 3;
+			return {
+				fn: (world: WorldRenderer, config: RenderConfig) => {
+					let activity = e.activity(config.rendertime);
+					let cachedStatus = e.cachedStatus;
+					visuals.skeletonRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*magnify, activity.animationTime, activity.activity);
+				},
+				magnify
 			}
 		}
 		case entityTypes.OGRE: {
-			return (world: WorldRenderer, config: RenderConfig) => {
-				let activity = e.activity(config.rendertime);
-				let cachedStatus = e.cachedStatus;
-				visuals.ogreRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*3, activity.animationTime, activity.activity);
+			const magnify = 3;
+			return {
+				fn: (world: WorldRenderer, config: RenderConfig) => {
+					let activity = e.activity(config.rendertime);
+					let cachedStatus = e.cachedStatus;
+					visuals.ogreRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*magnify, activity.animationTime, activity.activity);
+				},
+				magnify
 			}
 		}
 		case entityTypes.SLIME: {
-			return (world: WorldRenderer, config: RenderConfig) => {
-				let activity = e.activity(config.rendertime);
-				let cachedStatus = e.cachedStatus;
-				visuals.slimeRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize, activity.animationTime);
+			const magnify = 1
+			return {
+				fn: (world: WorldRenderer, config: RenderConfig) => {
+					let activity = e.activity(config.rendertime);
+					let cachedStatus = e.cachedStatus;
+					visuals.slimeRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*magnify, activity.animationTime);
+				},
+				magnify
 			}
 		}
 		case entityTypes.HUMAN: {
-			return (world: WorldRenderer, config: RenderConfig) => {
-				let human = e as HumanEntity;
-				let cachedStatus = e.cachedStatus;
-				let translated = world.translateXY(...cachedStatus.position);
-				let {activity, animationTime} = human.activity(config.rendertime);
-				visuals.humanRenderer.drawTo(world.ctx, human.skin, cachedStatus.facing, activity, animationTime, translated, config.tileSize*2, human.clothes, e);
-			
-/* 				let cozyActivity = world.visuals.cozy.getCozyActivity(activity);
-				cozyActivity.human(human.skin).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
-				for(let clothes of human.clothes) {
-					cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
-				} */
+			const magnify = 2
+			return {
+				fn: (world: WorldRenderer, config: RenderConfig) => {
+					let human = e as HumanEntity;
+					let cachedStatus = e.cachedStatus;
+					let translated = world.translateXY(...cachedStatus.position);
+					let {activity, animationTime} = human.activity(config.rendertime);
+					visuals.humanRenderer.drawTo(world.ctx, human.skin, cachedStatus.facing, activity, animationTime, translated, config.tileSize*magnify, human.clothes, e);
+				},
+				magnify
 			}
+			
+/*			let cozyActivity = world.visuals.cozy.getCozyActivity(activity);
+			cozyActivity.human(human.skin).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
+			for(let clothes of human.clothes) {
+				cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
+			} */
 		}
 		case entityTypes.DUMMY: {
-			return (world: WorldRenderer, config: RenderConfig) => {
-				visuals.unknownEntityRenderer.renderEntity(world.ctx, e, world.translateXY(...e.cachedStatus.position), config.tileSize);
+			const magnify = 1;
+			return {
+				fn: (world: WorldRenderer, config: RenderConfig) => {
+					visuals.unknownEntityRenderer.renderEntity(world.ctx, e, world.translateXY(...e.cachedStatus.position), config.tileSize*magnify);
+				},
+				magnify
+			}
 			
-/* 				let cozyActivity = world.visuals.cozy.getCozyActivity(activity);
-				cozyActivity.human(human.skin).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
-				for(let clothes of human.clothes) {
-					cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
-				} */
+/* 			let cozyActivity = world.visuals.cozy.getCozyActivity(activity);
+			cozyActivity.human(human.skin).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
+			for(let clothes of human.clothes) {
+				cozyActivity.getCozyCloth(clothes.cloth).ofColor(clothes.color).drawTo(world.ctx, true, cachedStatus.facing, translated, config.tileSize*2, animationTime);
+			} */
+		}
+		case entityTypes.SPECTRE: {
+			const magnify = 2;
+			return {
+				fn: (world: WorldRenderer, config: RenderConfig) => {
+					let activity = e.activity(config.rendertime);
+					let cachedStatus = e.cachedStatus;
+					visuals.spectreRenderer.drawTo(world.ctx, cachedStatus.facing, world.translateXY(...cachedStatus.position), e, config.tileSize*magnify, activity.animationTime, activity.activity);
+				},
+				magnify
 			}
 		}
 		default: {
-			return (world: WorldRenderer, config: RenderConfig) => {
-				let cachedStatus = e.cachedStatus;
-				visuals.unknownEntityRenderer.renderEntity(world.ctx, e, world.translateXY(...cachedStatus.position), config.tileSize);
+			const magnify = 2;
+			return {
+				fn: (world: WorldRenderer, config: RenderConfig) => {
+					let cachedStatus = e.cachedStatus;
+					visuals.unknownEntityRenderer.renderEntity(world.ctx, e, world.translateXY(...cachedStatus.position), config.tileSize*magnify);
+				},
+				magnify
 			}
 		}
 	}
@@ -71,7 +111,7 @@ export interface EntityLike {
 	maxHp: number
 	alive: boolean
 	type: EntityType
-	name: string | null
+	nameData: Array<ParsedText> | null
 }
 
 export default class EntityRenderer {
@@ -97,8 +137,12 @@ export default class EntityRenderer {
 			top -= barHeight+5;
 		}
 	
-		if(e.name !== null) {
-			top -= (drawText(ctx, [pos[0], top], e.name, "end", "middle")[1]+5);
+		let nameData = e.nameData;
+		if(nameData !== null) {
+			for(let i = nameData.length - 1; i >= 0; --i) {
+				top -= (drawText(ctx, [pos[0], top], nameData[i], "end", "middle")[1]);
+			}
+			top -= 5;
 		}
 	}
 

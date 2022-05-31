@@ -1,3 +1,4 @@
+import parseText, { ParsedText, TextFragment } from "game/ui/chat/textparser"
 import { ActivitySnapshot } from "./ActivityFunction"
 import { EntityType } from "./EntityType"
 import { ConstStatus, Direction, DirectionMode, EntityConstStatus, entityZigzagStatus, Path, Status, StatusFn } from "./Paths"
@@ -16,6 +17,7 @@ export default abstract class Entity<T> {
 	maxHp: number
 	alive: boolean = true
 	readonly directionMode: DirectionMode
+	nameData: Array<ParsedText> | null = null;
 
 	constructor(id: number, type: EntityType, loc: Position, speed: number, facing: Direction, hp: number, maxHp: number, directionMode: DirectionMode) {
 		this.id = id;
@@ -35,6 +37,12 @@ export default abstract class Entity<T> {
 
 	setName(name: string | null) {
 		this.name = name;
+		if(name === null) {
+			this.nameData = null;
+		}
+		else {
+			this.nameData = name.split("\n").map(parseText);
+		}
 	}
 
 	walkBy(startTime: number, points: Position[]) {

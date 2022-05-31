@@ -9,10 +9,12 @@ import hu.kristall.rpg.network.packet.out.PacketOutChat;
 import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.Material;
 
+import java.util.function.Supplier;
+
 public class CommandWorldSpawnitem extends SimpleCommand {
 	
 	public CommandWorldSpawnitem(CommandParent parent) {
-		super(parent, "spawnitem", "<item> [name]", "spawns an item to your position");
+		super(parent, "spawnitem", "<item>", "tárgy lerakása a helyedre");
 	}
 	
 	@Override
@@ -25,28 +27,26 @@ public class CommandWorldSpawnitem extends SimpleCommand {
 					return;
 				}
 				StringBuilder names = new StringBuilder();
-				for (Material value : Material.values()) {
+				for (String type : entityHuman.getWorld().getItemMap().getItemTypes()) {
 					names.append(", ");
-					names.append(value.name());
+					names.append(type);
 				}
 				entityHuman.getWorldPlayer().getAsyncPlayer().connection.sendPacket(new PacketOutChat(names.substring(2)));
 				return;
 			}
 			Position pos = entityHuman.getPosition();
-			String name = null;
-			if(args.length > 1) {
-				name = args[1];
-			}
-			Material m;
-			try {
-				m = Material.valueOf(args[0]);
-			}
-			catch (IllegalArgumentException ex) {
-				entityHuman.getWorldPlayer().getAsyncPlayer().connection.sendPacket(new PacketOutChat("nincs ilyen item"));
+			Supplier<Item> itemSupplier = sender.getServer().getItemMap().getItem(args[0]);
+			if(itemSupplier == null) {
+				sender.sendTranslatedMessage("error.item-not-found");
 				return;
 			}
-			entityHuman.getWorld().spawnItem(new Item(m, name), pos);
-			entityHuman.getWorldPlayer().getAsyncPlayer().connection.sendPacket(new PacketOutChat("item spawned"));
+			Item i = itemSupplier.get();
+			if(i == null) {
+				sender.sendTranslatedMessage("cerror.item-not-available");
+				return;
+			}
+			entityHuman.getWorld().spawnItem(i, pos);
+			sender.sendTranslatedMessage("command.world.spawnitem.done");
 		});
 	}
 }

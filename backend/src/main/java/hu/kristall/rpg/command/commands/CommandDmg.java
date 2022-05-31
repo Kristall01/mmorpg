@@ -7,7 +7,7 @@ import hu.kristall.rpg.command.senders.CommandSender;
 
 public class CommandDmg extends SimpleCommand {
 	public CommandDmg(CommandParent parent) {
-		super(parent, "dmg", "<amount>", null);
+		super(parent, "dmg", "<amount>", "gyógítás/sebzés");
 	}
 	
 	@Override

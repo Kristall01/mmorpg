@@ -197,8 +197,8 @@ public class TestWorld {
 		AStarPathFinder finder = new AStarPathFinder(new SearchGrid(new boolean[][]{{false,false}}, 2, 1));
 		List<Position> positions = finder.findPath(new Position(0.2, 0.2), new Position(1.8,0.8), 1, 0).getCollection();
 		assertEquals(2, positions.size());
-		assertEquals(new Position(0.2,0.2), positions.get(0));
-		assertEquals(new Position(1.8,0.8), positions.get(1));
+		assertEquals(new Position(0.5,0.5), positions.get(0));
+		assertEquals(new Position(1.5,0.5), positions.get(1));
 	}
 	
 	@Test
@@ -207,25 +207,25 @@ public class TestWorld {
 		List<Position> positions = finder.findPath(new Position(0, 0), new Position(1,1), 1, 0).getCollection();
 		assertNotNull(positions);
 		assertEquals(3, positions.size());
-		assertEquals(new Position(0,0), positions.get(0));
+		assertEquals(new Position(0.5,0.5), positions.get(0));
 		assertEquals(new Position(1.5,0.5), positions.get(1));
-		assertEquals(new Position(1,1), positions.get(2));
+		assertEquals(new Position(1.5,1), positions.get(2));
 	}
 	
-	/* @Test
+	@Test
 	public void testWorldAstartPathfinderRing() {
 		AStarPathFinder finder = new AStarPathFinder(new SearchGrid(new boolean[][]{
 			{false,false,false},
 			{false,true,false},
 			{false,false,false},
 		}, 3, 3));
-		List<Position> positions = finder.findPath(new Position(0, 0), new Position(1,2), 1, 0).getCollection();
+		List<Position> positions = finder.findPath(new Position(0, 0), new Position(1.75,3.4), 1, 0).getCollection();
 		assertNotNull(positions);
 		assertEquals(4, positions.size());
 		assertEquals(new Position(0.5,0.5), positions.get(0));
 		assertEquals(new Position(0.5,1.5), positions.get(1));
 		assertEquals(new Position(0.5,2.5), positions.get(2));
-		assertEquals(new Position(1.5,2.5), positions.get(3));
+		assertEquals(new Position(1.75,2.5), positions.get(3));
 	}
-	 */
+	
 }

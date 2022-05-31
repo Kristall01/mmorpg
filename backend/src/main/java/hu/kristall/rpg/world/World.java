@@ -35,9 +35,11 @@ public class World extends SynchronizedObject<World> {
 	private PathFinder pathFinder;
 	private Position bottomRightPosition;
 	private Position topLeftPosition = new Position(0,0);
+	private ItemMap itemMap;
 	
-	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners) {
+	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners, ItemMap itemMap) {
 		super("world-"+name);
+		this.itemMap = itemMap;
 		this.pathFinder = pathFinder;
 		
 		this.logger = LoggerFactory.getLogger("world-"+name);
@@ -48,7 +50,7 @@ public class World extends SynchronizedObject<World> {
 		this.width = width;
 		this.height = height;
 		
-		bottomRightPosition = new Position(width, height);
+		bottomRightPosition = new Position(width-1, height-1);
 		
 		if(tileGrid == null) {
 			tileGrid = new String[width*height];
@@ -56,10 +58,18 @@ public class World extends SynchronizedObject<World> {
 		}
 		this.bakedMapSerialize = List.of(tileGrid);
 		
-		getTimer().scheduleAtFixedRate(this::checkPortals, 0, 250);
+		getTimer().scheduleAtFixedRate((c) -> this.checkPortals(), 0, 250);
 		for (EntitySpawner entitySpawner : entitySpawners) {
 			entitySpawner.registerTo(this);
 		}
+		if(name.equals("spawn")) {
+			EntityHuman human = (EntityHuman) this.spawnEntity(EntityType.HUMAN, new Position(width/2, height/2));
+			human.setName("Enzan\n§a§lNPC");
+		}
+	}
+	
+	public ItemMap getItemMap() {
+		return itemMap;
 	}
 	
 	public Collection<FloatingItem> getItems() {
@@ -137,6 +147,9 @@ public class World extends SynchronizedObject<World> {
 			case OGRE: {
 				createdEntity = new EntityOgre(this, getNextEntityID(), pos);
 				break;
+			}
+			case SPECTRE: {
+				createdEntity = new EntitySpectre(this, getNextEntityID(), pos);
 			}
 		}
 		if(createdEntity == null) {
@@ -217,12 +230,20 @@ public class World extends SynchronizedObject<World> {
 	}
 	
 	public FloatingItem spawnItem(Item item, Position pos) {
+		if(item == null) {
+			return null;
+		}
 		GeneratedID<FloatingItem> itemID = nextItemID.get();
 		FloatingItem floatingItem = new FloatingItem(this, itemID, pos, item);
 		floatingItems.put(itemID, floatingItem);
 		broadcastPacket(new PacketOutSpawnItem(floatingItem));
 		return floatingItem;
 	}
+	
+	public FloatingItem spawnItemNear(Item item, Position pos) {
+		return spawnItem(item, getRandomPositionNear(pos, 0,0.5));
+	}
+	
 	
 	public void cleanRemovedEntity(Entity e) {
 		if(e.isRemoved()) {

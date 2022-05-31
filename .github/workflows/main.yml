@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+        
+      - name: setup JDK
+        uses: actions/setup-java@v3.0.0
+        with:
+          java-version: 11
+          distribution: adopt
+        
+      - name: build backend
+        run: sh build.sh backend
+        
+      - name: save backend artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: backend
+          path: ./artifacts/backend.jar
+        
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+        
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.0.0
+        with:
+          node-version: 16
+
+
+      - name: build frontend      
+        run: sh build.sh frontend
+        
+      - name: import action-zip
+        uses: montudor/action-zip@v1.0.0
+        
+      - name: ZIP files
+        run: zip -q -r frontend.zip frontend
+        working-directory: ./artifacts
+        
+      - name: list files
+        run: |
+          sudo apt update
+          sudo apt install -y tree
+          tree -halt .
+        
+      - name: save frontend artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: frontend
+          path: ./artifacts/frontend.zip
+
+  
+  docker_deploy:
+    runs-on: ubuntu-latest
+    needs: [build_backend, build_frontend]
+    steps:
+    - name: checkout repo
+      uses: actions/checkout@v2
+      
+    - name: import action-zip
+      uses: montudor/action-zip@v1.0.0
+      
+    - name: download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: ./artifacts
+        
+    - name: unzip frontend
+      run: |
+        mkdir unzipped
+        unzip ./frontend.zip -d ./unzipped
+      working-directory: ./artifacts/frontend
+    
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - name: Build and push Docker images
+      run: |
+        docker image build --no-cache --build-arg backend=./artifacts/backend/backend.jar --build-arg frontend=./artifacts/frontend/unzipped/frontend -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:latest -t ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg:$(date +%s) .
+        docker image push ${{ secrets.DOCKERHUB_USERNAME }}/mmorpg
+  
+  ssh_deploy:
+    runs-on: ubuntu-latest
+    needs: [docker_deploy]
+    steps:
+    - name: copy ssh keys
+      run: |
+        mkdir -p ~/.ssh
+        echo ${{ secrets.SSH_PUBLIC_KEY }} > ~/id_rsa.pub
+
+    - name: upgrade
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        script: ${{ secrets.SSH_COMMAND }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}

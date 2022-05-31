@@ -15,8 +15,8 @@ public class SearchGrid {
 	public SearchGrid(boolean[][] walls, int width, int height) {
 		this.width = width;
 		this.height = height;
-		min = new Position(0,0);
-		max = new Position(width,height);
+		min = new Position(0.5,0.5);
+		max = new Position(width-0.5,height-0.5);
 		
 		nodes = new SearchNode[height*width];
 		for(int i = 0; i < nodes.length; ++i) {
@@ -30,7 +30,7 @@ public class SearchGrid {
 		return nodes[pos.y*width + pos.x];
 	}
 	
-	public GridPosition findClosestValidPoint(GridPosition pos) {
+	private GridPosition findClosestValidPoint(GridPosition pos) {
 		if(!getNode(pos).isWall()) {
 			return pos;
 		}
@@ -54,7 +54,9 @@ public class SearchGrid {
 	}
 	
 	public List<Position> search(Position start, Position to) {
+		//fixed
 		start = Path.fixPosition(min,start,max);
+		//fixed
 		to = Path.fixPosition(min,to,max);
 		
 		GridPosition

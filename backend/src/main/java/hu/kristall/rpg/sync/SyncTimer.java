@@ -3,6 +3,7 @@ package hu.kristall.rpg.sync;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
 public class SyncTimer extends Timer implements ISyncTimer {
 	
@@ -14,42 +15,42 @@ public class SyncTimer extends Timer implements ISyncTimer {
 	}
 	
 	@Override
-	public Cancelable schedule(Runnable task, long delay, long period) {
+	public Cancelable schedule(Consumer<Cancelable> task, long delay, long period) {
 		SyncTask t = new SyncTask(runner, task);
 		super.schedule(t, delay, period);
 		return t;
 	}
 	
 	@Override
-	public Cancelable schedule(Runnable task, Date time) {
+	public Cancelable schedule(Consumer<Cancelable> task, Date time) {
 		SyncTask t = new SyncTask(runner, task);
 		super.schedule(t, time);
 		return t;
 	}
 	
 	@Override
-	public Cancelable schedule(Runnable task, Date firstTime, long period) {
+	public Cancelable schedule(Consumer<Cancelable> task, Date firstTime, long period) {
 		SyncTask t = new SyncTask(runner, task);
 		super.schedule(t, firstTime, period);
 		return t;
 	}
 	
 	@Override
-	public Cancelable scheduleAtFixedRate(Runnable task, long delay, long period) {
+	public Cancelable scheduleAtFixedRate(Consumer<Cancelable> task, long delay, long period) {
 		SyncTask t = new SyncTask(runner, task);
 		super.scheduleAtFixedRate(t, delay, period);
 		return t;
 	}
 	
 	@Override
-	public Cancelable scheduleAtFixedRate(Runnable task, Date firstTime, long period) {
+	public Cancelable scheduleAtFixedRate(Consumer<Cancelable> task, Date firstTime, long period) {
 		SyncTask t = new SyncTask(runner, task);
 		super.scheduleAtFixedRate(t, firstTime, period);
 		return t;
 	}
 	
 	@Override
-	public Cancelable schedule(Runnable task, long delay) {
+	public Cancelable schedule(Consumer<Cancelable> task, long delay) {
 		SyncTask t = new SyncTask(runner, task);
 		super.schedule(t, delay);
 		return t;
@@ -59,8 +60,9 @@ public class SyncTimer extends Timer implements ISyncTimer {
 		
 		private final Runnable r;
 		
-		public SyncTask(TaskRunner runner, Runnable r) {
-			this.r = () -> runner.runTask(r);
+		public SyncTask(TaskRunner runner, Consumer<Cancelable> r) {
+			final SyncTask cancelTarget = this;
+			this.r = () -> runner.runTask(() -> r.accept(cancelTarget));
 		}
 		
 		@Override

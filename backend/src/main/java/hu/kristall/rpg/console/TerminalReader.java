@@ -16,6 +16,7 @@ public class TerminalReader implements CommandSupplier {
 	private LineReader reader;
 	private Terminal t;
 	private Synchronizer<Server> asyncServer;
+	private boolean receivedShutdown = false;
 	
 	public TerminalReader(final InputReader inputReader, Synchronizer<Server> asyncServer) throws IOException {
 		t = TerminalBuilder.terminal();
@@ -47,6 +48,17 @@ public class TerminalReader implements CommandSupplier {
 		try {
 			return reader.readLine("> ");
 		}
+		catch(UserInterruptException ex) {
+			if(!receivedShutdown) {
+				sendMessage("received user interrupt signal, interpreted as \"stop\" command. send signal again to force shutdown");
+				receivedShutdown = true;
+			}
+			else {
+				sendMessage("received user interrupt signal AGAIN, forcing shutdown");
+				System.exit(0);
+			}
+			return "stop";
+		}
 		catch (EndOfFileException ex) {
 			return "stop";
 		}
@@ -68,6 +80,7 @@ public class TerminalReader implements CommandSupplier {
 	@Override
 	public void sendMessage(String message) {
 		this.t.writer().println(ChatColor.translateColorCodes(message));
+		this.t.writer().flush();
 	}
 	
 }

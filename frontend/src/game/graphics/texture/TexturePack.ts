@@ -1,4 +1,4 @@
-import ImageStore from "game/ImageStore";
+import ResourceStore from "game/ResourceStore";
 import EmptyTexture from "./EmptyTexture";
 import NullTexture from "./NullTexture";
 import Texture, { ofType } from "./Texture";
@@ -6,10 +6,10 @@ import Texture, { ofType } from "./Texture";
 class TexturePack {
 
 	private defaultTexture: Texture = new EmptyTexture();
-	private images: ImageStore
+	private images: ResourceStore
 	private categories: Map<string, Map<string, Texture>> = new Map();
 
-	constructor(images: ImageStore) {
+	constructor(images: ResourceStore) {
 		this.images = images;
 		this.addTexture("null", "tile", NullTexture.instance);
 		this.addTexture("empty", "tile", EmptyTexture.instance);
@@ -45,7 +45,7 @@ class TexturePack {
 			for(let [key, entryData] of Object.entries(textureJson.entries)) {
 				let data = Object.assign({}, textureJson.similarity, entryData);
 				let {texture_type, path, category} = data;
-				let generateResult = ofType(texture_type, this.images.get(path).img, data);
+				let generateResult = ofType(texture_type, this.images.getImage(path).img, data);
 				this.addGeneratedTextures(key, category, generateResult);
 			}
 			return;
@@ -54,7 +54,7 @@ class TexturePack {
 			for(let [key, entryData] of Object.entries(textureJson.entries)) {
 				let data = (entryData as any);
 				let {texture_type, path, category} = data;
-				let generateResult = ofType(texture_type, this.images.get(path).img, data);
+				let generateResult = ofType(texture_type, this.images.getImage(path).img, data);
 				this.addGeneratedTextures(key, category, generateResult);
 			}
 		}
@@ -65,7 +65,7 @@ class TexturePack {
 					data = Object.assign({}, textureJson.similarity, entryData);
 				}
 				let {texture_type, path, category} = data;
-				let texture = ofType(texture_type, this.images.get(path).img, data);
+				let texture = ofType(texture_type, this.images.getImage(path).img, data);
 				this.addGeneratedTextures(key, category, texture);
 			}
 		}

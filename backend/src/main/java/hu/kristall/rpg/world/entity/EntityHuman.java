@@ -8,6 +8,7 @@ import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOutAttack;
 import hu.kristall.rpg.network.packet.out.PacketOutChangeClothes;
 import hu.kristall.rpg.network.packet.out.PacketOutLabelFor;
+import hu.kristall.rpg.network.packet.out.PacketOutSound;
 import hu.kristall.rpg.network.packet.out.inventory.PacketOutSetInventory;
 import hu.kristall.rpg.persistence.SavedItem;
 import hu.kristall.rpg.persistence.SavedItemStack;
@@ -27,11 +28,13 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 	private Position moveTarget;
 	
 	private long channel = 0;
+	private boolean NPC;
 	
-	private EntityHuman(World world, int entityID, Position startPosition, double hp, ClothPack clothes, Map<Item, Integer> items) {
+	private EntityHuman(World world, int entityID, Position startPosition, double hp, ClothPack clothes, Map<Item, Integer> items, boolean NPC) {
 		super(world, EntityType.HUMAN, entityID, 2.0, hp, 100, startPosition);
 		this.inventory = new Inventory(this, items);
 		this.clothes = clothes;
+		this.NPC = NPC;
 	}
 	
 	private boolean channel(long time) {
@@ -44,7 +47,7 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 	}
 	
 	public EntityHuman(World world, int entityID, Position startPosition) {
-		this(world, entityID, startPosition, 100, ClothPack.suit, new HashMap<>());
+		this(world, entityID, startPosition, 100, ClothPack.suit, new HashMap<>(), true);
 	}
 	
 	public static EntityHuman ofData(World world, int entityID, Position pos, Object data) {
@@ -60,13 +63,13 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 			SavedItem savedItem = stack.item;
 			Material m = null;
 			try {
-				m = Material.valueOf(savedItem.type);
+				m = Material.valueOf(savedItem.material);
 			}
 			catch (Exception ex) {
-				world.getLogger().warn("failed to load item of type '" + savedItem.type+'\'');
+				world.getLogger().warn("failed to load item of material '" + savedItem.type+'\'');
 				continue;
 			}
-			Item it = new Item(m, savedItem.name);
+			Item it = new Item(savedItem.type, m, savedItem.description, savedItem.flags);
 			Integer n = items.get(it);
 			if(n == null) {
 				n = stack.amount;
@@ -76,7 +79,11 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 			}
 			items.put(it, n);
 		}
-		return new EntityHuman(world, entityID, pos, savedPlayer.hp, savedPlayer.clothes, items);
+		return new EntityHuman(world, entityID, pos, savedPlayer.hp, savedPlayer.clothes, items, false);
+	}
+	
+	public boolean isNPC() {
+		return NPC;
 	}
 	
 	public WorldPlayer getWorldPlayer() {
@@ -163,11 +170,21 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 		return amount;
 	}
 	
+	@Override
+	public double damage(double amount) {
+		if(isNPC()) {
+			getWorld().broadcastMessage("§aNPC §7»§r Heyho");
+			return 0;
+		}
+		return super.damage(amount);
+	}
+	
 	//0.5 sec
 	public void attackTowards(Position p) {
 		if(this.channel(400_000_000)) {
 			return;
 		}
+		getWorld().broadcastPacket(new PacketOutSound("sword"));
 		moveTarget = null;
 		this.stop();
 		getWorld().broadcastPacket(new PacketOutAttack(this, p));
@@ -218,7 +235,7 @@ public class EntityHuman extends RegularMovingEntity implements ThreadCloneable<
 			this.attack(attackTargets[i], 5);
 		}
 		
-		getWorld().getTimer().schedule(() -> {
+		getWorld().getTimer().schedule(c -> {
 			//this runs on world thread
 			if(!owner.hasQuit() && moveTarget != null && owner.hasEntity() && owner.getEntity().equals(thisHuman)) {
 				thisHuman.move(moveTarget);

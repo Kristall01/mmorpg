@@ -1,8 +1,10 @@
 FROM openjdk:11
 
 WORKDIR /server
-COPY ./artifacts/bakcend.jar /server/server.jar
-COPY ./artifacts/frontend /server/frontend
+ARG backend=./artifacts/backend.jar
+ARG frontend=./artifacts/frontend
+COPY ${backend} /server/server.jar
+COPY ${frontend} /server/frontend
 ENV port=8080
 ENV serve=frontend
-RUN ["java","-jar","server.jar"]
+CMD ["java","-jar","server.jar"]
