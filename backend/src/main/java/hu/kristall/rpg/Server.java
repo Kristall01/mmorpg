@@ -54,7 +54,7 @@ public class Server extends SynchronizedObject<Server> {
 			
 			commandMap = CommandCollections.base(this);
 			//this.inputReader = new InputReader(text -> getSynchronizer().sync(srv -> srv.getCommandMap().executeConsoleCommand(text)), this.commandMap);
-			this.worldsManager = new WorldsManager(this);
+			this.worldsManager = new WorldsManager(this, savefile == null ? null : savefile.defaultLevel);
 			this.networkServer.startAcceptingConnections();
 			
 			
@@ -62,7 +62,7 @@ public class Server extends SynchronizedObject<Server> {
 				itemMap = savefile.itemMap;
 				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
 					SavedLevel level = levelEntry.getValue();
-					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder, level.entitySpawners);
+					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder, level.entitySpawners, level.spawnPosition);
 					final List<SavedPortal> portals = level.portals;
 					asyncWorld.sync(world -> {
 						for (SavedPortal portal : portals) {

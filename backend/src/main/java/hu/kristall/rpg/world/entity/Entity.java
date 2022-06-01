@@ -21,7 +21,6 @@ public abstract class Entity {
 	private String name;
 	private double hp;
 	private double maxHp;
-	private boolean alive = true;
 	protected Inventory inventory;
 	
 	public Entity(World world, EntityType type, int entityID, double speed, double HP, double maxHp) {
@@ -84,12 +83,7 @@ public abstract class Entity {
 	}
 	
 	public void kill() {
-		this.alive = false;
 		this.remove();
-	}
-	
-	public boolean isAlive() {
-		return alive;
 	}
 	
 	protected void handleHpChange(double amount) {}

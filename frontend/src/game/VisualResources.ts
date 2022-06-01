@@ -19,6 +19,7 @@ export default class VisualResources {
 	public readonly humanRenderer: HumanRenderer
 	public readonly unknownEntityRenderer: UnknownEntityRenderer
 	public readonly spectreRenderer: SpectreRenderer
+	public readonly fontRenderer: FontRenderer;
 
 	private static instance: VisualResources | null = null;
 

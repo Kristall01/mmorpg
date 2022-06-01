@@ -381,9 +381,11 @@ class WorldRenderer implements Renderable {
 		}
 
 		if(showPickupMessage) {
+			let textGlue = itemPickupMessage.fragments.map(v => v.text).join("");
+			console.log(textGlue);
+			this.visuals.fontRenderer.drawText(this.ctx, textGlue, [width / 2, height*0.8], 32);
 //			drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items")
 			//drawText(this.ctx, [width / 2, height*0.8], "press [A] to pick up items", "middle")
-			drawText(this.ctx, [width / 2, height*0.8], itemPickupMessage, "middle", "middle",)
 		}
 
 		if(this.model.drawPath) {

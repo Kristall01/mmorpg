@@ -14,17 +14,19 @@ public class WorldsManager {
 	private final HashMap<String, Synchronizer<World>> worlds = new HashMap<>();
 	private Server server;
 	private Synchronizer<World> defaultWorld;
+	private String defaultWorldName;
 	
-	public WorldsManager(Server server) {
+	public WorldsManager(Server server, String defaultWorldName) {
 		this.server = server;
+		this.defaultWorldName = defaultWorldName;
 	}
 	
-	public Synchronizer<World> createWorld(String name, int width, int height, String[] layers, PathFinder pathFinder, List<EntitySpawner> entitySpawners) {
+	public Synchronizer<World> createWorld(String name, int width, int height, String[] layers, PathFinder pathFinder, List<EntitySpawner> entitySpawners, Position spawnPosition) {
 		if(worlds.containsKey(name)) {
 			throw new IllegalStateException(server.getLang().getMessage("worldmanager.create.name-taken"));
 		}
-		boolean defaultWorld = this.defaultWorld == null;
-		World world = new World(server.getSynchronizer(), name, width, height, layers, pathFinder, entitySpawners, server.getItemMap());
+		boolean defaultWorld = this.defaultWorld == null || defaultWorldName.contentEquals(name);
+		World world = new World(server.getSynchronizer(), name, width, height, layers, pathFinder, entitySpawners, server.getItemMap(), spawnPosition);
 		Synchronizer<World> worldSyncer = world.getSynchronizer();
 		this.worlds.put(name, worldSyncer);
 		if(defaultWorld) {

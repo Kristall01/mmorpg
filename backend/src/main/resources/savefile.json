@@ -1835,7 +1835,8 @@
 						15
 					]
 				}
-			]
+			],
+			"spawnPosition": [15.0, 10.0]
 		},
 		"w0-astar": {
 			"height": 20,
@@ -3669,7 +3670,8 @@
 				true
 			],
 			"type": "astar",
-			"spawners": []
+			"spawners": [],
+			"spawnPosition": [14.0, 18.0]
 		},
 		"w0-thetastar": {
 			"height": 20,
@@ -5503,7 +5505,8 @@
 				true
 			],
 			"type": "thetastar",
-			"spawners": []
+			"spawners": [],
+			"spawnPosition": [15.0, 10.0]
 		},
 		"w1": {
 			"height": 20,
@@ -7329,7 +7332,7 @@
 			"spawners": [
 				{
 					"entityType": "SKELETON",
-					"count": 5,
+					"count": 1,
 					"respawnTimer": 200,
 					"topLeft": [
 						3,
@@ -7340,7 +7343,8 @@
 						17
 					]
 				}
-			]
+			],
+			"spawnPosition": [15.0, 10.0]
 		}
 	},
 	"default": "spawn",

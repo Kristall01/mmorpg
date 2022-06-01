@@ -36,8 +36,9 @@ public class World extends SynchronizedObject<World> {
 	private Position bottomRightPosition;
 	private Position topLeftPosition = new Position(0,0);
 	private ItemMap itemMap;
+	private Position spawnPosition;
 	
-	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners, ItemMap itemMap) {
+	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners, ItemMap itemMap, Position spawnPosition) {
 		super("world-"+name);
 		this.itemMap = itemMap;
 		this.pathFinder = pathFinder;
@@ -49,6 +50,7 @@ public class World extends SynchronizedObject<World> {
 		
 		this.width = width;
 		this.height = height;
+		this.spawnPosition = spawnPosition;
 		
 		bottomRightPosition = new Position(width-1, height-1);
 		
@@ -170,7 +172,7 @@ public class World extends SynchronizedObject<World> {
 		try {
 			//sync world state to joining player
 			if(pos == null) {
-				pos = new Position(width >> 1, height >> 1);
+				pos = spawnPosition;
 			}
 			PlayerConnection connectingConnection = player.connection;
 			connectingConnection.sendPacket(new PacketOutJoinworld(this, pos));

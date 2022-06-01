@@ -1,9 +1,6 @@
 package hu.kristall.rpg.test;
 
-import hu.kristall.rpg.Player;
-import hu.kristall.rpg.Server;
-import hu.kristall.rpg.WorldPosition;
-import hu.kristall.rpg.WorldsManager;
+import hu.kristall.rpg.*;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.PacketOut;
 import hu.kristall.rpg.persistence.Savefile;
@@ -109,8 +106,8 @@ public class Main {
 			final Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			asyncServer.sync(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
-				final Synchronizer<World> asyncW1 = worldsManager.createWorld("w1",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
+				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
+				final Synchronizer<World> asyncW1 = worldsManager.createWorld("w1",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
 				try {
 					Future<Player> playerFuture = srv.createPlayer(new PlayerConnection() {
 						private Player player;

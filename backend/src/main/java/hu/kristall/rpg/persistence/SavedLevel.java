@@ -21,8 +21,9 @@ public class SavedLevel {
 	public final List<EntitySpawner> entitySpawners;
 	public final List<SavedPortal> portals;
 	public PathFinder pathFinder;
+	public Position spawnPosition;
 	
-	public SavedLevel(String name, int width, int height, String[] layers, List<EntitySpawner> entitySpawners, List<SavedPortal> portals, PathFinder pathFinder) {
+	public SavedLevel(String name, int width, int height, String[] layers, List<EntitySpawner> entitySpawners, List<SavedPortal> portals, PathFinder pathFinder, Position spawnPosition) {
 		this.name = name;
 		this.width = width;
 		this.height = height;
@@ -30,6 +31,7 @@ public class SavedLevel {
 		this.entitySpawners = Collections.unmodifiableList(entitySpawners);
 		this.portals = List.copyOf(portals);
 		this.pathFinder = pathFinder;
+		this.spawnPosition = spawnPosition;
 	}
 	
 	public static class SavedLevelParser implements JsonDeserializer<SavedLevel> {
@@ -81,7 +83,8 @@ public class SavedLevel {
 					Position bottomRight = Utils.gson().fromJson(spawner.get("bottomRight"), Position.class);
 					entitySpawners.add(new EntitySpawner(count,respawnTimer, EntityType.valueOf(entityType), topLeft, bottomRight));
 				}
-				return new SavedLevel(null,width, height, layers.toArray(new String[0]), entitySpawners, portals, pathFinder);
+				Position spawnPosition = Utils.gson().fromJson(base.get("spawnPosition"), Position.class);
+				return new SavedLevel(null,width, height, layers.toArray(new String[0]), entitySpawners, portals, pathFinder, spawnPosition);
 			}
 			catch (Throwable err) {
 				err.printStackTrace();

@@ -27,7 +27,7 @@ public class TestWorld {
 			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
+				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
 				return worldsManager.getWorld("w0") != null;
 			});
 			assertTrue(f.get());
@@ -44,7 +44,7 @@ public class TestWorld {
 			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
+				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
 				try {
 					return asyncWorld.syncCompute(world -> {
 						int entityCount = world.getEntities().size();
@@ -70,7 +70,7 @@ public class TestWorld {
 			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
+				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
 				try {
 					return asyncWorld.syncCompute(world -> {
 						Entity entity = world.spawnEntity(EntityType.DUMMY, new Position(20,20));
@@ -97,7 +97,7 @@ public class TestWorld {
 			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
+				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
 				try {
 					return asyncWorld.syncCompute(world -> {
 						Position source = new Position(20,20);
@@ -126,7 +126,7 @@ public class TestWorld {
 			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
+				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
 				try {
 					return asyncWorld.syncCompute(world -> {
 						Entity entity = world.spawnEntity(EntityType.DUMMY, new Position(20,20));
@@ -154,7 +154,7 @@ public class TestWorld {
 			Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			Future<Boolean> f = asyncServer.syncCompute(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList());
+				Synchronizer<World> asyncWorld = worldsManager.createWorld("w0",1,1,new String[]{""}, new FreePathFinder(), Collections.emptyList(), new Position(0,0));
 				try {
 					return asyncWorld.syncCompute(world -> {
 						Entity entity = world.spawnEntity(EntityType.DUMMY, new Position(20,20));
