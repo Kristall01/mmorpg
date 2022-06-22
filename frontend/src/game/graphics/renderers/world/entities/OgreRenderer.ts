@@ -41,8 +41,14 @@ export default class OgreRenderer extends EntityRenderer {
 		this.mirroredImage = mirroredCanvas;
 	}
 
-	drawTo(ctx: RenderContext, direction: Direction, pos: Position, ogre: EntityLike, size: number, activityTime: number, activity: OgreActivity) {
+	drawTo(ctx: RenderContext, direction: Direction, pos: Position, ogre: EntityLike, size: number, activityTime: number, activity: OgreActivity, translate: [number,number] | "center" = "center") {
 		super.renderEntity(ctx, ogre, pos, size);
+		if(translate === "center") {
+			translate = [-0.5,-0.5];
+		}
+		pos[0] += translate[0]*size;
+		pos[1] += translate[1]*size;
+
 
 		let row: number;
 		let drawSource: HTMLImageElement | OffscreenCanvas;
@@ -60,7 +66,7 @@ export default class OgreRenderer extends EntityRenderer {
 
 		let currentAnimTime = (activityTime % activityAnimTime) / activityAnimTime;
 		let frameIndex = Math.floor(currentAnimTime * activity.frameCount);
-		ctx.drawImage(drawSource, frameIndex * spriteDimension, (row+activity.rowModifier)*spriteDimension, spriteDimension, spriteDimension, pos[0]-(size/2), pos[1] - (size/2), size, size);
+		ctx.drawImage(drawSource, frameIndex * spriteDimension, (row+activity.rowModifier)*spriteDimension, spriteDimension, spriteDimension, pos[0], pos[1], size, size);
 
 		//let drawSource : HTMLImageElement | OffscreenCanvas = direction === Direction.enum.map.EAST ? this.slime : this.mirroredSlime;
 

@@ -359,6 +359,7 @@ class WorldRenderer implements Renderable {
 
 		for(let entity of orderedEntities) {
 			entity.render(this, this.renderConfig);
+			this.ctx.fillRect(entity.baseCanvasPosition[0]-5, entity.baseCanvasPosition[1]-5, 10, 10);
 		}
 
 		renderLabels(this, this.world, this.renderConfig);

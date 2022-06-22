@@ -7,15 +7,20 @@ import hu.kristall.rpg.world.entity.Entity;
 public class Follow implements AiTask {
 	
 	private Entity actor, followedEntity;
+	private Cancelable followTask;
 	
 	public Follow(Entity actor, Entity followedEntity) {
 		this.actor = actor;
 		this.followedEntity = followedEntity;
+		actor.getWorld().getTimer().schedule(this::tickAI, 0, 1000);
 	}
 	
 	@Override
 	public boolean cancel() {
-		return false;
+		if(followTask != null) {
+			return this.followTask.cancel();
+		}
+		return true;
 	}
 	
 	private void tickAI(Cancelable c) {

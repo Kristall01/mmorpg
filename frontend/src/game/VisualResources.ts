@@ -22,15 +22,17 @@ export default class VisualResources {
 
 	private static instance: VisualResources | null = null;
 
-	private constructor(images: ImageStore, cozy: CozyPack, texture: TexturePack, slimeRenderer: SlimeRenderer, skeletonRenderer: SkeletonRenderer, humanRenderer: HumanRenderer, ogreRenderer: OgreRenderer, spectreRenderer: SpectreRenderer) {
-		this.cozy = cozy;
+	private constructor(images: ImageStore, texture: TexturePack) {
 		this.textures = texture;
 		this.images = images;
-		this.slimeRenderer = slimeRenderer;
-		this.skeletonRenderer = skeletonRenderer;
-		this.ogreRenderer = ogreRenderer;
-		this.humanRenderer = humanRenderer;
-		this.spectreRenderer = spectreRenderer;
+
+		this.cozy = new CozyPack(images);
+		this.slimeRenderer = new SlimeRenderer(images);
+		this.skeletonRenderer = new SkeletonRenderer(images);
+		this.humanRenderer = new HumanRenderer(this.cozy);
+		this.ogreRenderer = new OgreRenderer(images);
+		this.spectreRenderer = new SpectreRenderer(images);
+
 		this.unknownEntityRenderer = new UnknownEntityRenderer();
 	}
 
@@ -43,19 +45,13 @@ export default class VisualResources {
 		let soundZipFiles = ["sound.zip"];
 		await Promise.all(imageZipFiles.map(async f => images.loadImageZip(f)));
 		await Promise.all(soundZipFiles.map(async f => images.loadSoundZip(f)));
-
-		let cozy = new CozyPack(images);
-		let textures = new TexturePack(images);
-		let slimeRenderer = new SlimeRenderer(images);
-		let skeletonRenderer = new SkeletonRenderer(images);
-		let humanRenderer = new HumanRenderer(cozy);
-		let ogreRenderer = new OgreRenderer(images);
-		let spectreRenderer = new SpectreRenderer(images);
-
 		let textureJsons = ["items.json","sprout/sprout_index.json","items2/items2.json"];
+		let textures = new TexturePack(images);
+
 		await Promise.all(textureJsons.map(async t => textures.loadPack(t)));
 
-		let resources = new VisualResources(images, cozy, textures, slimeRenderer, skeletonRenderer, humanRenderer, ogreRenderer, spectreRenderer);
+
+		let resources = new VisualResources(images, textures);
 		this.instance = resources;
 		return resources;
 	}

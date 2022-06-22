@@ -70,6 +70,8 @@ interface HumanPack {
 
 }
 
+const tt = -2/3;
+
 class Sprite {
 
 	readonly img: HTMLImageElement;
@@ -92,17 +94,26 @@ class Sprite {
 
 	//abstract drawTo(ctx: RenderContext, direction: Direction, [tox, toy]: Position, size: number, activityTime: number): void;
 
- 	drawTo(ctx: RenderContext, centered: boolean, direction: Direction, [tox, toy]: Position, size: number, activityTime: number) {
+ 	drawTo(ctx: RenderContext, direction: Direction, pos: Position, size: number, activityTime: number, translate: [number,number] | "center" = "center") {
 
-		const dx = centered ? tox - size/2 : tox;
-		const dy = centered ? toy-size*2/3 : toy;
+		if(translate === "center") {
+			translate = [-0.5,tt];
+		}
+		let newPos = [
+			pos[0] + translate[0]*size,
+			pos[1] + translate[1]*size
+		];
+
+
+		//const dx = centered ? tox - size/2 : tox;
+		//const dy = centered ? toy-size*2/3 : toy;
 
 		//ctx.fillRect(tox-5, toy-5, 10, 10);
 
 		ctx.drawImage(this.img,
 			this.startCorner[0]+ this.frameTime.indexAt(direction, activityTime)*CozySize,
 			this.startCorner[1] + direction.ordinal*this.directionMultiplyer,
-			CozySize, CozySize, dx, dy, size, size);
+			CozySize, CozySize, newPos[0], newPos[1], size, size);
 /* 		ctx.fillStyle = "#f00";
 		ctx.strokeRect(dx, dy, size, size);
  */	}

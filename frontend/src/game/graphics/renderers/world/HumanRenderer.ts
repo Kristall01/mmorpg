@@ -10,6 +10,11 @@ export interface ColoredCloth {
 	cloth: Cloth
 }
 
+export interface HumanRenderOptions {
+	entity?: EntityLike,
+	translate?: [number,number] | "center"
+}
+
 export default class HumanRenderer extends EntityRenderer {
 
 	private cozyPack: CozyPack
@@ -19,24 +24,23 @@ export default class HumanRenderer extends EntityRenderer {
 		this.cozyPack = pack;
 	}
 
-	drawTo(ctx: RenderContext, skin: Skintone, facing: Direction, activity: HumanActivity, animationTime: number, renderPos: Position, scale: number, clothes: Array<ColoredCloth | null>, e?: EntityLike) {
+	drawTo(ctx: RenderContext, skin: Skintone, facing: Direction, activity: HumanActivity, animationTime: number, renderPos: Position, scale: number, clothes: Array<ColoredCloth | null>, opt?: HumanRenderOptions) {
 		let cozyActivity: CozyActivity = this.cozyPack.getCozyActivity(activity);
-		this.drawToCozy(ctx, skin, facing, cozyActivity, animationTime, renderPos, scale, clothes, e);
+		this.drawToCozy(ctx, skin, facing, cozyActivity, animationTime, renderPos, scale, clothes, opt);
 	}
 
-	drawToCozy(ctx: RenderContext, skin: Skintone, facing: Direction, cozyActivity: CozyActivity, animationTime: number, renderPos: Position, scale: number, clothes: Array<ColoredCloth | null>, e?: EntityLike) {
-		if(e !== undefined) {
-			super.renderEntity(ctx, e, renderPos, scale);
+	drawToCozy(ctx: RenderContext, skin: Skintone, facing: Direction, cozyActivity: CozyActivity, animationTime: number, renderPos: Position, scale: number, clothes: Array<ColoredCloth | null>, opt?: HumanRenderOptions) {
+		if(opt !== undefined && opt.entity !== undefined) {
+			super.renderEntity(ctx, opt.entity, renderPos, scale);
 		}
-		const centeredRender = true;
 	
-		cozyActivity.human(skin).drawTo(ctx, centeredRender, facing, renderPos, scale, animationTime);
+		cozyActivity.human(skin).drawTo(ctx, facing, renderPos, scale, animationTime, opt?.translate);
 		for(let e of clothes) {
 			if(e === null) {
 				continue;
 			}
 			let {cloth, color} = e;
-			cozyActivity.getCozyCloth(cloth).ofColor(color).drawTo(ctx, centeredRender, facing, renderPos, scale, animationTime);
+			cozyActivity.getCozyCloth(cloth).ofColor(color).drawTo(ctx, facing, renderPos, scale, animationTime, opt?.translate);
 		}
 	}
 	

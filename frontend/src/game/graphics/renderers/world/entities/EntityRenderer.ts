@@ -56,7 +56,7 @@ export const createRendererFor = (e: Entity<any>, visuals: VisualResources): a =
 					let cachedStatus = e.cachedStatus;
 					let translated = world.translateXY(...cachedStatus.position);
 					let {activity, animationTime} = human.activity(config.rendertime);
-					visuals.humanRenderer.drawTo(world.ctx, human.skin, cachedStatus.facing, activity, animationTime, translated, config.tileSize*magnify, human.clothes, e);
+					visuals.humanRenderer.drawTo(world.ctx, human.skin, cachedStatus.facing, activity, animationTime, translated, config.tileSize*magnify, human.clothes, {entity: e});
 				},
 				magnify
 			}
