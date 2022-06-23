@@ -15,6 +15,7 @@ import SlimeEntity from "./entity/SlimeEntity";
 import SkeletonEntity from "./entity/SkeletonEntity";
 import OgreEntity from "./entity/OgreEntity";
 import SpectreEntity from "./entity/SpectreEntity";
+import Particle from "./Particle";
 
 export type WorldEvent = "item" | "inventory-update" | "entity-change";
 
@@ -32,7 +33,7 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	private _items: Map<number, FloatingItem> = new Map();
 	public followedEntity: Entity<unknown> | null = null;
 	private inventory: Array<ItemStack> = [];
-
+	particles: Array<Particle> = []
 
 	constructor(model: VisualModel, width: number, height: number, tileGrid: Array<Matrix<string>>, camStart: Position) {
 		super();
@@ -151,6 +152,10 @@ class World extends UpdateBroadcaster<WorldEvent> {
 		}
 		this._entities.delete(id);
 		this.triggerUpdate("entity-change");
+	}
+
+	spawnParticle(p: Particle) {
+		this.particles.push(p);
 	}
 
 	followEntity(id: number) {

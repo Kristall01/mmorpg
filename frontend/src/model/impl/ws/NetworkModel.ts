@@ -19,6 +19,7 @@ import SignalInSpawnItem from "model/signals/SignalInSpawnItem";
 import SignalJoinworld from "model/signals/SignalJoinworld";
 import SignalLabelFor from "model/signals/SignalLabel";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
+import SignalParticle from "model/signals/SignalParticle";
 import SignalRenameEntity from "model/signals/SignalRenameEntity";
 import SignalSetinventory from "model/signals/SignalSetinventory";
 import SignalSound from "model/signals/SignalSound";
@@ -27,6 +28,7 @@ import FloatingItem from "visual_model/FloatingItem";
 import Item from "visual_model/Item";
 import ItemStack from "visual_model/ItemStack";
 import { LabelType } from "visual_model/Label";
+import Particle from "visual_model/Particle";
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 
@@ -92,6 +94,7 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("attack", ({x,y,entityID}) => new SignalAttack(entityID, x,y));
 		this.addPacketSignal("sudo", ({text}) => new SignalSudo(text));
 		this.addPacketSignal("sound", ({soundID}) => new SignalSound(soundID));
+		this.addPacketSignal("particle", ({position, color, size, livesUntil}) => new SignalParticle(new Particle(position, color, size, livesUntil)));
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 

@@ -15,6 +15,8 @@ import { ConstStatus, Direction, StatusFn, zigzagStatus } from "visual_model/Pat
 import { Position } from "visual_model/VisualModel";
 //import SignalOut from "model/signals/SignalOut";
 import map from "./map";
+import SignalParticle from "model/signals/SignalParticle";
+import Particle from "visual_model/Particle";
 
 const tileGrid = map.data;
 
@@ -110,6 +112,18 @@ class DModel extends LogicModel {
 			args = message.substring(firstSpace+1).split(" ");
 		}
 		switch(prefix) {
+			case "circle": {
+				const unit = Math.PI/10;
+				const drawPixel = (i: number) => {
+					let playerPos = this.statusFn(performance.now()).position;
+					let xdiff = Math.cos(unit*i);
+					let ydiff = Math.sin(unit*i);
+					this.broadcastSignal(new SignalParticle(new Particle([playerPos[0] + xdiff, playerPos[1] + ydiff], "red", 1, performance.now()+500)))
+					setTimeout(()=>drawPixel(i+1), 100);
+				}
+				drawPixel(0);
+				break;
+			}
 			case "clearchat": {
 				this.broadcastSignal(new SignalClarchat());
 				this.broadcastSignal(new SignalChat("§7§oChat törölve"));

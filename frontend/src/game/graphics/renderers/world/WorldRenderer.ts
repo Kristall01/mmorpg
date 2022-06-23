@@ -404,6 +404,15 @@ class WorldRenderer implements Renderable {
 			}
 		}
 
+		this.world.particles = this.world.particles.filter(p => p.livesUntil > renderTime);
+		for(let p of this.world.particles) {
+			this.ctx.fillStyle = p.color;
+			let pos = this.translateXY(...p.positionFn(renderTime));
+			let realSize = p.size*tileSize/16;
+			let halfRealSize = realSize/2;
+			this.ctx.fillRect(pos[0] - halfRealSize, pos[1] - halfRealSize, realSize,realSize);
+		}
+
 		// for(let entity of this.model.world.entities) {
 		// for(let entity of this.world.entities) {
 		// 	entity.render(this.renderConfig, this, this.ctx);

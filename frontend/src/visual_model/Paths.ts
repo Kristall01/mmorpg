@@ -41,6 +41,7 @@ export type Path = {
 }
 
 export type StatusFn = (rendertime: number) => Status
+export type PositionFn = (rendertime: number) => Position
 
 const pointDistance = (pos0: Position, pos1: Position): number => {
 	return Math.sqrt(Math.pow(pos0[0] - pos1[0], 2) + Math.pow(pos0[1] - pos1[1], 2));
