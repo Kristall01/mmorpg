@@ -199,17 +199,23 @@ public class Server extends SynchronizedObject<Server> {
 		final Synchronizer<Server> serverSynchronizer = this.getSynchronizer();
 		AsyncExecutor.instance().runTask(() -> {
 			SavedPlayer savedPlayer = null;
+			boolean loaded = false;
 			try {
 				savedPlayer = playerPersistence.loadPlayer(name);
+				loaded = true;
 			}
 			catch (Throwable e) {
 				AsyncExecutor.instance().getLogger().error(lang.getMessage("server.playerdata.loadfail"), e);
 				c.completeExceptionally(e);
-				return;
 			}
+			final boolean loadSuccess = loaded;
 			final SavedPlayer finalSavedPlayer = savedPlayer;
 			try {
 				serverSynchronizer.sync(srv -> {
+					if(!loadSuccess) {
+						takeNames.remove(name);
+						return;
+					}
 					Player p = new Player(this, finalSavedPlayer, this.playerPersistence, () -> quitPlayer(name), conn, name);
 					players.put(name, p);
 					c.complete(p);
