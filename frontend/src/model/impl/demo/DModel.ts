@@ -180,6 +180,10 @@ class DModel extends LogicModel {
 		this.broadcastEvent({type: ModelEventType.END});
 	}
 
+	inventoryInteract(type: string, inventoryID: string) {
+		
+	}
+
 }
 
 export default DModel;

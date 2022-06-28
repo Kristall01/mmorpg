@@ -37,6 +37,10 @@ export interface ImageResource {
 	src: string;
 }
 
+const extensions: Map<string,string> = new Map();
+extensions.set("mp3", "audio/mpeg");
+extensions.set("wav", "audio/x-wav");
+
 export default class ImageStore {
 
 	private images: Map<string, ImageResource> = new Map();
@@ -112,7 +116,17 @@ export default class ImageStore {
 				if(entries[i].directory) {
 					continue;
 				}
-				promises.push(this.loadSoundBlob(await entries[i].getData(new zipjs.BlobWriter("audio/mpeg")), entries[i].filename));
+				let nameBase: string = entries[i].filename;
+				let extensionDot = nameBase.lastIndexOf('.');
+				if(extensionDot === -1) {
+					continue;
+				}
+				let fileExtension = nameBase.substring(extensionDot+1);
+
+				let mimeType = extensions.get(fileExtension);
+				if(mimeType !== undefined) {
+					promises.push(this.loadSoundBlob(await entries[i].getData(new zipjs.BlobWriter(mimeType)), entries[i].filename));
+				}
 			}
 			await Promise.all(promises);
 		}

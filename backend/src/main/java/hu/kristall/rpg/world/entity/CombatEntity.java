@@ -29,7 +29,7 @@ public class CombatEntity extends AiEntity {
 		this.attackDamage = attackDamage;
 		this.attackDelay = (long)(1000/attackSpeed);
 		
-		changeAI(new PassiveWander(this));
+		changeAI(new PassiveWander(this, 0));
 	}
 	
 	public double getTargetLockDistance() {

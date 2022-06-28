@@ -17,7 +17,6 @@ export default class SignalLabelFor implements SignalIn {
 	execute(model: VisualModel): void {
 		let entity = model.world?.getEntity(this.entityID);
 		if(entity === undefined) {
-			console.warn("network error: entity of ",this.entityID," does not exist clientside.");
 			return;
 		}
 		model.showLabelFor(this.text, this.labelType, entity);

@@ -1,26 +1,32 @@
 package hu.kristall.rpg.persistence;
 
+import hu.kristall.rpg.world.PotionEffect;
 import hu.kristall.rpg.world.entity.EntityHuman;
 import hu.kristall.rpg.world.entity.cozy.ClothPack;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class SavedPlayer {
 	
 	public final String name;
 	public final LogoutPosition logoutPosition;
 	public final double hp;
-	public final List<SavedItemStack> inventory;
+	public final Map<String, Integer> inventory;
 	public final ClothPack clothes;
 	public final boolean loaded;
+	public final Collection<PotionEffect> potionEffects;
 	
-	public SavedPlayer(String name, LogoutPosition pos, double hp, List<SavedItemStack> inventory, ClothPack pack) {
+	public SavedPlayer(String name, LogoutPosition pos, double hp, Map<String, Integer> inventory, ClothPack pack, List<PotionEffect> effects) {
 		this.loaded = true;
 		this.name = name;
 		this.logoutPosition = pos;
 		this.hp = hp;
-		this.inventory = List.copyOf(inventory);
+		this.inventory = inventory;
 		this.clothes = pack;
+		this.potionEffects = effects;
 	}
 	
 	public SavedPlayer(EntityHuman entityHuman) {
@@ -28,8 +34,16 @@ public class SavedPlayer {
 		this.name = entityHuman.getName();
 		this.logoutPosition = new LogoutPosition(entityHuman.getPosition(), entityHuman.getWorld().getName());
 		this.hp = entityHuman.getHp();
-		this.inventory = entityHuman.getInventory().structuredClone();
+		this.inventory = entityHuman.getInventory().serialize();
 		this.clothes = entityHuman.getClothes().structuredClone();
+		potionEffects = new ArrayList<>();
+		for (PotionEffect potionEffect : entityHuman.getPotionEffects()) {
+			if(potionEffect.isActive()) {
+				PotionEffect copy = potionEffect.structuredClone();
+				copy.reduceTime();
+				potionEffects.add(copy);
+			}
+		}
 	}
 	
 	/*public static class SavedPlayerPersistence implements JsonDeserializer<SavedPlayer> {

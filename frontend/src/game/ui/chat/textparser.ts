@@ -101,6 +101,12 @@ export type ParsedText = {
 }
 
 const parseText = (text: string): ParsedText => {
+	if(parseText.length === 0) {
+		return {
+			fragments: [],
+			original: text
+		}
+	}
 	let fragments: TextFragment[] = []
 	let flagByte: boolean = false
 	let bufferedText = "";
@@ -147,6 +153,7 @@ const parseText = (text: string): ParsedText => {
 				fragments.push({color: currentColor, flags: options, text: bufferedText});
 			}
 			options = {...options};
+			bufferedText = '';
 			(options as any)[styleKey] = true;
 		}
 	}

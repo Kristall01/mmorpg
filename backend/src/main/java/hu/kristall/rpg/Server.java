@@ -28,7 +28,7 @@ public class Server extends SynchronizedObject<Server> {
 	private NetworkServer networkServer;
 	private CommandMap commandMap;
 	//private InputReader inputReader;
-	private Lang lang = new Lang();
+	private final Lang lang = new Lang();
 	private WorldsManager worldsManager;
 	private Map<String, Player> players = new HashMap<>();
 	private Set<String> takeNames = new HashSet<>();
@@ -45,7 +45,7 @@ public class Server extends SynchronizedObject<Server> {
 		super("server");
 		this.port = port;
 		
-		changeSyncer(new AsyncServer(this));
+		changeSyncer(new AsyncServer(this, this.lang));
 		this.playerPersistence = new PlayerPersistence(new File(System.getProperty("user.dir"), "playerdata"));
 		try {
 			lang.loadConfigFromJar("lang.cfg");
@@ -62,7 +62,7 @@ public class Server extends SynchronizedObject<Server> {
 				itemMap = savefile.itemMap;
 				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
 					SavedLevel level = levelEntry.getValue();
-					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder, level.entitySpawners);
+					Synchronizer<World> asyncWorld = worldsManager.createWorld(levelEntry.getKey(), level.width, level.height, level.layers, level.pathFinder, level.entitySpawners, level.merchantData);
 					final List<SavedPortal> portals = level.portals;
 					asyncWorld.sync(world -> {
 						for (SavedPortal portal : portals) {
@@ -70,6 +70,10 @@ public class Server extends SynchronizedObject<Server> {
 						}
 					});
 				}
+				worldsManager.setDefaultWorld(savefile.defaultLevel);
+			}
+			else {
+				itemMap = new ItemMap.Builder().bake();
 			}
 			/*if(savefile != null) {
 				for (Map.Entry<String, SavedLevel> levelEntry : savefile.levels.entrySet()) {
@@ -199,17 +203,23 @@ public class Server extends SynchronizedObject<Server> {
 		final Synchronizer<Server> serverSynchronizer = this.getSynchronizer();
 		AsyncExecutor.instance().runTask(() -> {
 			SavedPlayer savedPlayer = null;
+			boolean loaded = false;
 			try {
 				savedPlayer = playerPersistence.loadPlayer(name);
+				loaded = true;
 			}
 			catch (Throwable e) {
 				AsyncExecutor.instance().getLogger().error(lang.getMessage("server.playerdata.loadfail"), e);
 				c.completeExceptionally(e);
-				return;
 			}
+			final boolean loadSuccess = loaded;
 			final SavedPlayer finalSavedPlayer = savedPlayer;
 			try {
 				serverSynchronizer.sync(srv -> {
+					if(!loadSuccess) {
+						takeNames.remove(name);
+						return;
+					}
 					Player p = new Player(this, finalSavedPlayer, this.playerPersistence, () -> quitPlayer(name), conn, name);
 					players.put(name, p);
 					c.complete(p);

@@ -2,6 +2,7 @@ package hu.kristall.rpg.world;
 
 import hu.kristall.rpg.ThreadCloneable;
 import hu.kristall.rpg.persistence.SavedItem;
+import hu.kristall.rpg.world.item.InteractHandler;
 import hu.kristall.rpg.world.item.ItemFlags;
 
 import java.util.Collections;
@@ -14,22 +15,34 @@ public class Item implements ThreadCloneable<SavedItem> {
 	private String type;
 	private List<String> description;
 	private ItemFlags flags;
+	private String name;
+	private List<InteractHandler> interactHandlers;
 	
-	public Item(String type, Material material, List<String> description, ItemFlags flags) {
+	public Item(String type, Material material, String name, List<String> description, ItemFlags flags, List<InteractHandler> interactHandlers) {
 		this.type = type;
 		if(description == null) {
 			description = Collections.emptyList();
 		}
-		this.description = description;
+		this.name = name;
+		this.description = Collections.unmodifiableList(description);
 		this.material = material;
 		if(flags == null) {
 			flags = new ItemFlags();
 		}
 		this.flags = flags;
+		this.interactHandlers = interactHandlers;
 	}
 	
-	public Item(String type, Material material) {
-		this(type, material, null, null);
+	public String getName() {
+		return name;
+	}
+	
+	public Item(String type, String name, Material material) {
+		this(type, material, name, null, null, Collections.emptyList());
+	}
+	
+	public List<InteractHandler> getInteractHandlers() {
+		return interactHandlers;
 	}
 	
 	public ItemFlags getFlags() {
@@ -38,6 +51,10 @@ public class Item implements ThreadCloneable<SavedItem> {
 	
 	public Material getMaterial() {
 		return material;
+	}
+	
+	public List<String> getDescription() {
+		return description;
 	}
 	
 	public String getType() {

@@ -3,16 +3,19 @@ import GraphicsComponent from 'game/graphics/component/GraphicsComponent';
 import TextureRenderer from 'game/graphics/renderers/world/TextureRenderer';
 import EmptyTexture from 'game/graphics/texture/EmptyTexture';
 import TexturePack from 'game/graphics/texture/TexturePack';
-import React, {createRef, ReactNode } from 'react';
+import LogicModel from 'model/LogicModel';
+import React, {createRef, HTMLAttributes, ReactNode } from 'react';
 import VisualModel, {Position, UpdateTypes} from 'visual_model/VisualModel';
-import World, { WorldEvent } from 'visual_model/World';
-import { parseTextHtml } from '../chat/textparser';
+import World, { Inventory, WorldEvent } from 'visual_model/World';
+import parseText, { ParsedText, parseTextHtml } from '../chat/textparser';
 import './InventoryMenu.scss';
 
 export type InventoryMenuProps = {
 	texturePack: TexturePack
 	model: VisualModel
 	world: World,
+	inventory: Inventory
+	logicModel: LogicModel
 }
 
 type InventoryMenuState = {
@@ -44,7 +47,7 @@ class InventoryMenu extends ConnectedComponent<UpdateTypes | WorldEvent, Invento
 	private handleKeyDown(e: React.KeyboardEvent) {
 		e.stopPropagation();
 		if(e.key === "e" || e.key === "E" || e.key === "Escape") {
-			this.props.model.setInventoryOpen(false);
+			this.props.world.closeInventory();
 		}
 	}
 
@@ -104,20 +107,29 @@ class InventoryMenu extends ConnectedComponent<UpdateTypes | WorldEvent, Invento
 	render() {
 		let items = [];
 		let i = 0;
-		for(let item of this.props.world.getItems()) {
-			let titleElements: Array<React.ReactNode> = item.item.description.map((fragments,key) => {
+		for(let item of this.props.inventory.items) {
+			let titleElements: Array<React.ReactNode> = [];
+			let lines: Array<ParsedText> = [item.item.name];
+			if(item.item.description.length !== 0) {
+				lines.push(parseText(""));
+				for(let descriptionItem of item.item.description) {
+					lines.push(descriptionItem);
+				}
+			}
+			titleElements = lines.map((fragments, key) => {
 				return (
 					<div key={key} className="title" dangerouslySetInnerHTML={{__html: parseTextHtml(fragments).innerHTML}} />
 				)
 			})
 			items.push(
 				<div
+					key={item.item.type}
+					className='cell'
 					onMouseMove={e => this.handleMouseMove(e)}
 					onMouseEnter={e => this.handleMouseEnter(e, titleElements)}
 					onMouseLeave={e => this.handleMouseLeave(e)}
-					key={i++}
-					className='cell'
-					>
+					onClick={e => this.props.logicModel.inventoryInteract(item.item.type, this.props.inventory.inventoryID)}
+				>
 					<GraphicsComponent
 						renderable={new TextureRenderer(this.props.texturePack.getTexture(item.item.material, "item") || new EmptyTexture())}
 						maxFPS={1}

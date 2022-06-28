@@ -4,7 +4,7 @@ import { SignalIn } from "model/Definitions";
 import Entity from "./Entity";
 import { LabelType, WorldLabel } from "./Label";
 import UpdateBroadcaster from "./UpdateBroadcaster";
-import World from "./World";
+import World, { Inventory } from "./World";
 
 export type focus = "main" | "chat" | "menu" | "inventory" | "clotheditor";
 
@@ -30,7 +30,6 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 	private _dead: boolean = false;
 	private listeners = []
 	private chatHistory: string[] = [];
-	private _inventoryOpen: boolean = false;
 	private _clothEditorOpen: boolean = false;
 	public drawGrid: boolean = false;
 	public drawPath: boolean = false;
@@ -59,21 +58,8 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		return this._volume;
 	}
 
-	public get inventoryOpen() {
-		return this._inventoryOpen;
-	}
-
 	public get clothEditorOpen() {
 		return this._clothEditorOpen;
-	}
-
-	setInventoryOpen(value: boolean) {
-		if(this.inventoryOpen === value) {
-			return;
-		}
-		this._inventoryOpen = value;
-		this.triggerUpdate("inventory-open");
-		this.setFocus(value ? "inventory" : "main");
 	}
 
 	setClotheditorOpen(value: boolean) {
@@ -141,7 +127,7 @@ class VisualModel extends UpdateBroadcaster<UpdateTypes> {
 		this.setFocus(value ? "chat" : "main");
 	}
 
-	private setFocus(focus: focus) {
+	setFocus(focus: focus) {
 		this.focus = focus;
 		this.triggerUpdate("focus");
 	}

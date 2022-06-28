@@ -11,6 +11,9 @@ public class Follow implements AiTask {
 	public Follow(Entity actor, Entity followedEntity) {
 		this.actor = actor;
 		this.followedEntity = followedEntity;
+		
+		
+		actor.getWorld().getTimer().schedule(this::tickAI,0, 1000);
 	}
 	
 	@Override

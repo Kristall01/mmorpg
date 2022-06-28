@@ -8,8 +8,7 @@ import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.network.packet.out.PacketOutChat;
 import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.Material;
-
-import java.util.function.Supplier;
+import hu.kristall.rpg.world.item.ItemGenerator;
 
 public class CommandWorldSpawnitem extends SimpleCommand {
 	
@@ -35,12 +34,12 @@ public class CommandWorldSpawnitem extends SimpleCommand {
 				return;
 			}
 			Position pos = entityHuman.getPosition();
-			Supplier<Item> itemSupplier = sender.getServer().getItemMap().getItem(args[0]);
+			ItemGenerator itemSupplier = sender.getServer().getItemMap().getItem(args[0]);
 			if(itemSupplier == null) {
 				sender.sendTranslatedMessage("error.item-not-found");
 				return;
 			}
-			Item i = itemSupplier.get();
+			Item i = itemSupplier.generateItem();
 			if(i == null) {
 				sender.sendTranslatedMessage("cerror.item-not-available");
 				return;

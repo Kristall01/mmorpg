@@ -17,7 +17,7 @@ public class EntitySpectre extends CombatEntity {
 	
 	@Override
 	public void kill() {
-		getWorld().spawnItem(dungeonKeyGenerator.get(), getPosition());
+		getWorld().spawnItem(dungeonKeyGenerator.generateItem(), getPosition());
 		super.kill();
 	}
 	

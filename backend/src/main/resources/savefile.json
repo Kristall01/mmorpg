@@ -1835,6 +1835,108 @@
 						15
 					]
 				}
+			],
+			"merchants": [
+				{
+					"ID": "witch",
+					"name": "Boszorkány",
+					"position": [14, 5],
+					"clothes": [
+						{
+							"color":"BLACK",
+							"cloth":"DRESS_WITCH"
+						}
+					],
+					"products": [
+						{
+							"item": "hp_potion",
+							"amount": 3,
+							"price": {
+								"coin": 1
+							}
+						},
+						{
+							"item": "coin",
+							"amount": 5,
+							"price": {
+								"skeleton_bone": 1
+							}
+						},
+						{
+							"item": "strength_potion",
+							"amount": 1,
+							"price": {
+								"coin": 1
+							}
+						},
+						{
+							"item": "defence_cheese",
+							"amount": 1,
+							"price": {
+								"coin": 2
+							}
+						}
+					]
+				},
+				{
+					"ID": "smith",
+					"name": "Kovács",
+					"position": [17, 5],
+					"clothes": [
+						{
+							"color": "BROWN",
+							"cloth": "OVERALL"
+						},
+						{
+							"color": "BROWN",
+							"cloth": "PANTS_SUIT"
+						}
+					],
+					"products": [
+						{
+							"item": "coin",
+							"amount": 1,
+							"price": {
+								"dungeon_key": 2
+							}
+						},
+						{
+							"item": "helmet",
+							"amount": 1,
+							"price": {
+								"coin": 1
+							}
+						},
+						{
+							"item": "horny_helmet",
+							"amount": 1,
+							"price": {
+								"coin": 1
+							}
+						},
+						{
+							"item": "shield",
+							"amount": 1,
+							"price": {
+								"coin": 1
+							}
+						},
+						{
+							"item": "spear",
+							"amount": 1,
+							"price": {
+								"coin": 1
+							}
+						},
+						{
+							"item": "sword",
+							"amount": 1,
+							"price": {
+								"coin": 1
+							}
+						}
+					]
+				}
 			]
 		},
 		"w0-astar": {
@@ -7347,21 +7449,340 @@
 	"items": {
 		"dungeon_key": {
 			"material": "KEY_IRON",
-			"description": [
-				"§akapu kulcs"
-			],
+			"name": "§akapu kulcs",
 			"flags": {
 				"renderTitle": true
 			}
 		},
 		"skeleton_bone": {
 			"material": "BONE",
+			"name": "csontváz csont",
 			"description": [
-				"csontváz csont",
-				"",
 				"§7§oVajon mire való?"
 			]
-
+		},
+		"hp_potion": {
+			"material": "POTION_RED_MEDIUM",
+			"name": "§c[+20 ♥§c] §dÉleterő itala",
+			"description": [
+				"§7§oEz az ital használatkor visszatölt §c§o20 §7§oéleterőt"
+			],
+			"potion": {
+				"health": 20
+			}
+		},
+		"strength_potion": {
+			"material": "POTION_BLUE_BIG",
+			"name": "§e[+10 ⚔§e] §dErő itala",
+			"description": [
+				"§7§oEz az ital használatkor ad §e§o10 §7§oerőt §a60 mp§7 erejéig."
+			],
+			"potion": {
+				"strength": {
+					"amount": 10,
+					"lasts": 60000
+				}
+			}
+		},
+		"defence_cheese": {
+			"material": "CHEESE",
+			"name": "§2[+20 \uD83D\uDEE1§2] §dElvarázsolt sajt",
+			"potion": {
+				"defence": {
+					"amount": 20,
+					"lasts": 60000
+				}
+			},
+			"description": [
+				"§7§oEz az étel használatkor ad §2§o10 §7§oszívósságot §a60 mp§7 erejéig."
+			]
+		},
+		"coin": {
+			"name": "§6Pénzérme",
+			"material": "SHIELD_BRONZE",
+			"description": [
+				"§7§oEzt felhasználva fizethetsz bizonyos kereskedőknél."
+			]
+		},
+		"helmet": {
+			"name": "Dísz sisak",
+			"material": "HELMET_0"
+		},
+		"horny_helmet": {
+			"name": "Szarvas sisak",
+			"material": "HELMET_3"
+		},
+		"shield": {
+			"name": "Pajzs",
+			"material": "SHIELD_IRON"
+		},
+		"spear": {
+			"name": "Dísz dárda",
+			"material": "SPEAR"
+		},
+		"sword": {
+			"name": "Dísz kard",
+			"material": "SWORD_6"
+		},
+		"basic_apple": {
+			"material": "APPLE",
+			"name": "basic_apple"
+		},
+		"basic_cheese": {
+			"material": "CHEESE",
+			"name": "basic_cheese"
+		},
+		"basic_fried_eggs": {
+			"material": "FRIED_EGGS",
+			"name": "basic_fried_eggs"
+		},
+		"basic_pie": {
+			"material": "PIE",
+			"name": "basic_pie"
+		},
+		"basic_key_bronze": {
+			"material": "KEY_BRONZE",
+			"name": "basic_key_bronze"
+		},
+		"basic_key_iron": {
+			"material": "KEY_IRON",
+			"name": "basic_key_iron"
+		},
+		"basic_candle": {
+			"material": "CANDLE",
+			"name": "basic_candle"
+		},
+		"basic_cup": {
+			"material": "CUP",
+			"name": "basic_cup"
+		},
+		"basic_chest_plate": {
+			"material": "CHEST_PLATE",
+			"name": "basic_chest_plate"
+		},
+		"basic_gauntlet_leather": {
+			"material": "GAUNTLET_LEATHER",
+			"name": "basic_gauntlet_leather"
+		},
+		"basic_gauntlet_iron": {
+			"material": "GAUNTLET_IRON",
+			"name": "basic_gauntlet_iron"
+		},
+		"basic_boots_leather": {
+			"material": "BOOTS_LEATHER",
+			"name": "basic_boots_leather"
+		},
+		"basic_boots_iron": {
+			"material": "BOOTS_IRON",
+			"name": "basic_boots_iron"
+		},
+		"basic_boots_gold": {
+			"material": "BOOTS_GOLD",
+			"name": "basic_boots_gold"
+		},
+		"basic_shoes": {
+			"material": "SHOES",
+			"name": "basic_shoes"
+		},
+		"basic_magic_hat_0": {
+			"material": "MAGIC_HAT_0",
+			"name": "basic_magic_hat_0"
+		},
+		"basic_magic_hat_1": {
+			"material": "MAGIC_HAT_1",
+			"name": "basic_magic_hat_1"
+		},
+		"basic_ring_0": {
+			"material": "RING_0",
+			"name": "basic_ring_0"
+		},
+		"basic_ring_1": {
+			"material": "RING_1",
+			"name": "basic_ring_1"
+		},
+		"basic_ring_2": {
+			"material": "RING_2",
+			"name": "basic_ring_2"
+		},
+		"basic_ring_3": {
+			"material": "RING_3",
+			"name": "basic_ring_3"
+		},
+		"basic_helmet_0": {
+			"material": "HELMET_0",
+			"name": "basic_helmet_0"
+		},
+		"basic_helmet_1": {
+			"material": "HELMET_1",
+			"name": "basic_helmet_1"
+		},
+		"basic_helmet_2": {
+			"material": "HELMET_2",
+			"name": "basic_helmet_2"
+		},
+		"basic_helmet_3": {
+			"material": "HELMET_3",
+			"name": "basic_helmet_3"
+		},
+		"basic_necklace": {
+			"material": "NECKLACE",
+			"name": "basic_necklace"
+		},
+		"basic_necklace_start": {
+			"material": "NECKLACE_START",
+			"name": "basic_necklace_start"
+		},
+		"basic_necklace_fang": {
+			"material": "NECKLACE_FANG",
+			"name": "basic_necklace_fang"
+		},
+		"basic_necklace_skull": {
+			"material": "NECKLACE_SKULL",
+			"name": "basic_necklace_skull"
+		},
+		"basic_scroll_blue": {
+			"material": "SCROLL_BLUE",
+			"name": "basic_scroll_blue"
+		},
+		"basic_scroll_red": {
+			"material": "SCROLL_RED",
+			"name": "basic_scroll_red"
+		},
+		"basic_scroll_opened": {
+			"material": "SCROLL_OPENED",
+			"name": "basic_scroll_opened"
+		},
+		"basic_stone_tablet": {
+			"material": "STONE_TABLET",
+			"name": "basic_stone_tablet"
+		},
+		"basic_shield_wood": {
+			"material": "SHIELD_WOOD",
+			"name": "basic_shield_wood"
+		},
+		"basic_shield_iron": {
+			"material": "SHIELD_IRON",
+			"name": "basic_shield_iron"
+		},
+		"basic_shield_bronze": {
+			"material": "SHIELD_BRONZE",
+			"name": "basic_shield_bronze"
+		},
+		"basic_shield_gold": {
+			"material": "SHIELD_GOLD",
+			"name": "basic_shield_gold"
+		},
+		"basic_potion_red_small": {
+			"material": "POTION_RED_SMALL",
+			"name": "basic_potion_red_small"
+		},
+		"basic_potion_red_medium": {
+			"material": "POTION_RED_MEDIUM",
+			"name": "basic_potion_red_medium"
+		},
+		"basic_potion_blue_small": {
+			"material": "POTION_BLUE_SMALL",
+			"name": "basic_potion_blue_small"
+		},
+		"basic_potion_blue_big": {
+			"material": "POTION_BLUE_BIG",
+			"name": "basic_potion_blue_big"
+		},
+		"basic_bow_0": {
+			"material": "BOW_0",
+			"name": "basic_bow_0"
+		},
+		"basic_bow_1": {
+			"material": "BOW_1",
+			"name": "basic_bow_1"
+		},
+		"basic_bow_2": {
+			"material": "BOW_2",
+			"name": "basic_bow_2"
+		},
+		"basic_bow_3": {
+			"material": "BOW_3",
+			"name": "basic_bow_3"
+		},
+		"basic_wand_0": {
+			"material": "WAND_0",
+			"name": "basic_wand_0"
+		},
+		"basic_wand_1": {
+			"material": "WAND_1",
+			"name": "basic_wand_1"
+		},
+		"basic_wand_2": {
+			"material": "WAND_2",
+			"name": "basic_wand_2"
+		},
+		"basic_wand_3": {
+			"material": "WAND_3",
+			"name": "basic_wand_3"
+		},
+		"basic_spear": {
+			"material": "SPEAR",
+			"name": "basic_spear"
+		},
+		"basic_spear_ribbon": {
+			"material": "SPEAR_RIBBON",
+			"name": "basic_spear_ribbon"
+		},
+		"basic_spear_spike": {
+			"material": "SPEAR_SPIKE",
+			"name": "basic_spear_spike"
+		},
+		"basic_axe_0": {
+			"material": "AXE_0",
+			"name": "basic_axe_0"
+		},
+		"basic_axe_1": {
+			"material": "AXE_1",
+			"name": "basic_axe_1"
+		},
+		"basic_axe_2": {
+			"material": "AXE_2",
+			"name": "basic_axe_2"
+		},
+		"basic_axe_3": {
+			"material": "AXE_3",
+			"name": "basic_axe_3"
+		},
+		"basic_sword_0": {
+			"material": "SWORD_0",
+			"name": "basic_sword_0"
+		},
+		"basic_sword_1": {
+			"material": "SWORD_1",
+			"name": "basic_sword_1"
+		},
+		"basic_sword_2": {
+			"material": "SWORD_2",
+			"name": "basic_sword_2"
+		},
+		"basic_sword_3": {
+			"material": "SWORD_3",
+			"name": "basic_sword_3"
+		},
+		"basic_sword_4": {
+			"material": "SWORD_4",
+			"name": "basic_sword_4"
+		},
+		"basic_sword_5": {
+			"material": "SWORD_5",
+			"name": "basic_sword_5"
+		},
+		"basic_sword_6": {
+			"material": "SWORD_6",
+			"name": "basic_sword_6"
+		},
+		"basic_sword_7": {
+			"material": "SWORD_7",
+			"name": "basic_sword_7"
+		},
+		"basic_bone": {
+			"material": "BONE",
+			"name": "basic_bone"
 		}
 	}
 }

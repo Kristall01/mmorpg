@@ -131,7 +131,7 @@ public class TestWorld {
 					return asyncWorld.syncCompute(world -> {
 						Entity entity = world.spawnEntity(EntityType.DUMMY, new Position(20,20));
 						double hp = entity.getHp();
-						entity.damage(20);
+						entity.damage(20, null);
 						return Math.round(hp-20 - entity.getHp()) < 0.001;
 					}).get();
 				}
@@ -158,7 +158,7 @@ public class TestWorld {
 				try {
 					return asyncWorld.syncCompute(world -> {
 						Entity entity = world.spawnEntity(EntityType.DUMMY, new Position(20,20));
-						entity.damage(entity.getHp());
+						entity.damage(entity.getHp(), null);
 						return entity.isRemoved();
 					}).get();
 				}

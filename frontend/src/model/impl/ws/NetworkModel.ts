@@ -5,6 +5,7 @@ import SignalAttack from "model/signals/SignalAttack";
 import SignalChangeClothes from "model/signals/SignalChangeClothes";
 import SignalChangeHp from "model/signals/SignalChangeHp";
 import SignalChat from "model/signals/SignalChat";
+import SignalCloseInventory from "model/signals/SignalCloseInventory";
 import SignalDespawnItem from "model/signals/SignalDespawnItem";
 import SignalDied from "model/signals/SignalDied";
 import SignalEntityDeath from "model/signals/SignalEntityDeath";
@@ -19,6 +20,7 @@ import SignalInSpawnItem from "model/signals/SignalInSpawnItem";
 import SignalJoinworld from "model/signals/SignalJoinworld";
 import SignalLabelFor from "model/signals/SignalLabel";
 import SignalLeaveworld from "model/signals/SignalLeaveworld";
+import SignalOpenInventory from "model/signals/SignalOpenInventory";
 import SignalRenameEntity from "model/signals/SignalRenameEntity";
 import SignalSetinventory from "model/signals/SignalSetinventory";
 import SignalSound from "model/signals/SignalSound";
@@ -77,21 +79,22 @@ class NetworkModel extends LogicModel {
 		this.addPacketSignal("entityDeath", ({id}) => new SignalEntityDeath(id));
 		this.addPacketSignal("died", () => new SignalDied());
 		this.addPacketSignal("portal-spawn", ({X, Y, radius}) => new SignalInPortalspawn(X, Y, radius));
-		this.addPacketSignal("spawn-item", ({x,y,id,item}) => new SignalInSpawnItem(new FloatingItem(id, [x,y], new Item(item.material, item.description, item.flags))));
+		this.addPacketSignal("spawn-item", ({x,y,id,item}) => new SignalInSpawnItem(new FloatingItem(id, [x,y], new Item(item.type, item.material, item.name, item.description, item.flags))));
 		this.addPacketSignal("despawn-item", ({id}) => new SignalDespawnItem(id));
-		this.addPacketSignal("setinventory", ({items}) => {
+		this.addPacketSignal("setinventory", ({items, inventoryID}) => {
 			let itemStacks: Array<ItemStack> = [];
 			for(let {amount, item} of items) {
-				let {description, material, flags} = item;
-				itemStacks.push({amount, item: new Item(material, description, flags)})
+				let {name, description, material, flags, type} = item;
+				itemStacks.push({amount, item: new Item(type, material, name, description, flags)})
 			}
-
-			return new SignalSetinventory(itemStacks);
+			return new SignalSetinventory(itemStacks, inventoryID);
 		});
 		this.addPacketSignal("teleport", ({x,y,entityID, instant}) => new SignalEntityTeleport(x,y,entityID,instant));
 		this.addPacketSignal("attack", ({x,y,entityID}) => new SignalAttack(entityID, x,y));
 		this.addPacketSignal("sudo", ({text}) => new SignalSudo(text));
 		this.addPacketSignal("sound", ({soundID}) => new SignalSound(soundID));
+		this.addPacketSignal("open-inventory", ({inventoryID}) => new SignalOpenInventory(inventoryID));
+		this.addPacketSignal("close-inventory", () => new SignalCloseInventory());
 
 		//this.register("entitypath", ({id, startNanos, points}) => new SignalEntitypath(id, (startNanos - netModel.pingDelay)/1000000, points))
 
@@ -154,6 +157,9 @@ class NetworkModel extends LogicModel {
 		});
 	}
 
+	inventoryInteract(type: string, inventoryID: string): void {
+		this.sendPacket("inventory-interact", {inventoryID, type})
+	}
 
 	attackTowards(x: number, y: number) {
 		this.sendPacket("attack", {x, y});

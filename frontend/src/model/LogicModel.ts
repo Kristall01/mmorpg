@@ -33,4 +33,6 @@ export default abstract class LogicModel {
 
 	abstract attackTowards(x: number, y: number): void;
 
+	abstract inventoryInteract(type: string, inventoryID: string): void;
+
 }

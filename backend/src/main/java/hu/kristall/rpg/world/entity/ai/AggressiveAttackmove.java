@@ -12,9 +12,10 @@ public class AggressiveAttackmove implements AiTask {
 	private CombatEntity actor;
 	private long lastAttack;
 	
-	public AggressiveAttackmove (CombatEntity actor, Entity target) {
+	public AggressiveAttackmove (CombatEntity actor, Entity target, long lastAttack) {
 		this.actor = actor;
 		this.target = target;
+		this.lastAttack = lastAttack;
 		
 		this.aiTask = actor.getWorld().getTimer().schedule(this::tick, 0, 100);
 	}
@@ -42,7 +43,7 @@ public class AggressiveAttackmove implements AiTask {
 			if(autoAttackTask != null) {
 				autoAttackTask.cancel();
 			}
-			actor.changeAI(new PassiveWander(actor));
+			actor.changeAI(new PassiveWander(actor, lastAttack));
 			return;
 		}
 		if(Position.distance(actor.getPosition(), target.getPosition()) > actor.getAttackRange()) {

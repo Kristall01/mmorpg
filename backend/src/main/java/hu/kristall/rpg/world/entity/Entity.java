@@ -4,8 +4,8 @@ import hu.kristall.rpg.Position;
 import hu.kristall.rpg.network.PlayerConnection;
 import hu.kristall.rpg.network.packet.out.*;
 import hu.kristall.rpg.world.FloatingItem;
-import hu.kristall.rpg.world.Inventory;
 import hu.kristall.rpg.world.World;
+import hu.kristall.rpg.world.inventory.WritableInventory;
 import hu.kristall.rpg.world.path.Path;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public abstract class Entity {
 	private double hp;
 	private double maxHp;
 	private boolean alive = true;
-	protected Inventory inventory;
+	protected WritableInventory inventory;
 	
 	public Entity(World world, EntityType type, int entityID, double speed, double HP, double maxHp) {
 		this.type = type;
@@ -33,11 +33,11 @@ public abstract class Entity {
 		this.maxHp = maxHp;
 	}
 	
-	public void setInventory(Inventory inventory) {
+	public void setInventory(WritableInventory inventory) {
 		this.inventory = inventory;
 	}
 	
-	public Inventory getInventory() {
+	public WritableInventory getInventory() {
 		return inventory;
 	}
 	
@@ -94,7 +94,7 @@ public abstract class Entity {
 	
 	protected void handleHpChange(double amount) {}
 	
-	public double damage(double amount) {
+	public double damage(double amount, Entity source) {
 		if(amount <= 0) {
 			world.getLogger().error("Entity::damage() got negative amount of damage");
 			return 0;
@@ -108,7 +108,7 @@ public abstract class Entity {
 			//cannot attack self
 			return 0;
 		}
-		return entity.damage(damage);
+		return entity.damage(damage, this);
 	}
 	
 	public void setName(String name) {

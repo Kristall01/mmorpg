@@ -5,9 +5,7 @@ import hu.kristall.rpg.command.CommandParent;
 import hu.kristall.rpg.command.impl.SimpleCommand;
 import hu.kristall.rpg.command.senders.CommandSender;
 import hu.kristall.rpg.world.Item;
-import hu.kristall.rpg.world.Material;
-
-import java.util.function.Supplier;
+import hu.kristall.rpg.world.item.ItemGenerator;
 
 public class CommandInventoryAdd extends SimpleCommand {
 	
@@ -21,12 +19,12 @@ public class CommandInventoryAdd extends SimpleCommand {
 			return;
 		}
 		CommandCheckers.checkWorldPlayerEntity(sender, e -> {
-			Supplier<Item> itemSupplier = sender.getServer().getItemMap().getItem(args[0]);
+			ItemGenerator itemSupplier = sender.getServer().getItemMap().getItem(args[0]);
 			if(itemSupplier == null) {
 				sender.sendTranslatedMessage("error.item-not-found");
 				return;
 			}
-			Item i = itemSupplier.get();
+			Item i = itemSupplier.generateItem();
 			if(i == null) {
 				sender.sendTranslatedMessage("error.item-not-available");
 				return;

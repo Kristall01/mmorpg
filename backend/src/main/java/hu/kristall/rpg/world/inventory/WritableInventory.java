@@ -1,24 +1,18 @@
-package hu.kristall.rpg.world;
+package hu.kristall.rpg.world.inventory;
 
-import hu.kristall.rpg.ThreadCloneable;
-import hu.kristall.rpg.persistence.SavedItemStack;
+import hu.kristall.rpg.world.Item;
 import hu.kristall.rpg.world.entity.Entity;
 
-import java.util.*;
+import java.util.Map;
 
-public class Inventory implements ThreadCloneable<List<SavedItemStack>> {
+public abstract class WritableInventory extends Inventory {
 	
-	private Map<Item, Integer> items = new HashMap<>();
 	private Entity owner;
 	private boolean broadcastStopped = false;
 	
-	public Inventory(Entity owner) {
+	public WritableInventory(Entity owner, Map<Item, Integer> items) {
+		super(items);
 		this.owner = owner;
-	}
-	
-	public Inventory(Entity owner, Map<Item, Integer> items) {
-		this.owner = owner;
-		this.items = items;
 	}
 	
 	public void broadcastUpdate() {
@@ -27,17 +21,28 @@ public class Inventory implements ThreadCloneable<List<SavedItemStack>> {
 		}
 	}
 	
-	public boolean hasItem(Item item) {
-		return items.containsKey(item);
-	}
-	
-	public boolean isEmpty() {
-		return items.isEmpty();
-	}
-	
 	public void addItem(Item item, int amount) {
 		items.merge(item, amount, Integer::sum);
 		broadcastUpdate();
+	}
+	
+	public boolean removeItemsAtomically(Map<Item, Integer> removeCandidates) {
+		for (Map.Entry<Item, Integer> entry : removeCandidates.entrySet()) {
+			if(countItems(entry.getKey()) < entry.getValue()) {
+				return false;
+			}
+		}
+		for (Map.Entry<Item, Integer> itemIntegerEntry : removeCandidates.entrySet()) {
+			int value = items.get(itemIntegerEntry.getKey());
+			if(value == itemIntegerEntry.getValue()) {
+				items.remove(itemIntegerEntry.getKey());
+			}
+			else {
+				items.put(itemIntegerEntry.getKey(), value - itemIntegerEntry.getValue());
+			}
+		}
+		broadcastUpdate();
+		return true;
 	}
 	
 	public int removeItem(Item item, int amount) {
@@ -47,6 +52,7 @@ public class Inventory implements ThreadCloneable<List<SavedItemStack>> {
 		}
 		if(i == amount) {
 			items.remove(item);
+			broadcastUpdate();
 			return amount;
 		}
 		int min = Math.min(amount, i);
@@ -66,19 +72,6 @@ public class Inventory implements ThreadCloneable<List<SavedItemStack>> {
 		}
 		this.broadcastStopped = false;
 		this.broadcastUpdate();
-	}
-	
-	public Collection<Map.Entry<Item, Integer>> getItems() {
-		return Collections.unmodifiableCollection(items.entrySet());
-	}
-	
-	@Override
-	public List<SavedItemStack> structuredClone() {
-		List<SavedItemStack> l = new ArrayList<>(this.items.size());
-		for (Map.Entry<Item, Integer> entry : this.items.entrySet()) {
-			l.add(new SavedItemStack(entry.getValue(), entry.getKey().structuredClone()));
-		}
-		return l;
 	}
 	
 }

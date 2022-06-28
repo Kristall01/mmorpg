@@ -22,4 +22,5 @@ public class PacketOutChangeClothes extends PacketOut {
 	public PacketOutChangeClothes(EntityHuman e) {
 		this(e.getID(), e.getClothes());
 	}
+	
 }
