@@ -25,7 +25,7 @@ public class CommandDmg extends SimpleCommand {
 				return;
 			}
 			if(amount < 0) {
-				entityHuman.damage(-amount);
+				entityHuman.damage(-amount, null);
 			}
 			else {
 				entityHuman.heal(amount);

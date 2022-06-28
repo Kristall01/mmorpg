@@ -10,6 +10,10 @@ import hu.kristall.rpg.persistence.SavedPlayer;
 import hu.kristall.rpg.sync.SynchronizedObject;
 import hu.kristall.rpg.sync.Synchronizer;
 import hu.kristall.rpg.world.entity.*;
+import hu.kristall.rpg.world.inventory.CreativeInventory;
+import hu.kristall.rpg.world.inventory.Inventory;
+import hu.kristall.rpg.world.inventory.MerchantInventory;
+import hu.kristall.rpg.world.inventory.MerchantProduct;
 import hu.kristall.rpg.world.path.ConstantPosition;
 import hu.kristall.rpg.world.path.Path;
 import hu.kristall.rpg.world.path.plan.PathFinder;
@@ -36,8 +40,9 @@ public class World extends SynchronizedObject<World> {
 	private Position bottomRightPosition;
 	private Position topLeftPosition = new Position(0,0);
 	private ItemMap itemMap;
+	private Map<String, Inventory> inventories = new HashMap<>();
 	
-	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners, ItemMap itemMap) {
+	public World(AsyncServer serverSynchronizer, String name, int width, int height, String[] tileGrid, PathFinder pathFinder, List<EntitySpawner> entitySpawners, ItemMap itemMap, List<MerchantData> merchants) {
 		super("world-"+name);
 		this.itemMap = itemMap;
 		this.pathFinder = pathFinder;
@@ -62,10 +67,31 @@ public class World extends SynchronizedObject<World> {
 		for (EntitySpawner entitySpawner : entitySpawners) {
 			entitySpawner.registerTo(this);
 		}
-		if(name.equals("spawn")) {
-			EntityHuman human = (EntityHuman) this.spawnEntity(EntityType.HUMAN, new Position(width/2, height/2));
-			human.setName("Enzan\n§a§lNPC");
+		
+		
+		ArrayList<MerchantProduct> products = new ArrayList<>();
+		Map<Item, Integer> prices = new HashMap<>();
+		//prices.put(itemMap.getItem("skeleton_bone").generateItem(),3);
+		
+		for (MerchantData merchant : merchants) {
+			MerchantInventory inv = MerchantInventory.createMerchantInventory(merchant.getID(), this, merchant.generateProductList(itemMap));
+			inventories.put(merchant.getID(), inv);
+			EntityHuman e = (EntityHuman) this.spawnEntity(EntityType.HUMAN, merchant.getPosition(), inv);
+			e.setClothes(merchant.getClothPack());
+			e.setName(merchant.getName()+"\n§a§lNPC");
 		}
+		
+		inventories.put("creative", CreativeInventory.createCreativeInventory(getItemMap(), getAsyncServer().lang));
+		
+		if(name.equals("spawn")) {
+			EntityHuman human = (EntityHuman) this.spawnEntity(EntityType.HUMAN, new Position(width/2 - 1, height/2));
+			human.setName("Enzan\n§a§lNPC");
+			//EntityHuman human = (EntityHuman) this.spawnMerchant(EntityType.HUMAN, new Position(width/2, height/2));
+		}
+	}
+	
+	public Inventory getInventory(String inventoryID) {
+		return inventories.get(inventoryID);
 	}
 	
 	public ItemMap getItemMap() {
@@ -159,6 +185,10 @@ public class World extends SynchronizedObject<World> {
 		return createdEntity;
 	}
 	
+/*	public Entity spawnMerchant(Position position, List<MerchantProduct> data) {
+	
+	}*/
+	
 	private void addEntity(Entity entity) {
 		worldEntities.put(entity.getID(), entity);
 		for (WorldPlayer value : worldPlayers.values()) {
@@ -183,6 +213,9 @@ public class World extends SynchronizedObject<World> {
 			
 			for(FloatingItem item : this.floatingItems.values()) {
 				connectingConnection.sendPacket(new PacketOutSpawnItem(item));
+			}
+			for (Inventory value : inventories.values()) {
+				connectingConnection.sendPacket(new PacketOutSetInventory(value));
 			}
 			
 			//sync done

@@ -32,7 +32,7 @@ public class EntitySlime extends AiEntity {
 	}
 	
 	@Override
-	public double damage(double amount) {
+	public double damage(double amount, Entity source) {
 		return 0;
 	}
 	

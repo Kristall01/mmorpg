@@ -6,6 +6,7 @@ export default class SignalLeaveworld implements SignalIn {
 	constructor() {}
 
 	execute(model: VisualModel): void {
+		model.world?.closeInventory();
 		model.leaveWorld();
 	}
 

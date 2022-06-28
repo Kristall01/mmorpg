@@ -12,13 +12,15 @@ public class PassiveWander implements AiTask {
 	private CombatEntity actor;
 	private long idleUntil = 0;
 	private boolean idleStarted = false;
+	private long lastAttack;
 	
 	Cancelable task;
 	
-	public PassiveWander(CombatEntity actor) {
+	public PassiveWander(CombatEntity actor, long lastAttack) {
 		this.actor = actor;
 		
 		this.task = actor.getWorld().getTimer().schedule(this::tick, 0, 500);
+		this.lastAttack = lastAttack;
 	}
 	
 	private void tick(Cancelable c) {
@@ -26,7 +28,7 @@ public class PassiveWander implements AiTask {
 		for (Entity entity : actor.getWorld().getEntities()) {
 			if(!entity.isRemoved() && entity.type() == EntityType.HUMAN && !((EntityHuman)entity).isNPC() && Position.distance(myPosition, entity.getPosition()) < actor.getTargetLockDistance()) {
 				task.cancel();
-				actor.changeAI(new AggressiveAttackmove(actor, entity));
+				actor.changeAI(new AggressiveAttackmove(actor, entity, lastAttack));
 				//start combat
 				return;
 			}

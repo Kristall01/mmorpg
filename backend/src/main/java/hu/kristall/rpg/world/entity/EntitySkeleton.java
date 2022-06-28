@@ -16,7 +16,7 @@ public class EntitySkeleton extends CombatEntity {
 	@Override
 	public void kill() {
 		Position pos = getPosition();
-		getWorld().spawnItem(boneGenerator.get(), getWorld().getRandomPositionNear(pos, 0.5, 1));
+		getWorld().spawnItem(boneGenerator.generateItem(), getWorld().getRandomPositionNear(pos, 0.5, 1));
 		super.kill();
 	}
 	

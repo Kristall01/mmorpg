@@ -1,9 +1,10 @@
+import ConnectedComponent from "ConnectedComponent";
 import InventoryMenu from "game/ui/inventory/InventoryMenu";
 import VisualResources from "game/VisualResources";
 import LogicModel from "model/LogicModel";
-import React, { createRef } from "react";
+import React, { Component, createRef, ReactNode } from "react";
 import VisualModel from "visual_model/VisualModel";
-import World from "visual_model/World";
+import World, { WorldEvent } from "visual_model/World";
 import GraphicsComponent from "../component/GraphicsComponent";
 import WorldRenderer from "../renderers/world/WorldRenderer";
 import "./WorldView.scss";
@@ -15,7 +16,7 @@ export type props = {
 	visuals: VisualResources
 }
 
-class WorldView extends React.Component<props> {
+class WorldView extends Component<props> {
 
 	private logicModel: LogicModel
 	private visualModel: VisualModel
@@ -28,11 +29,10 @@ class WorldView extends React.Component<props> {
 	private mainRef = createRef<HTMLDivElement>();
 
 	constructor(props: props) {
-		super(props);
+		super(props, [props.world]);
 		this.visualModel = props.visualModel;
 		this.logicModel = props.logicModel;
 		this.worldRenderer = new WorldRenderer(props.world, props.visuals);
-
 	}
 
 	componentDidMount() {
@@ -61,7 +61,14 @@ class WorldView extends React.Component<props> {
 		return true;
 	}
 
+	handleEvents() {
+		return this.visualModel.world?.getOpenInventory() === null;
+	}
+
 	handleKeyDown(e: React.KeyboardEvent) {
+		if(!this.handleEvents()) {
+			return;
+		}
 		let lowercase = e.key.toLowerCase();
 		//console.log("handled keydown");
 		if(lowercase === "a") {
@@ -81,11 +88,17 @@ class WorldView extends React.Component<props> {
 	}
 
 	handleMouseMove(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+		if(!this.handleEvents()) {
+			return;
+		}
 		this.mousePositionX = e.nativeEvent.offsetX
 		this.mousePositionY = e.nativeEvent.offsetY;
 	}
 
 	handleWheel(e: React.WheelEvent) {
+		if(!this.handleEvents()) {
+			return;
+		}
 		if(e.target instanceof Element) {
 			if(e.target.matches(".nozoom") || e.target.matches(".nozoom *")) {
 				return;
@@ -95,6 +108,9 @@ class WorldView extends React.Component<props> {
 	}
 
 	handleMouseDown(e: React.MouseEvent) {
+		if(!this.handleEvents()) {
+			return;
+		}
 		if(e.nativeEvent.button === 0) {
 			let {offsetX, offsetY} = e.nativeEvent;
 			this.logicModel.attackTowards(...this.worldRenderer.translateCanvasXY(offsetX, offsetY));
@@ -124,7 +140,11 @@ class WorldView extends React.Component<props> {
 	}
 
 	render() {
-		let inventoryMenu = this.visualModel.inventoryOpen ? <InventoryMenu world={this.props.world} texturePack={this.props.visuals.textures} model={this.visualModel} /> : null;
+		let baseInventory = this.props.world.getOpenInventory();
+		let inventoryElement: ReactNode = null;
+		if(baseInventory !== null) {
+			inventoryElement = <InventoryMenu logicModel={this.logicModel} inventory={baseInventory} world={this.props.world} texturePack={this.props.visuals.textures} model={this.visualModel} />
+		}
 		return (
 			<div tabIndex={-1}
 				ref={this.mainRef}
@@ -136,7 +156,7 @@ class WorldView extends React.Component<props> {
 				onKeyDown={e => this.handleKeyDown(e)}
 				onContextMenu={e => e.preventDefault()}
 			>
-				{inventoryMenu}
+				{inventoryElement}
 				<GraphicsComponent showFpsCounter={true} maxFPS={this.visualModel.maxFPS} renderable={this.worldRenderer} />
 			</div>
 		);

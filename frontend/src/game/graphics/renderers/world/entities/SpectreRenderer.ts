@@ -20,7 +20,7 @@ export default class SpectreRenderer extends EntityRenderer {
 
 	constructor(images: ResourceStore) {
 		super();
-		let mirrorWidth = Math.max(...SpectreActivity.enum.values.map(val => val.frameCount))*spriteDimension;
+		let mirrorWidth = Math.max(...SpectreActivity.enum.values.map(val => Math.max(...val.frameCount)))*spriteDimension;
 		let mirrorHeight = SpectreActivity.enum.values.length*spriteDimension;
 
 		let opectreImg = images.getImage("spectre.png").img;
@@ -30,10 +30,10 @@ export default class SpectreRenderer extends EntityRenderer {
 		mirroredCtx.translate(opectreImg.width, 0);
 		mirroredCtx.scale(-1, 1);
 
-		let maxFrameCount = Math.max(...SpectreActivity.enum.values.map(v => v.frameCount));
+		let maxFrameCount = Math.max(...SpectreActivity.enum.values.map(v => Math.max(...v.frameCount)));
 
 		for(let activity of SpectreActivity.enum.values) {
-			for(let i = 0; i < activity.frameCount; ++i) {
+			for(let i = 0; i < Math.max(...activity.frameCount); ++i) {
 				let vals = [(activity.rowModifier)*spriteDimension, spriteDimension, spriteDimension];
 				mirroredCtx.drawImage(this.opectreImg, i * spriteDimension, vals[0], vals[1], vals[2], (maxFrameCount-i-1) * spriteDimension, vals[0], vals[1], vals[2]);
 			}
@@ -59,7 +59,7 @@ export default class SpectreRenderer extends EntityRenderer {
 		let activityAnimTime = activity.animTime;
 
 		let currentAnimTime = (activityTime % activityAnimTime) / activityAnimTime;
-		let frameIndex = Math.floor(currentAnimTime * activity.frameCount);
+		let frameIndex = Math.floor(currentAnimTime * activity.frameCount[direction.ordinal]);
 		ctx.drawImage(drawSource, frameIndex * spriteDimension, (row+activity.rowModifier)*spriteDimension, spriteDimension, spriteDimension, pos[0]-(size/2), pos[1] - (size/2), size, size);
 
 		//let drawSource : HTMLImageElement | OffscreenCanvas = direction === Direction.enum.map.EAST ? this.slime : this.mirroredSlime;

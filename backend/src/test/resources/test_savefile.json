@@ -35,9 +35,21 @@
 				"img0","img1","img2","img3"
 			],
 			"type": "free",
-			"spawners": []
+			"spawners": [],
+			"merchants": []
 		}
 	},
 	"default": "level0",
-	"items": {}
+	"items": {
+		"hp_potion": {
+			"material": "POTION_RED_MEDIUM",
+			"name": "§c[+20 ♥§c] §dÉleterő itala",
+			"description": [
+				"§7§oEz az ital használatkor visszatölt §c§o20 §7§oéleterőt"
+			],
+			"potion": {
+				"health": 20
+			}
+		}
+	}
 }

@@ -32,7 +32,7 @@ export class EntityType {
 			SKELETON: new EntityType(0.5),
 			OGRE: new EntityType(0.5),
 			DUMMY: new EntityType(1.0),
-			SPECTRE: new EntityType(0.5),
+			SPECTRE: new EntityType(0.7),
 		},
 		values: new Array<EntityType>()
 	}

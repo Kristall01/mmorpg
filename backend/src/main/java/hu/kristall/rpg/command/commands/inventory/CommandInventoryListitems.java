@@ -4,7 +4,7 @@ import hu.kristall.rpg.command.CommandCheckers;
 import hu.kristall.rpg.command.CommandParent;
 import hu.kristall.rpg.command.impl.SimpleCommand;
 import hu.kristall.rpg.command.senders.CommandSender;
-import hu.kristall.rpg.world.Inventory;
+import hu.kristall.rpg.world.inventory.Inventory;
 import hu.kristall.rpg.world.Item;
 
 import java.util.Map;

@@ -94,7 +94,7 @@ export const createRendererFor = (e: Entity<any>, visuals: VisualResources): a =
 			}
 		}
 		default: {
-			const magnify = 2;
+			const magnify = 1;
 			return {
 				fn: (world: WorldRenderer, config: RenderConfig) => {
 					let cachedStatus = e.cachedStatus;

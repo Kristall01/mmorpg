@@ -60,7 +60,10 @@ export default class GameView extends React.Component<props, {}> {
 		}
 		if(this.visualModel.focus === "main") {
 			if(e.key === "e" || e.key === "E") {
-				this.visualModel.setInventoryOpen(true);
+				let world = this.visualModel.world;
+				if(world !== null) {
+					world.openInventory();
+				}
 				return
 			}
 			if(e.key === "r" || e.key === "R") {

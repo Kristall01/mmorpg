@@ -4,14 +4,15 @@ import com.google.gson.*;
 import hu.kristall.rpg.Position;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.world.EntitySpawner;
+import hu.kristall.rpg.world.MerchantData;
 import hu.kristall.rpg.world.entity.EntityType;
+import hu.kristall.rpg.world.entity.cozy.ClothPack;
+import hu.kristall.rpg.world.entity.cozy.ColoredCloth;
 import hu.kristall.rpg.world.grid.SearchGrid;
 import hu.kristall.rpg.world.path.plan.*;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class SavedLevel {
 
@@ -21,8 +22,9 @@ public class SavedLevel {
 	public final List<EntitySpawner> entitySpawners;
 	public final List<SavedPortal> portals;
 	public PathFinder pathFinder;
+	public List<MerchantData> merchantData;
 	
-	public SavedLevel(String name, int width, int height, String[] layers, List<EntitySpawner> entitySpawners, List<SavedPortal> portals, PathFinder pathFinder) {
+	public SavedLevel(String name, int width, int height, String[] layers, List<EntitySpawner> entitySpawners, List<SavedPortal> portals, PathFinder pathFinder, List<MerchantData> merchants) {
 		this.name = name;
 		this.width = width;
 		this.height = height;
@@ -30,6 +32,7 @@ public class SavedLevel {
 		this.entitySpawners = Collections.unmodifiableList(entitySpawners);
 		this.portals = List.copyOf(portals);
 		this.pathFinder = pathFinder;
+		this.merchantData = merchants;
 	}
 	
 	public static class SavedLevelParser implements JsonDeserializer<SavedLevel> {
@@ -81,7 +84,44 @@ public class SavedLevel {
 					Position bottomRight = Utils.gson().fromJson(spawner.get("bottomRight"), Position.class);
 					entitySpawners.add(new EntitySpawner(count,respawnTimer, EntityType.valueOf(entityType), topLeft, bottomRight));
 				}
-				return new SavedLevel(null,width, height, layers.toArray(new String[0]), entitySpawners, portals, pathFinder);
+				JsonElement merchantsElement = base.get("merchants");
+				List<MerchantData> merchantList = new ArrayList<>();
+				if(merchantsElement != null) {
+					JsonArray merchantsElements = merchantsElement.getAsJsonArray();
+					for (JsonElement merchantElement : merchantsElements) {
+						JsonObject merchantObject = merchantElement.getAsJsonObject();
+						Position pos = Utils.gson().fromJson(merchantObject.get("position"), Position.class);
+						String ID = merchantObject.get("ID").getAsString();
+						String name = merchantObject.get("name").getAsString();
+						JsonArray productsArray = merchantObject.get("products").getAsJsonArray();
+						List<SavedMerchantProduct> merchantProducts = new ArrayList<>();
+						for (JsonElement productElement : productsArray) {
+							JsonObject productObject = productElement.getAsJsonObject();
+							String itemType = productObject.get("item").getAsString();
+							int itemAmount = productObject.get("amount").getAsInt();
+							JsonObject productPrice = productObject.get("price").getAsJsonObject();
+							Map<String, Integer> priceMap = new HashMap<>();
+							for (Map.Entry<String, JsonElement> productPriceEntry : productPrice.entrySet()) {
+								priceMap.put(productPriceEntry.getKey(), productPriceEntry.getValue().getAsInt());
+							}
+							merchantProducts.add(new SavedMerchantProduct(itemType, priceMap, itemAmount));
+						}
+						ClothPack clothPack = null;
+						JsonElement clothesJsonElement = merchantObject.get("clothes");
+						if(clothesJsonElement  == null) {
+							clothPack = ClothPack.suit;
+						}
+						else {
+							List<ColoredCloth> clothList = new ArrayList<>();
+							for (JsonElement element : clothesJsonElement.getAsJsonArray()) {
+								clothList.add(Utils.gson().fromJson(element, ColoredCloth.class));
+							}
+							clothPack = new ClothPack(clothList);
+						}
+						merchantList.add(new MerchantData(pos, ID, name, merchantProducts, clothPack));
+					}
+				}
+				return new SavedLevel(null,width, height, layers.toArray(new String[0]), entitySpawners, portals, pathFinder, merchantList);
 			}
 			catch (Throwable err) {
 				err.printStackTrace();

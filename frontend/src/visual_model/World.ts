@@ -18,6 +18,13 @@ import SpectreEntity from "./entity/SpectreEntity";
 
 export type WorldEvent = "item" | "inventory-update" | "entity-change";
 
+export interface Inventory {
+	inventoryID: string;
+	items: Array<ItemStack>
+}
+
+const defaultInventoryName = "default";
+
 class World extends UpdateBroadcaster<WorldEvent> {
 
 	public width: number
@@ -31,11 +38,13 @@ class World extends UpdateBroadcaster<WorldEvent> {
 	private portals: Portal[] = []
 	private _items: Map<number, FloatingItem> = new Map();
 	public followedEntity: Entity<unknown> | null = null;
-	private inventory: Array<ItemStack> = [];
 
+	private inventories: Map<string, Inventory> = new Map();
+	private _activeInventory: Inventory | null = null;
 
 	constructor(model: VisualModel, width: number, height: number, tileGrid: Array<Matrix<string>>, camStart: Position) {
 		super();
+		this.inventories.set(defaultInventoryName, {inventoryID: defaultInventoryName, items: []})
 		this.tileGrid = tileGrid;
 		this.model = model;
 		this.width = width;
@@ -47,13 +56,37 @@ class World extends UpdateBroadcaster<WorldEvent> {
 		//this.tex
 	}
 
-	public setInventory(items: Array<ItemStack>) {
-		this.inventory = items;
+	public setInventory(inventory: Inventory, id: string) {
+		this.inventories.set(id, inventory);
+		if(this._activeInventory?.inventoryID === inventory.inventoryID) {
+			this._activeInventory.items = inventory.items;
+//			this.closeInventory();
+//			this.openInventory(id);
+		}
 		this.triggerUpdate("inventory-update");
 	}
 
-	getItems(): Iterable<ItemStack> {
-		return this.inventory;
+	getInventory(id?: string): Inventory | undefined {
+		return this.inventories.get(id || defaultInventoryName);
+	}
+
+	openInventory(id: string = defaultInventoryName) {
+		let inv = this.inventories.get(id);
+		if(inv !== undefined) {
+			this._activeInventory = inv;
+			this.model.triggerUpdate("inventory-open");
+			this.model.setFocus("inventory");
+		}
+	}
+
+	closeInventory() {
+		this._activeInventory = null;
+		this.model.triggerUpdate("inventory-open");
+		this.model.setFocus("main");
+	}
+
+	getOpenInventory() {
+		return this._activeInventory;
 	}
 
 	spawnItem(item: FloatingItem) {

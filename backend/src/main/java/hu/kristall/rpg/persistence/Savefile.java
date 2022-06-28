@@ -4,14 +4,16 @@ import com.google.gson.*;
 import hu.kristall.rpg.ItemMap;
 import hu.kristall.rpg.Utils;
 import hu.kristall.rpg.world.Material;
+import hu.kristall.rpg.world.PotionEffectType;
+import hu.kristall.rpg.world.item.InteractHandler;
 import hu.kristall.rpg.world.item.ItemFlags;
 import hu.kristall.rpg.world.item.SimpleItemGenerator;
+import hu.kristall.rpg.world.item.interact.DefencePotion;
+import hu.kristall.rpg.world.item.interact.HealthPotion;
+import hu.kristall.rpg.world.item.interact.StrengthPotion;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Savefile {
 	
@@ -47,6 +49,7 @@ public class Savefile {
 					JsonObject itemJson = itemsJson.get(itemType).getAsJsonObject();
 					String material = itemJson.get("material").getAsString();
 					List<String> description;
+					String name = itemJson.get("name").getAsString();
 					JsonElement descriptionJson = itemJson.get("description");
 					if(descriptionJson != null) {
 						JsonArray descriptionJsonArray = descriptionJson.getAsJsonArray();
@@ -61,13 +64,33 @@ public class Savefile {
 					Material m = Material.valueOf(material);
 					ItemFlags flags;
 					JsonElement jsonFlagsJson = itemJson.get("flags");
+					
+					JsonElement potion = itemJson.get("potion");
+					List<InteractHandler> interactHandlers = new ArrayList<>();
+					if(potion != null) {
+						JsonElement healthElement = potion.getAsJsonObject().get("health");
+						if(healthElement != null) {
+							interactHandlers.add(new HealthPotion(healthElement.getAsDouble()));
+						}
+						JsonElement strengthElement = potion.getAsJsonObject().get(PotionEffectType.STRENGTH.name().toLowerCase());
+						if(strengthElement != null) {
+							JsonObject obj = strengthElement.getAsJsonObject();
+							interactHandlers.add(new StrengthPotion(obj.get("lasts").getAsLong(), obj.get("amount").getAsDouble()));
+						}
+						JsonElement defenceElement = potion.getAsJsonObject().get(PotionEffectType.DEFENCE.name().toLowerCase());
+						if(defenceElement != null) {
+							JsonObject obj = defenceElement.getAsJsonObject();
+							interactHandlers.add(new DefencePotion(obj.get("lasts").getAsLong(), obj.get("amount").getAsDouble()));
+						}
+					}
+					
 					if(jsonFlagsJson != null) {
 						flags = Utils.gson().fromJson(jsonFlagsJson, ItemFlags.class);
 					}
 					else {
 						flags = new ItemFlags();
 					}
-					builder.registerItem(itemType, new SimpleItemGenerator(itemType, m, description, flags));
+					builder.registerItem(itemType, new SimpleItemGenerator(itemType, m, name, description, flags, interactHandlers));
 				}
 				return new Savefile(levels, defaultLevel, builder.bake());
 			}
