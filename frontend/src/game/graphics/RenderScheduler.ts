@@ -15,7 +15,7 @@ export class _fpsCounter {
 		if(rendertime - this.time > this.updateInterval) {
 			this.oldfps = this.fpsc * this.fpsMultiplicator;
 			this.fpsc = 1;
-			this.time = this.time + this.updateInterval;
+			this.time = Math.max(this.time + this.updateInterval, rendertime - 10000);
 			return this.oldfps;
 		}
 		else {

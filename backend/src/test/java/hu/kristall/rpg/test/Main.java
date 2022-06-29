@@ -109,8 +109,8 @@ public class Main {
 			final Synchronizer<Server> asyncServer = TestUtils.createTestServer(null);
 			asyncServer.sync(srv -> {
 				WorldsManager worldsManager = srv.getWorldsManager();
-				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
-				final Synchronizer<World> asyncW1 = worldsManager.createWorld("w1",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList());
+				worldsManager.createWorld("w0",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList(), Collections.emptyList());
+				final Synchronizer<World> asyncW1 = worldsManager.createWorld("w1",2,2,new String[]{"A","B","C","D"}, new FreePathFinder(), Collections.emptyList(), Collections.emptyList());
 				try {
 					Future<Player> playerFuture = srv.createPlayer(new PlayerConnection() {
 						private Player player;
